@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
 import ExpenseForm from './components/ExpenseForm';
+import Login from './components/Login';
+import UserProfile from './components/UserProfile';
 import { exportToCSV } from './utils/exportData';
 import './App.css';
 
@@ -13,7 +16,25 @@ const AppContent = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
 
+  const { currentUser, loading: authLoading } = useAuth();
   const { expenses, familyMembers, loading, error, readOnly } = useExpenses();
+
+  // Show loading state while checking authentication
+  if (authLoading) {
+    return (
+      <div className="app">
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login if not authenticated
+  if (!currentUser) {
+    return <Login />;
+  }
 
   const handleAddExpense = () => {
     if (readOnly) return;
@@ -67,12 +88,15 @@ const AppContent = () => {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>💰 Family Expense Tracker</h1>
-        <p className="subtitle">
-          {readOnly
-            ? 'View family expenses transparently'
-            : 'Track and manage family expenses transparently'}
-        </p>
+        <div>
+          <h1>💰 Family Expense Tracker</h1>
+          <p className="subtitle">
+            {readOnly
+              ? 'View family expenses transparently'
+              : 'Track and manage family expenses transparently'}
+          </p>
+        </div>
+        <UserProfile />
       </header>
 
       <div className="controls">
@@ -160,9 +184,11 @@ const AppContent = () => {
 
 function App({ readOnly = false }) {
   return (
-    <ExpenseProvider readOnly={readOnly}>
-      <AppContent />
-    </ExpenseProvider>
+    <AuthProvider>
+      <ExpenseProvider readOnly={readOnly}>
+        <AppContent />
+      </ExpenseProvider>
+    </AuthProvider>
   );
 }
 
