@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { useAuthorization } from './hooks/useAuthorization';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
 import ExpenseForm from './components/ExpenseForm';
 import Login from './components/Login';
 import UserProfile from './components/UserProfile';
+import Unauthorized from './components/Unauthorized';
 import { exportToCSV } from './utils/exportData';
 import './App.css';
 
@@ -17,10 +19,11 @@ const AppContent = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
 
   const { currentUser, loading: authLoading } = useAuth();
+  const { isAuthorized, loading: authorizationLoading } = useAuthorization(currentUser);
   const { expenses, familyMembers, loading, error, readOnly } = useExpenses();
 
   // Show loading state while checking authentication
-  if (authLoading) {
+  if (authLoading || authorizationLoading) {
     return (
       <div className="app">
         <div className="loading-container">
@@ -34,6 +37,11 @@ const AppContent = () => {
   // Show login if not authenticated
   if (!currentUser) {
     return <Login />;
+  }
+
+  // Show unauthorized if user is not in authorized users list
+  if (isAuthorized === false) {
+    return <Unauthorized />;
   }
 
   const handleAddExpense = () => {
