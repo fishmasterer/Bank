@@ -1,21 +1,29 @@
 :root {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  line-height: 1.5;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.6;
   font-weight: 400;
 
-  --primary-color: #4f46e5;
-  --primary-hover: #4338ca;
-  --secondary-color: #6b7280;
-  --success-color: #10b981;
-  --danger-color: #ef4444;
-  --warning-color: #f59e0b;
+  /* Claude-inspired warm color palette */
+  --primary-color: #C2410C;
+  --primary-hover: #9A3412;
+  --primary-light: #EA580C;
+  --secondary-color: #78716c;
+  --success-color: #059669;
+  --danger-color: #DC2626;
+  --warning-color: #D97706;
 
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --bg-tertiary: #f3f4f6;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --border-color: #e5e7eb;
+  /* Warm neutral backgrounds */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #FAFAF9;
+  --bg-tertiary: #F5F5F4;
+  --bg-hover: #E7E5E4;
+
+  /* Refined text colors */
+  --text-primary: #1C1917;
+  --text-secondary: #57534E;
+  --text-tertiary: #78716C;
+  --border-color: #E7E5E4;
+  --border-light: #F5F5F4;
 
   color: var(--text-primary);
   background-color: var(--bg-secondary);
@@ -44,27 +52,30 @@ body {
 }
 
 button {
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
+  padding: 0.625rem 1rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.25s;
+  transition: all 0.15s ease;
+  letter-spacing: -0.01em;
 }
 
 input, select, textarea {
   font-family: inherit;
-  font-size: 1em;
-  padding: 0.5em;
+  font-size: 0.9375rem;
+  padding: 0.625rem 0.75rem;
   border: 1px solid var(--border-color);
   border-radius: 6px;
   background-color: var(--bg-primary);
   color: var(--text-primary);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 input:focus, select:focus, textarea:focus {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(194, 65, 12, 0.1);
 }
