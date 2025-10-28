@@ -32,6 +32,12 @@
   font-weight: 400;
 }
 
+.header-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+}
+
 .controls {
   display: flex;
   flex-wrap: wrap;

@@ -8,6 +8,7 @@ import ExpenseForm from './components/ExpenseForm';
 import Login from './components/Login';
 import UserProfile from './components/UserProfile';
 import Unauthorized from './components/Unauthorized';
+import ThemeToggle from './components/ThemeToggle';
 import { exportToCSV } from './utils/exportData';
 import './App.css';
 
@@ -104,7 +105,10 @@ const AppContent = () => {
               : 'Track and manage family expenses transparently'}
           </p>
         </div>
-        <UserProfile />
+        <div className="header-actions">
+          <ThemeToggle />
+          <UserProfile />
+        </div>
       </header>
 
       <div className="controls">
