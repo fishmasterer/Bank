@@ -1,0 +1,103 @@
+.install-prompt {
+  position: fixed;
+  bottom: var(--spacing-md);
+  left: var(--spacing-md);
+  right: var(--spacing-md);
+  z-index: 999;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.install-prompt-content {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.install-prompt-icon {
+  font-size: var(--font-size-2xl);
+  flex-shrink: 0;
+}
+
+.install-prompt-text {
+  flex: 1;
+}
+
+.install-prompt-text h4 {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.install-prompt-text p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.install-prompt-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.btn-install {
+  background-color: var(--primary-color);
+  color: var(--text-inverse);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  min-height: 40px;
+  white-space: nowrap;
+}
+
+.btn-install:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-dismiss {
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: none;
+  padding: var(--spacing-sm);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  min-height: 40px;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-sm);
+}
+
+.btn-dismiss:hover {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+@media (min-width: 768px) {
+  .install-prompt {
+    left: auto;
+    right: var(--spacing-xl);
+    max-width: 400px;
+  }
+}

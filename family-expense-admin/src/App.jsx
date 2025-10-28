@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
+import { useTheme } from './context/ThemeContext';
+import { useAuth } from './context/AuthContext';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
 import ExpenseForm from './components/ExpenseForm';
+import InstallPrompt from './components/InstallPrompt';
+import Login from './components/Login';
+import Settings from './components/Settings';
 import { exportToCSV } from './utils/exportData';
 import './App.css';
 
@@ -12,8 +17,20 @@ const AppContent = () => {
   const [editingExpense, setEditingExpense] = useState(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const { expenses, familyMembers, loading, error, readOnly } = useExpenses();
+  const { theme, toggleTheme } = useTheme();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
 
   const handleAddExpense = () => {
     if (readOnly) return;
@@ -66,13 +83,61 @@ const AppContent = () => {
 
   return (
     <div className="app">
+      <button
+        className="theme-toggle"
+        onClick={toggleTheme}
+        aria-label="Toggle dark mode"
+        title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+      >
+        {theme === 'light' ? '🌙' : '☀️'}
+      </button>
+
       <header className="app-header">
-        <h1>💰 Family Expense Tracker</h1>
-        <p className="subtitle">
-          {readOnly
-            ? 'View family expenses transparently'
-            : 'Track and manage family expenses transparently'}
-        </p>
+        <div className="header-content">
+          <div>
+            <h1>💰 Family Expense Tracker</h1>
+            <p className="subtitle">
+              {readOnly
+                ? 'View family expenses transparently'
+                : 'Track and manage family expenses transparently'}
+            </p>
+          </div>
+          {user && (
+            <div className="user-profile">
+              <button
+                className="user-avatar"
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                title={user.email}
+              >
+                {user.photoURL ? (
+                  <img src={user.photoURL} alt={user.displayName} />
+                ) : (
+                  <span>{user.displayName?.[0] || user.email?.[0] || '?'}</span>
+                )}
+              </button>
+              {showUserMenu && (
+                <div className="user-menu">
+                  <div className="user-menu-header">
+                    <p className="user-name">{user.displayName || 'User'}</p>
+                    <p className="user-email">{user.email}</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setShowSettings(true);
+                      setShowUserMenu(false);
+                    }}
+                    className="btn-settings-menu"
+                  >
+                    ⚙️ Settings
+                  </button>
+                  <button onClick={handleSignOut} className="btn-signout">
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </header>
 
       <div className="controls">
@@ -154,11 +219,35 @@ const AppContent = () => {
           onClose={handleCloseForm}
         />
       )}
+
+      <InstallPrompt />
+
+      {showSettings && <Settings onClose={() => setShowSettings(false)} />}
     </div>
   );
 };
 
 function App({ readOnly = false }) {
+  const { user, loading } = useAuth();
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className="app">
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login page if not authenticated
+  if (!user) {
+    return <Login />;
+  }
+
+  // Show main app if authenticated
   return (
     <ExpenseProvider readOnly={readOnly}>
       <AppContent />
