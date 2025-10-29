@@ -14,12 +14,13 @@
 
 .modal-content {
   background-color: var(--bg-primary);
-  border-radius: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
   max-width: 600px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
 .modal-header {
@@ -31,15 +32,17 @@
 }
 
 .modal-header h2 {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: var(--text-primary);
   margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .close-btn {
   background: none;
   border: none;
-  font-size: 2rem;
+  font-size: 1.75rem;
   color: var(--text-secondary);
   cursor: pointer;
   padding: 0;
@@ -48,11 +51,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s;
+  transition: all 0.15s ease;
+  border-radius: 4px;
 }
 
 .close-btn:hover {
   color: var(--text-primary);
+  background-color: var(--bg-tertiary);
 }
 
 .expense-form {
@@ -68,17 +73,18 @@
   margin-bottom: 0.5rem;
   font-weight: 500;
   color: var(--text-primary);
+  font-size: 0.9375rem;
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.625rem 0.75rem;
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
+  font-size: 0.9375rem;
+  transition: all 0.15s ease;
 }
 
 .form-group input:focus,
@@ -86,6 +92,7 @@
 .form-group textarea:focus {
   border-color: var(--primary-color);
   outline: none;
+  box-shadow: 0 0 0 3px rgba(194, 65, 12, 0.1);
 }
 
 .form-group textarea {
@@ -132,31 +139,35 @@
 }
 
 .form-actions button {
-  padding: 0.75rem 1.5rem;
+  padding: 0.625rem 1.25rem;
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s ease;
+  font-size: 0.9375rem;
 }
 
 .form-actions .btn-primary {
   background-color: var(--primary-color);
   color: white;
   border: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .form-actions .btn-primary:hover {
   background-color: var(--primary-hover);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .form-actions .btn-secondary {
-  background-color: transparent;
+  background-color: var(--bg-primary);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
 }
 
 .form-actions .btn-secondary:hover {
   background-color: var(--bg-tertiary);
+  border-color: var(--text-tertiary);
 }
 
 /* Mobile Responsive */

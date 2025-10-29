@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { useAuthorization } from './hooks/useAuthorization';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
 import ExpenseForm from './components/ExpenseForm';
+import Login from './components/Login';
+import UserProfile from './components/UserProfile';
+import Unauthorized from './components/Unauthorized';
+import ThemeToggle from './components/ThemeToggle';
 import { exportToCSV } from './utils/exportData';
 import './App.css';
 
@@ -13,7 +19,31 @@ const AppContent = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
 
+  const { currentUser, loading: authLoading } = useAuth();
+  const { isAuthorized, loading: authorizationLoading } = useAuthorization(currentUser);
   const { expenses, familyMembers, loading, error, readOnly } = useExpenses();
+
+  // Show loading state while checking authentication
+  if (authLoading || authorizationLoading) {
+    return (
+      <div className="app">
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login if not authenticated
+  if (!currentUser) {
+    return <Login />;
+  }
+
+  // Show unauthorized if user is not in authorized users list
+  if (isAuthorized === false) {
+    return <Unauthorized />;
+  }
 
   const handleAddExpense = () => {
     if (readOnly) return;
@@ -67,12 +97,18 @@ const AppContent = () => {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>💰 Family Expense Tracker</h1>
-        <p className="subtitle">
-          {readOnly
-            ? 'View family expenses transparently'
-            : 'Track and manage family expenses transparently'}
-        </p>
+        <div>
+          <h1>💰 Family Expense Tracker</h1>
+          <p className="subtitle">
+            {readOnly
+              ? 'View family expenses transparently'
+              : 'Track and manage family expenses transparently'}
+          </p>
+        </div>
+        <div className="header-actions">
+          <ThemeToggle />
+          <UserProfile />
+        </div>
       </header>
 
       <div className="controls">
@@ -160,9 +196,11 @@ const AppContent = () => {
 
 function App({ readOnly = false }) {
   return (
-    <ExpenseProvider readOnly={readOnly}>
-      <AppContent />
-    </ExpenseProvider>
+    <AuthProvider>
+      <ExpenseProvider readOnly={readOnly}>
+        <AppContent />
+      </ExpenseProvider>
+    </AuthProvider>
   );
 }
 

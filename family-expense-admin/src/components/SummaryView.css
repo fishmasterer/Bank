@@ -6,20 +6,24 @@
 
 .summary-card {
   background-color: var(--bg-primary);
-  border-radius: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .total-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-color: var(--primary-color);
   color: white;
+  border-color: var(--primary-color);
 }
 
 .total-card h2 {
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-size: clamp(1.125rem, 3vw, 1.5rem);
   margin-bottom: 1rem;
   text-align: center;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .amount-row {
@@ -44,36 +48,39 @@
 
 .amount-item .label {
   font-weight: 500;
-  opacity: 0.9;
+  opacity: 0.95;
+  font-size: 0.9375rem;
 }
 
 .amount {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .total-card .amount {
-  font-size: 1.5rem;
+  font-size: 1.375rem;
+  font-weight: 600;
 }
 
 .planned {
-  color: #93c5fd;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .paid {
-  color: #86efac;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .over {
-  color: #fca5a5;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .under {
-  color: #fde68a;
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .member-card .planned {
-  color: var(--primary-color);
+  color: var(--primary-light);
 }
 
 .member-card .paid {
@@ -95,11 +102,13 @@
 }
 
 .member-card h3 {
-  font-size: 1.25rem;
+  font-size: 1.125rem;
   margin-bottom: 1rem;
   color: var(--text-primary);
-  border-bottom: 2px solid var(--border-color);
-  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 /* Mobile Responsive */

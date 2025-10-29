@@ -2,12 +2,46 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="Finance" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- PWA Primary Meta Tags -->
     <title>Family Expense Tracker - Viewer</title>
+    <meta name="title" content="Family Expense Tracker - Viewer" />
+    <meta name="description" content="View family expenses and track spending transparently" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#C2410C" />
+    <meta name="theme-color" content="#1C1917" media="(prefers-color-scheme: dark)" />
+
+    <!-- iOS PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Expense Viewer" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+
+    <!-- Android PWA Support -->
+    <meta name="mobile-web-app-capable" content="yes" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Register service worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('Service Worker registered'))
+            .catch(err => console.log('Service Worker registration failed:', err));
+        });
+      }
+    </script>
   </body>
 </html>
