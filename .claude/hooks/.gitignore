@@ -1,0 +1,14 @@
+# Dependency directories
+node_modules/
+
+# npm debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Optional npm cache directory
+.npm
+
+# Lock files (keep package-lock.json in git for consistency)
+# Uncomment if you want to ignore lock files
+# package-lock.json
