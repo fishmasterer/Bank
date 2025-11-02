@@ -16,8 +16,9 @@ const CATEGORIES = [
   'Other'
 ];
 
-const ExpenseForm = ({ editingExpense, onClose }) => {
+const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
   const { addExpense, updateExpense, familyMembers } = useExpenses();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -47,25 +48,35 @@ const ExpenseForm = ({ editingExpense, onClose }) => {
     }
   }, [editingExpense, familyMembers]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    const expenseData = {
-      ...formData,
-      plannedAmount: parseFloat(formData.plannedAmount) || 0,
-      paidAmount: parseFloat(formData.paidAmount) || 0,
-      paidBy: parseInt(formData.paidBy),
-      year: parseInt(formData.year),
-      month: parseInt(formData.month)
-    };
+    try {
+      const expenseData = {
+        ...formData,
+        plannedAmount: parseFloat(formData.plannedAmount) || 0,
+        paidAmount: parseFloat(formData.paidAmount) || 0,
+        paidBy: parseInt(formData.paidBy),
+        year: parseInt(formData.year),
+        month: parseInt(formData.month)
+      };
 
-    if (editingExpense) {
-      updateExpense(editingExpense.id, expenseData);
-    } else {
-      addExpense(expenseData);
+      if (editingExpense) {
+        await updateExpense(editingExpense.id, expenseData);
+        onSuccess?.('Expense updated successfully!');
+      } else {
+        await addExpense(expenseData);
+        onSuccess?.('Expense added successfully!');
+      }
+
+      onClose();
+    } catch (err) {
+      console.error('Error submitting expense:', err);
+      onError?.(editingExpense ? 'Failed to update expense' : 'Failed to add expense');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    onClose();
   };
 
   const handleChange = (e) => {
@@ -221,11 +232,18 @@ const ExpenseForm = ({ editingExpense, onClose }) => {
           </div>
 
           <div className="form-actions">
-            <button type="button" onClick={onClose} className="btn-secondary">
+            <button type="button" onClick={onClose} className="btn-secondary" disabled={isSubmitting}>
               Cancel
             </button>
-            <button type="submit" className="btn-primary">
-              {editingExpense ? 'Update' : 'Add'} Expense
+            <button type="submit" className="btn-primary" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <span className="spinner-small"></span>
+                  {editingExpense ? 'Updating...' : 'Adding...'}
+                </>
+              ) : (
+                <>{editingExpense ? 'Update' : 'Add'} Expense</>
+              )}
             </button>
           </div>
         </form>
