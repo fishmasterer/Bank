@@ -1,6 +1,7 @@
 import React from 'react';
 import { useExpenses } from '../context/ExpenseContext';
 import { useBudget } from '../hooks/useBudget';
+import CategoryPieChart from './CategoryPieChart';
 import './SummaryView.css';
 
 const SummaryView = ({ selectedYear, selectedMonth }) => {
@@ -48,6 +49,11 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
           )}
         </div>
       )}
+
+      <CategoryPieChart
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonth}
+      />
 
       <div className="summary-card total-card">
         <h2>Total for {new Date(selectedYear, selectedMonth - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</h2>
