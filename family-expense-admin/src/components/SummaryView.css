@@ -4,6 +4,119 @@
   gap: 1.5rem;
 }
 
+.budget-warning {
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  padding: 1.25rem;
+  border: 2px solid;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.budget-good {
+  border-color: #10b981;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%);
+}
+
+.budget-warning {
+  border-color: #f59e0b;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.03) 100%);
+}
+
+.budget-critical {
+  border-color: #ef4444;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.03) 100%);
+}
+
+.budget-exceeded {
+  border-color: #dc2626;
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.15) 0%, rgba(220, 38, 38, 0.05) 100%);
+}
+
+.budget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.budget-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.budget-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.budget-amount {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.budget-percentage {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.budget-bar {
+  height: 8px;
+  background-color: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.budget-bar-fill {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
+  border-radius: 4px;
+}
+
+.budget-good .budget-bar-fill {
+  background-color: #10b981;
+}
+
+.budget-warning .budget-bar-fill {
+  background-color: #f59e0b;
+}
+
+.budget-critical .budget-bar-fill {
+  background-color: #ef4444;
+}
+
+.budget-exceeded .budget-bar-fill {
+  background-color: #dc2626;
+}
+
+.budget-message {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.budget-warning .budget-message {
+  color: #92400e;
+}
+
+.budget-critical .budget-message {
+  color: #991b1b;
+}
+
+.budget-exceeded .budget-message {
+  color: #991b1b;
+}
+
 .summary-card {
   background-color: var(--bg-primary);
   border-radius: 8px;

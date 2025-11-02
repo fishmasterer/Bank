@@ -1,0 +1,30 @@
+.budget-modal {
+  max-width: 500px;
+}
+
+.budget-form {
+  padding: 1.5rem;
+}
+
+.budget-description {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.helper-text {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 2rem;
+  justify-content: center;
+  color: var(--text-secondary);
+}

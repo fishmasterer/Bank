@@ -223,6 +223,59 @@ export const ExpenseProvider = ({ children, readOnly = false }) => {
     return breakdown;
   };
 
+  const copyRecurringExpenses = async (fromYear, fromMonth, toYear, toMonth) => {
+    if (readOnly) {
+      console.warn('Cannot copy expenses in read-only mode');
+      return 0;
+    }
+
+    try {
+      // Get all recurring expenses from the source month
+      const sourceExpenses = getExpensesByMonth(fromYear, fromMonth);
+      const recurringExpenses = sourceExpenses.filter(exp => exp.isRecurring);
+
+      if (recurringExpenses.length === 0) {
+        return 0;
+      }
+
+      // Check if any of these expenses already exist in the target month
+      const targetExpenses = getExpensesByMonth(toYear, toMonth);
+      const targetExpenseNames = new Set(targetExpenses.map(exp => exp.name.toLowerCase()));
+
+      // Copy each recurring expense to the new month
+      const promises = recurringExpenses.map(async (expense) => {
+        // Skip if expense with same name already exists in target month
+        if (targetExpenseNames.has(expense.name.toLowerCase())) {
+          return null;
+        }
+
+        const newExpense = {
+          name: expense.name,
+          category: expense.category,
+          plannedAmount: expense.plannedAmount,
+          paidAmount: 0, // Reset paid amount for new month
+          paidBy: expense.paidBy,
+          isRecurring: true,
+          year: toYear,
+          month: toMonth,
+          notes: expense.notes || '',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+
+        return addDoc(collection(db, 'expenses'), newExpense);
+      });
+
+      const results = await Promise.all(promises);
+      const copiedCount = results.filter(r => r !== null).length;
+
+      return copiedCount;
+    } catch (err) {
+      console.error('Error copying recurring expenses:', err);
+      throw err;
+    }
+  };
+
   const value = {
     expenses,
     familyMembers,
@@ -237,6 +290,7 @@ export const ExpenseProvider = ({ children, readOnly = false }) => {
     getMonthlyTotal,
     getMonthlyPlanned,
     getCategoryBreakdown,
+    copyRecurringExpenses,
     readOnly
   };
 

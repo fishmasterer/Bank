@@ -2,26 +2,31 @@ import React, { useState } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { useAuthorization } from './hooks/useAuthorization';
+import { useToast } from './hooks/useToast';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
 import ExpenseForm from './components/ExpenseForm';
+import BudgetSettings from './components/BudgetSettings';
 import Login from './components/Login';
 import UserProfile from './components/UserProfile';
 import Unauthorized from './components/Unauthorized';
 import ThemeToggle from './components/ThemeToggle';
+import Toast from './components/Toast';
 import { exportToCSV } from './utils/exportData';
 import './App.css';
 
 const AppContent = () => {
   const [activeTab, setActiveTab] = useState('summary');
   const [showForm, setShowForm] = useState(false);
+  const [showBudgetSettings, setShowBudgetSettings] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
 
   const { currentUser, loading: authLoading } = useAuth();
   const { isAuthorized, loading: authorizationLoading } = useAuthorization(currentUser);
-  const { expenses, familyMembers, loading, error, readOnly } = useExpenses();
+  const { expenses, familyMembers, loading, error, readOnly, copyRecurringExpenses } = useExpenses();
+  const { toasts, hideToast, success, error: showError, info } = useToast();
 
   // Show loading state while checking authentication
   if (authLoading || authorizationLoading) {
@@ -63,7 +68,31 @@ const AppContent = () => {
   };
 
   const handleExport = () => {
-    exportToCSV(expenses, familyMembers, selectedYear, selectedMonth);
+    try {
+      exportToCSV(expenses, familyMembers, selectedYear, selectedMonth);
+      success('Expenses exported successfully!');
+    } catch (err) {
+      showError('Failed to export expenses');
+    }
+  };
+
+  const handleCopyRecurring = async () => {
+    if (readOnly) return;
+
+    try {
+      const prevMonth = selectedMonth === 1 ? 12 : selectedMonth - 1;
+      const prevYear = selectedMonth === 1 ? selectedYear - 1 : selectedYear;
+
+      const count = await copyRecurringExpenses(prevYear, prevMonth, selectedYear, selectedMonth);
+
+      if (count > 0) {
+        success(`Copied ${count} recurring expense${count > 1 ? 's' : ''} from last month`);
+      } else {
+        info('No recurring expenses found in the previous month');
+      }
+    } catch (err) {
+      showError('Failed to copy recurring expenses');
+    }
   };
 
   const monthName = new Date(selectedYear, selectedMonth - 1).toLocaleDateString('en-US', {
@@ -144,9 +173,17 @@ const AppContent = () => {
 
         <div className="action-buttons">
           {!readOnly && (
-            <button onClick={handleAddExpense} className="btn-primary">
-              + Add Expense
-            </button>
+            <>
+              <button onClick={handleAddExpense} className="btn-primary">
+                + Add Expense
+              </button>
+              <button onClick={handleCopyRecurring} className="btn-secondary">
+                🔄 Copy Recurring
+              </button>
+              <button onClick={() => setShowBudgetSettings(true)} className="btn-secondary">
+                💰 Set Budget
+              </button>
+            </>
           )}
           <button onClick={handleExport} className="btn-secondary">
             📊 Export CSV
@@ -188,8 +225,30 @@ const AppContent = () => {
         <ExpenseForm
           editingExpense={editingExpense}
           onClose={handleCloseForm}
+          onSuccess={(message) => success(message)}
+          onError={(message) => showError(message)}
         />
       )}
+
+      {showBudgetSettings && !readOnly && (
+        <BudgetSettings
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+          onClose={() => setShowBudgetSettings(false)}
+          onSuccess={(message) => success(message)}
+          onError={(message) => showError(message)}
+        />
+      )}
+
+      {toasts.map(toast => (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          duration={toast.duration}
+          onClose={() => hideToast(toast.id)}
+        />
+      ))}
     </div>
   );
 };
