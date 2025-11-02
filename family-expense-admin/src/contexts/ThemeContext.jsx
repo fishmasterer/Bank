@@ -22,6 +22,22 @@ export const THEME_NAMES = {
   [THEMES.BLUE]: 'Calm Blue'
 };
 
+// Theme colors for PWA meta tags
+const THEME_COLORS = {
+  [THEMES.ORANGE]: {
+    light: '#C2410C',  // Warm orange
+    dark: '#1C1917'     // Dark background
+  },
+  [THEMES.NATURE]: {
+    light: '#6B9B7B',  // Soft sage green
+    dark: '#1C1917'     // Dark background
+  },
+  [THEMES.BLUE]: {
+    light: '#4A7BA7',  // Calm blue
+    dark: '#1C1917'     // Dark background
+  }
+};
+
 export function ThemeProvider({ children }) {
   const { currentUser } = useAuth();
   const [colorTheme, setColorTheme] = useState(THEMES.ORANGE);
@@ -65,12 +81,32 @@ export function ThemeProvider({ children }) {
     loadThemePreference();
   }, [currentUser]);
 
-  // Apply theme to document
+  // Apply theme to document and update PWA theme-color meta tag
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+    const mode = darkMode ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', mode);
     document.documentElement.setAttribute('data-color-theme', colorTheme);
-    localStorage.setItem('theme', darkMode ? 'dark' : 'light');
+    localStorage.setItem('theme', mode);
     localStorage.setItem('colorTheme', colorTheme);
+
+    // Update theme-color meta tag for PWA
+    const themeColor = THEME_COLORS[colorTheme]?.[mode] || THEME_COLORS[THEMES.ORANGE][mode];
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', themeColor);
+    } else {
+      metaThemeColor = document.createElement('meta');
+      metaThemeColor.name = 'theme-color';
+      metaThemeColor.content = themeColor;
+      document.head.appendChild(metaThemeColor);
+    }
+
+    // Update Apple status bar style based on dark mode
+    let appleStatusBar = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+    if (appleStatusBar) {
+      appleStatusBar.setAttribute('content', darkMode ? 'black-translucent' : 'default');
+    }
   }, [darkMode, colorTheme]);
 
   // Save theme preference to Firebase
