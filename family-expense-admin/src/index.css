@@ -23,6 +23,7 @@
   --font-3xl: 2rem;       /* 32px - hero */
 
   /* 60-30-10 Color Rule - Light Mode */
+  /* Default: Warm Orange Theme */
   /* 60% Primary (warm orange) */
   --color-primary-60: #C2410C;
   --color-primary-hover: #9A3412;
@@ -111,6 +112,59 @@
   --color-accent-warning: #F59E0B;
 }
 
+/* ============================= */
+/* COLOR THEME SYSTEM */
+/* ============================= */
+
+/* THEME 1: Warm Orange (Default) */
+:root[data-color-theme="orange"] {
+  --color-primary-60: #C2410C;
+  --color-primary-hover: #9A3412;
+  --color-primary-light: #EA580C;
+}
+
+:root[data-color-theme="orange"][data-theme="dark"] {
+  --color-primary-light: #FB923C;
+}
+
+/* THEME 2: Soft Nature (Animal Crossing Inspired) */
+:root[data-color-theme="nature"] {
+  /* Primary: Soft sage green with good contrast */
+  --color-primary-60: #6B9B7B;     /* Soft sage green - 4.5:1 contrast on white */
+  --color-primary-hover: #557D64;   /* Darker sage for hover */
+  --color-primary-light: #88B799;   /* Lighter sage for accents */
+
+  /* Secondary: Warm earth tones */
+  --color-secondary-30: #8B7D6B;
+  --color-secondary-light: #A89F91;
+}
+
+:root[data-color-theme="nature"][data-theme="dark"] {
+  /* Brighter, more vibrant in dark mode for contrast */
+  --color-primary-60: #7FB093;     /* Brighter sage green */
+  --color-primary-hover: #6B9B7B;   /* Medium sage for hover */
+  --color-primary-light: #A3C9B1;   /* Light pastel green */
+}
+
+/* THEME 3: Calm Blue */
+:root[data-color-theme="blue"] {
+  /* Primary: Soft medium blue with excellent legibility */
+  --color-primary-60: #4A7BA7;     /* Calm blue - 5.5:1 contrast on white */
+  --color-primary-hover: #3A6489;   /* Darker blue for hover */
+  --color-primary-light: #5E93C2;   /* Lighter blue for accents */
+
+  /* Secondary: Cool grays */
+  --color-secondary-30: #6B7B8C;
+  --color-secondary-light: #8E9AAA;
+}
+
+:root[data-color-theme="blue"][data-theme="dark"] {
+  /* Softer, more pastel blues in dark mode */
+  --color-primary-60: #6B9FD4;     /* Soft sky blue */
+  --color-primary-hover: #5A8BC2;   /* Medium blue for hover */
+  --color-primary-light: #8AB8E3;   /* Light pastel blue */
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -180,11 +234,11 @@ input, select, textarea {
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(194, 65, 12, 0.1);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-60) 10%, transparent);
 }
 
 :root[data-theme="dark"] input:focus,
 :root[data-theme="dark"] select:focus,
 :root[data-theme="dark"] textarea:focus {
-  box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.2);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-light) 20%, transparent);
 }

@@ -2,11 +2,13 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { useState } from 'react';
+import Settings from './Settings';
 import './UserProfile.css';
 
 export default function UserProfile() {
   const { currentUser } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -49,6 +51,15 @@ export default function UserProfile() {
               <p className="user-menu-email">{currentUser.email}</p>
             </div>
             <button
+              onClick={() => {
+                setShowSettings(true);
+                setShowMenu(false);
+              }}
+              className="menu-item-btn"
+            >
+              ⚙️ Settings
+            </button>
+            <button
               onClick={handleLogout}
               className="logout-btn"
             >
@@ -56,6 +67,10 @@ export default function UserProfile() {
             </button>
           </div>
         </>
+      )}
+
+      {showSettings && (
+        <Settings onClose={() => setShowSettings(false)} />
       )}
     </div>
   );
