@@ -1,0 +1,45 @@
+{
+  "skills": {
+    "frontend-dev-guidelines": {
+      "type": "domain",
+      "enforcement": "suggest",
+      "priority": "high",
+      "promptTriggers": {
+        "keywords": [
+          "component",
+          "React",
+          "useState",
+          "useEffect",
+          "Firebase",
+          "Firestore",
+          "UI",
+          "form",
+          "expense",
+          "styling",
+          "CSS"
+        ],
+        "intentPatterns": [
+          "create.*component",
+          "add.*feature",
+          "fix.*bug",
+          "refactor.*component",
+          "style.*component"
+        ]
+      },
+      "fileTriggers": {
+        "pathPatterns": [
+          "family-expense-admin/**/*.jsx",
+          "family-expense-admin/**/*.tsx",
+          "family-expense-admin/**/*.js",
+          "family-expense-admin/**/*.ts",
+          "family-expense-viewer/**/*.jsx",
+          "family-expense-viewer/**/*.tsx",
+          "family-expense-viewer/**/*.js",
+          "family-expense-viewer/**/*.ts",
+          "family-expense-tracker/**/*.jsx",
+          "family-expense-tracker/**/*.js"
+        ]
+      }
+    }
+  }
+}
