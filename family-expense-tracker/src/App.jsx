@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
+import { ThemeProvider } from './context/ThemeContext';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
 import ExpenseForm from './components/ExpenseForm';
+import ThemeToggle from './components/ThemeToggle';
+import Settings from './components/Settings';
 import { exportToCSV } from './utils/exportData';
 import './App.css';
 
 const AppContent = () => {
   const [activeTab, setActiveTab] = useState('summary');
   const [showForm, setShowForm] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
@@ -67,12 +71,24 @@ const AppContent = () => {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>💰 Family Expense Tracker</h1>
-        <p className="subtitle">
-          {readOnly
-            ? 'View family expenses transparently'
-            : 'Track and manage family expenses transparently'}
-        </p>
+        <div>
+          <h1>💰 Family Expense Tracker</h1>
+          <p className="subtitle">
+            {readOnly
+              ? 'View family expenses transparently'
+              : 'Track and manage family expenses transparently'}
+          </p>
+        </div>
+        <div className="header-actions">
+          <ThemeToggle />
+          <button
+            onClick={() => setShowSettings(true)}
+            className="btn-secondary"
+            style={{ minHeight: '40px' }}
+          >
+            ⚙️ Settings
+          </button>
+        </div>
       </header>
 
       <div className="controls">
@@ -154,15 +170,21 @@ const AppContent = () => {
           onClose={handleCloseForm}
         />
       )}
+
+      {showSettings && (
+        <Settings onClose={() => setShowSettings(false)} />
+      )}
     </div>
   );
 };
 
 function App({ readOnly = false }) {
   return (
-    <ExpenseProvider readOnly={readOnly}>
-      <AppContent />
-    </ExpenseProvider>
+    <ThemeProvider>
+      <ExpenseProvider readOnly={readOnly}>
+        <AppContent />
+      </ExpenseProvider>
+    </ThemeProvider>
   );
 }
 
