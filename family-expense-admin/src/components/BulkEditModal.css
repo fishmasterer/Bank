@@ -16,7 +16,7 @@
 }
 
 .bulk-edit-modal {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 16px;
   max-width: 600px;
   width: 100%;
@@ -55,7 +55,7 @@
   align-items: center;
   padding: 1.5rem;
   border-bottom: 2px solid #f0f0f0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
 }
 
 .bulk-edit-header h3 {
@@ -136,7 +136,7 @@
   border: 2px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.938rem;
-  background: white;
+  background: var(--bg-primary);
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -269,9 +269,9 @@
 }
 
 .bulk-edit-btn.save {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   color: white;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 2px 8px rgba(var(--primary-color-rgb, 102, 126, 234), 0.3);
 }
 
 .bulk-edit-btn.save:hover:not(:disabled) {

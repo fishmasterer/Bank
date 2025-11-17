@@ -6,7 +6,7 @@
   right: 0;
   z-index: 1000;
   padding: 1rem;
-  background: white;
+  background: var(--bg-primary);
   border-top: 3px solid var(--primary-color);
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
   animation: slideUp 0.3s ease-out;

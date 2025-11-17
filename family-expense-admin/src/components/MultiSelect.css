@@ -21,7 +21,7 @@
   padding: 0.75rem 1rem;
   border: 2px solid var(--border-color);
   border-radius: 8px;
-  background: white;
+  background: var(--bg-primary);
   cursor: pointer;
   transition: all 0.2s;
   min-height: 44px;
@@ -94,7 +94,7 @@
   top: calc(100% + 0.5rem);
   left: 0;
   right: 0;
-  background: white;
+  background: var(--bg-primary);
   border: 2px solid var(--border-color);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);

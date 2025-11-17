@@ -5,7 +5,7 @@
   right: 1rem;
   z-index: 1001;
   max-width: 400px;
-  background: white;
+  background: var(--bg-primary);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   animation: slideInRight 0.3s ease-out;
@@ -23,7 +23,7 @@
 }
 
 .pwa-update-notification.update {
-  border-left: 4px solid #667eea;
+  border-left: 4px solid var(--primary-color);
 }
 
 .pwa-update-notification.offline-ready {

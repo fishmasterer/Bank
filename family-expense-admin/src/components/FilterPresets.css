@@ -17,7 +17,7 @@
 
 /* Modal */
 .filter-presets-modal {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 16px;
   max-width: 600px;
   width: 100%;
@@ -36,7 +36,7 @@
   align-items: center;
   padding: 1.5rem;
   border-bottom: 2px solid #f0f0f0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
 }
 
 .filter-presets-header h3 {
@@ -88,7 +88,7 @@
 .btn-show-save-form {
   width: 100%;
   padding: 0.875rem 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -115,7 +115,7 @@
   border: 2px solid #bae6fd;
   border-radius: 8px;
   font-size: 0.938rem;
-  background: white;
+  background: var(--bg-primary);
   transition: all 0.2s;
 }
 
@@ -143,7 +143,7 @@
 }
 
 .btn-cancel-save {
-  background: white;
+  background: var(--bg-primary);
   color: var(--text-primary);
   border: 2px solid #bae6fd;
 }
@@ -217,7 +217,7 @@
   align-items: stretch;
   border: 2px solid var(--border-color);
   border-radius: 12px;
-  background: white;
+  background: var(--bg-primary);
   overflow: hidden;
   transition: all 0.2s;
 }

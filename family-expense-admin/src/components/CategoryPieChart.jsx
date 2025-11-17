@@ -8,6 +8,7 @@ import {
 } from 'chart.js';
 import { useExpenses } from '../context/ExpenseContext';
 import { SkeletonChart } from './SkeletonLoader';
+import { getThemeColors, hexToRgba, getChartColorPalette } from '../utils/themeColors';
 import './CategoryPieChart.css';
 
 // Register Chart.js components
@@ -38,39 +39,19 @@ const CategoryPieChart = ({ selectedYear, selectedMonth, loading = false }) => {
     );
   }
 
-  // Prepare data for pie chart
+  // Prepare data for pie chart using theme colors
+  const colorPalette = getChartColorPalette();
+  const backgroundColors = colorPalette.map(color => hexToRgba(color, 0.8));
+  const borderColors = colorPalette;
+
   const chartData = {
     labels: categories,
     datasets: [
       {
         label: 'Amount Paid',
         data: categories.map(cat => breakdown[cat].paid),
-        backgroundColor: [
-          'rgba(194, 65, 12, 0.8)',   // Primary orange
-          'rgba(59, 130, 246, 0.8)',   // Blue
-          'rgba(16, 185, 129, 0.8)',   // Green
-          'rgba(245, 158, 11, 0.8)',   // Amber
-          'rgba(239, 68, 68, 0.8)',    // Red
-          'rgba(139, 92, 246, 0.8)',   // Purple
-          'rgba(236, 72, 153, 0.8)',   // Pink
-          'rgba(20, 184, 166, 0.8)',   // Teal
-          'rgba(251, 146, 60, 0.8)',   // Orange
-          'rgba(14, 165, 233, 0.8)',   // Sky
-          'rgba(168, 85, 247, 0.8)',   // Violet
-        ],
-        borderColor: [
-          'rgba(194, 65, 12, 1)',
-          'rgba(59, 130, 246, 1)',
-          'rgba(16, 185, 129, 1)',
-          'rgba(245, 158, 11, 1)',
-          'rgba(239, 68, 68, 1)',
-          'rgba(139, 92, 246, 1)',
-          'rgba(236, 72, 153, 1)',
-          'rgba(20, 184, 166, 1)',
-          'rgba(251, 146, 60, 1)',
-          'rgba(14, 165, 233, 1)',
-          'rgba(168, 85, 247, 1)',
-        ],
+        backgroundColor: backgroundColors,
+        borderColor: borderColors,
         borderWidth: 2,
       },
     ],
@@ -112,7 +93,7 @@ const CategoryPieChart = ({ selectedYear, selectedMonth, loading = false }) => {
         },
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: hexToRgba(getThemeColors().textPrimary, 0.9),
         padding: 12,
         titleFont: {
           size: 14,

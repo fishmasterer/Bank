@@ -4,6 +4,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { useExpenses } from '../context/ExpenseContext';
 import ChartDrillDown from './ChartDrillDown';
 import { SkeletonChart } from './SkeletonLoader';
+import { getThemeColors, hexToRgba, getChartColorPalette } from '../utils/themeColors';
 import './MemberSpendingChart.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -29,28 +30,17 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth, loading = false }) =
 
     const total = memberSpendingData.reduce((sum, m) => sum + m.amount, 0);
 
-    // Rich color palette for members
-    const colors = [
-      'rgba(194, 65, 12, 0.8)',   // Orange
-      'rgba(59, 130, 246, 0.8)',   // Blue
-      'rgba(16, 185, 129, 0.8)',   // Green
-      'rgba(239, 68, 68, 0.8)',    // Red
-      'rgba(168, 85, 247, 0.8)',   // Purple
-      'rgba(236, 72, 153, 0.8)',   // Pink
-      'rgba(251, 146, 60, 0.8)',   // Amber
-      'rgba(6, 182, 212, 0.8)',    // Cyan
-      'rgba(132, 204, 22, 0.8)',   // Lime
-      'rgba(139, 92, 246, 0.8)',   // Violet
-    ];
-
-    const borderColors = colors.map(c => c.replace('0.8', '1'));
+    // Use theme color palette
+    const colorPalette = getChartColorPalette();
+    const backgroundColors = colorPalette.map(color => hexToRgba(color, 0.8));
+    const borderColors = colorPalette;
 
     return {
       labels: memberSpendingData.map(m => m.name),
       datasets: [{
         label: 'Amount Paid',
         data: memberSpendingData.map(m => m.amount),
-        backgroundColor: colors.slice(0, memberSpendingData.length),
+        backgroundColor: backgroundColors.slice(0, memberSpendingData.length),
         borderColor: borderColors.slice(0, memberSpendingData.length),
         borderWidth: 3,
         hoverOffset: window.innerWidth < 640 ? 8 : 15,
@@ -127,7 +117,7 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth, loading = false }) =
         }
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: hexToRgba(getThemeColors().textPrimary, 0.9),
         padding: window.innerWidth < 640 ? 10 : 14,
         titleFont: {
           size: window.innerWidth < 640 ? 12 : 14,

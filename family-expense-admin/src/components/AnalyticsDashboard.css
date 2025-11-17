@@ -70,7 +70,7 @@
   display: flex;
   gap: 1rem;
   padding: 1.25rem;
-  background: white;
+  background: var(--bg-primary);
   border-radius: 12px;
   border: 2px solid var(--border-color);
   transition: all 0.2s;
@@ -131,7 +131,7 @@
 }
 
 .chart-card {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 12px;
   border: 2px solid var(--border-color);
   padding: 1.5rem;
@@ -149,7 +149,7 @@
 }
 
 .widget-card {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 12px;
   border: 2px solid var(--border-color);
   padding: 1.5rem;

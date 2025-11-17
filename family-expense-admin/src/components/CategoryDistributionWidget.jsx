@@ -1,4 +1,5 @@
 import React from 'react';
+import { getChartColorPalette } from '../utils/themeColors';
 import './CategoryDistributionWidget.css';
 
 const CategoryDistributionWidget = ({ categoryBreakdown, currentTotal }) => {
@@ -23,14 +24,8 @@ const CategoryDistributionWidget = ({ categoryBreakdown, currentTotal }) => {
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 5); // Top 5 categories
 
-  // Generate colors for categories
-  const colors = [
-    '#667eea',
-    '#764ba2',
-    '#f093fb',
-    '#4facfe',
-    '#43e97b'
-  ];
+  // Use theme colors for categories
+  const colors = getChartColorPalette();
 
   return (
     <div className="category-distribution-widget">
