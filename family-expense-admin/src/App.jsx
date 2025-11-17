@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
+import { NotificationProvider } from './context/NotificationContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { useAuthorization } from './hooks/useAuthorization';
@@ -16,6 +17,8 @@ import UserProfile from './components/UserProfile';
 import Unauthorized from './components/Unauthorized';
 import ThemePicker from './components/ThemePicker';
 import Toast from './components/Toast';
+import NotificationBell from './components/NotificationBell';
+import ToastNotification from './components/ToastNotification';
 import { exportToCSV } from './utils/exportData';
 import './App.css';
 
@@ -142,6 +145,7 @@ const AppContent = () => {
           </p>
         </div>
         <div className="header-actions">
+          <NotificationBell />
           <ThemePicker />
           <UserProfile />
         </div>
@@ -284,6 +288,8 @@ const AppContent = () => {
         />
       )}
 
+      <ToastNotification />
+
       {toasts.map(toast => (
         <Toast
           key={toast.id}
@@ -302,7 +308,9 @@ function App({ readOnly = false }) {
     <AuthProvider>
       <ThemeProvider>
         <ExpenseProvider readOnly={readOnly}>
-          <AppContent />
+          <NotificationProvider>
+            <AppContent />
+          </NotificationProvider>
         </ExpenseProvider>
       </ThemeProvider>
     </AuthProvider>

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
 import { useCategoryBudget } from '../hooks/useCategoryBudget';
+import { useNotifications } from '../context/NotificationContext';
 import { SkeletonDetailedView } from './SkeletonLoader';
 import EmptyState from './EmptyState';
 import MultiSelect from './MultiSelect';
@@ -12,6 +13,7 @@ import './DetailedView.css';
 const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense }) => {
   const { getCategoryBreakdown, familyMembers, deleteExpense, readOnly, loading, updateExpense } = useExpenses();
   const { getCategoryBudgetStatus } = useCategoryBudget(selectedYear, selectedMonth);
+  const { addExpenseAction, addBudgetAlert } = useNotifications();
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -22,6 +24,21 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
 
   const breakdown = getCategoryBreakdown(selectedYear, selectedMonth);
   const allCategories = Object.keys(breakdown).sort();
+
+  // Check budgets and notify when breakdown changes
+  useEffect(() => {
+    if (loading || !breakdown) return;
+
+    Object.keys(breakdown).forEach(category => {
+      const data = breakdown[category];
+      const budgetStatus = getCategoryBudgetStatus(category, data.paid);
+
+      // Only notify for warning, critical, or exceeded states
+      if (['warning', 'critical', 'exceeded'].includes(budgetStatus.status)) {
+        addBudgetAlert(category, budgetStatus.spent, budgetStatus.limit, budgetStatus.status);
+      }
+    });
+  }, [breakdown, loading]); // Only run when breakdown changes
 
   const getMemberName = (memberId) => {
     const member = familyMembers.find(m => m.id === memberId);
@@ -401,6 +418,7 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
                               onClick={() => {
                                 if (window.confirm('Delete this expense?')) {
                                   deleteExpense(expense.id);
+                                  addExpenseAction('deleted', expense.name, expense.category);
                                 }
                               }}
                               className="btn-delete"
