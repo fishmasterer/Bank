@@ -2,6 +2,9 @@ import React from 'react';
 import { useExpenses } from '../context/ExpenseContext';
 import { useBudget } from '../hooks/useBudget';
 import CategoryPieChart from './CategoryPieChart';
+import CategoryBarChart from './CategoryBarChart';
+import SpendingTrendsChart from './SpendingTrendsChart';
+import MemberSpendingChart from './MemberSpendingChart';
 import './SummaryView.css';
 
 const SummaryView = ({ selectedYear, selectedMonth }) => {
@@ -51,6 +54,21 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
       )}
 
       <CategoryPieChart
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonth}
+      />
+
+      <CategoryBarChart
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonth}
+      />
+
+      <SpendingTrendsChart
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonth}
+      />
+
+      <MemberSpendingChart
         selectedYear={selectedYear}
         selectedMonth={selectedMonth}
       />

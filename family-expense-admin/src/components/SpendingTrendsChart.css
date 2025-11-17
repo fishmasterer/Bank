@@ -1,0 +1,46 @@
+/* Mobile-first line chart styling */
+.spending-trends-chart-container {
+  width: 100%;
+  background-color: var(--bg-primary);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.spending-trends-chart {
+  position: relative;
+  height: 280px;
+  width: 100%;
+}
+
+/* Tablet and up */
+@media (min-width: 640px) {
+  .spending-trends-chart-container {
+    padding: 1.5rem;
+  }
+
+  .spending-trends-chart {
+    height: 320px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .spending-trends-chart-container {
+    padding: 2rem;
+  }
+
+  .spending-trends-chart {
+    height: 350px;
+  }
+}
+
+/* Touch-friendly hover states */
+@media (hover: hover) {
+  .spending-trends-chart-container:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+    transition: all 0.2s ease;
+  }
+}
