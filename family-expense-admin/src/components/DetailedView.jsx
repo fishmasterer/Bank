@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
 import { useCategoryBudget } from '../hooks/useCategoryBudget';
 import { SkeletonDetailedView } from './SkeletonLoader';
+import EmptyState from './EmptyState';
 import './DetailedView.css';
 
-const DetailedView = ({ selectedYear, selectedMonth, onEditExpense }) => {
+const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense }) => {
   const { getCategoryBreakdown, familyMembers, deleteExpense, readOnly, getExpensesByMonth, loading } = useExpenses();
   const { getCategoryBudgetStatus } = useCategoryBudget(selectedYear, selectedMonth);
   const [expandedCategory, setExpandedCategory] = useState(null);
@@ -140,9 +141,23 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense }) => {
       </div>
 
       {categories.length === 0 ? (
-        <p className="no-expenses">
-          {hasFilters ? 'No expenses match your filters' : 'No expenses for this month'}
-        </p>
+        hasFilters ? (
+          <EmptyState
+            illustration="search"
+            title="No matches found"
+            message="Try adjusting your filters or search term"
+            actionLabel="Clear Filters"
+            onAction={clearFilters}
+          />
+        ) : (
+          <EmptyState
+            illustration="expenses"
+            title="No expenses yet"
+            message="Start tracking your expenses for this month"
+            actionLabel="Add First Expense"
+            onAction={onAddExpense}
+          />
+        )
       ) : (
         <div className="categories-list">
           {categories.map(category => {

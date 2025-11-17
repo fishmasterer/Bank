@@ -3,11 +3,12 @@ import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { useExpenses } from '../context/ExpenseContext';
 import ChartDrillDown from './ChartDrillDown';
+import { SkeletonChart } from './SkeletonLoader';
 import './MemberSpendingChart.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const MemberSpendingChart = ({ selectedYear, selectedMonth }) => {
+const MemberSpendingChart = ({ selectedYear, selectedMonth, loading = false }) => {
   const { familyMembers, getMonthlyTotal, getExpensesByMonth } = useExpenses();
   const [drillDown, setDrillDown] = useState({ isOpen: false, member: null, expenses: [] });
 
@@ -161,6 +162,10 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth }) => {
       animationDuration: 400
     }
   }), [handleChartClick]);
+
+  if (loading) {
+    return <SkeletonChart height="350px" />;
+  }
 
   if (!chartData) {
     return (

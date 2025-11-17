@@ -233,6 +233,7 @@ const AppContent = () => {
             selectedYear={selectedYear}
             selectedMonth={selectedMonth}
             onEditExpense={handleEditExpense}
+            onAddExpense={handleAddExpense}
           />
         )}
       </main>

@@ -13,6 +13,7 @@ import {
 } from 'chart.js';
 import { useExpenses } from '../context/ExpenseContext';
 import ChartDrillDown from './ChartDrillDown';
+import { SkeletonChart } from './SkeletonLoader';
 import './SpendingTrendsChart.css';
 
 ChartJS.register(
@@ -26,7 +27,7 @@ ChartJS.register(
   Filler
 );
 
-const SpendingTrendsChart = ({ selectedYear, selectedMonth }) => {
+const SpendingTrendsChart = ({ selectedYear, selectedMonth, loading = false }) => {
   const { getMonthlyTotal, getMonthlyPlanned, getExpensesByMonth } = useExpenses();
   const [drillDown, setDrillDown] = useState({ isOpen: false, month: null, year: null, expenses: [] });
 
@@ -230,6 +231,10 @@ const SpendingTrendsChart = ({ selectedYear, selectedMonth }) => {
       animationDuration: 400
     }
   }), [handleChartClick]);
+
+  if (loading) {
+    return <SkeletonChart height="320px" />;
+  }
 
   if (!chartData) {
     return (

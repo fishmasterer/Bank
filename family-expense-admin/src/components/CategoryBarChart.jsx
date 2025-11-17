@@ -11,6 +11,7 @@ import {
 } from 'chart.js';
 import { useExpenses } from '../context/ExpenseContext';
 import ChartDrillDown from './ChartDrillDown';
+import { SkeletonChart } from './SkeletonLoader';
 import './CategoryBarChart.css';
 
 ChartJS.register(
@@ -22,7 +23,7 @@ ChartJS.register(
   Legend
 );
 
-const CategoryBarChart = ({ selectedYear, selectedMonth }) => {
+const CategoryBarChart = ({ selectedYear, selectedMonth, loading = false }) => {
   const { getCategoryBreakdown } = useExpenses();
   const [drillDown, setDrillDown] = useState({ isOpen: false, category: null, expenses: [] });
 
@@ -187,6 +188,10 @@ const CategoryBarChart = ({ selectedYear, selectedMonth }) => {
       animationDuration: 400
     }
   }), [handleChartClick]);
+
+  if (loading) {
+    return <SkeletonChart height="350px" />;
+  }
 
   if (!chartData) {
     return (
