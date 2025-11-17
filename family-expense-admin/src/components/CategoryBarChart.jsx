@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { Bar } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -10,6 +10,7 @@ import {
   Legend
 } from 'chart.js';
 import { useExpenses } from '../context/ExpenseContext';
+import ChartDrillDown from './ChartDrillDown';
 import './CategoryBarChart.css';
 
 ChartJS.register(
@@ -23,9 +24,13 @@ ChartJS.register(
 
 const CategoryBarChart = ({ selectedYear, selectedMonth }) => {
   const { getCategoryBreakdown } = useExpenses();
+  const [drillDown, setDrillDown] = useState({ isOpen: false, category: null, expenses: [] });
+
+  const breakdown = useMemo(() => {
+    return getCategoryBreakdown(selectedYear, selectedMonth);
+  }, [getCategoryBreakdown, selectedYear, selectedMonth]);
 
   const chartData = useMemo(() => {
-    const breakdown = getCategoryBreakdown(selectedYear, selectedMonth);
     const categories = Object.keys(breakdown);
 
     if (categories.length === 0) {
@@ -57,11 +62,26 @@ const CategoryBarChart = ({ selectedYear, selectedMonth }) => {
         }
       ]
     };
-  }, [getCategoryBreakdown, selectedYear, selectedMonth]);
+  }, [breakdown]);
+
+  const handleChartClick = useCallback((event, elements) => {
+    if (elements.length > 0) {
+      const index = elements[0].index;
+      const category = Object.keys(breakdown)[index];
+      const categoryData = breakdown[category];
+
+      setDrillDown({
+        isOpen: true,
+        category,
+        expenses: categoryData.expenses || []
+      });
+    }
+  }, [breakdown]);
 
   const options = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
+    onClick: handleChartClick,
     interaction: {
       mode: 'index',
       intersect: false,
@@ -83,7 +103,7 @@ const CategoryBarChart = ({ selectedYear, selectedMonth }) => {
       },
       title: {
         display: true,
-        text: 'Planned vs Paid by Category',
+        text: 'Planned vs Paid by Category (Click to drill down)',
         font: {
           size: window.innerWidth < 640 ? 14 : 16,
           weight: 'bold'
@@ -158,8 +178,15 @@ const CategoryBarChart = ({ selectedYear, selectedMonth }) => {
           }
         }
       }
+    },
+    animation: {
+      duration: 750,
+      easing: 'easeInOutQuart'
+    },
+    hover: {
+      animationDuration: 400
     }
-  }), []);
+  }), [handleChartClick]);
 
   if (!chartData) {
     return (
@@ -172,11 +199,21 @@ const CategoryBarChart = ({ selectedYear, selectedMonth }) => {
   }
 
   return (
-    <div className="category-bar-chart-container">
-      <div className="category-bar-chart">
-        <Bar data={chartData} options={options} />
+    <>
+      <div className="category-bar-chart-container">
+        <div className="category-bar-chart">
+          <Bar data={chartData} options={options} />
+        </div>
       </div>
-    </div>
+
+      <ChartDrillDown
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown({ isOpen: false, category: null, expenses: [] })}
+        title={`${drillDown.category} Expenses`}
+        expenses={drillDown.expenses}
+        type="category"
+      />
+    </>
   );
 };
 
