@@ -90,6 +90,24 @@
   color: var(--text-secondary);
 }
 
+.menu-item-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  min-height: auto;
+}
+
+.menu-item-btn:hover {
+  background-color: var(--bg-tertiary);
+}
+
 .logout-btn {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -101,6 +119,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.15s ease;
+  min-height: auto;
 }
 
 .logout-btn:hover {

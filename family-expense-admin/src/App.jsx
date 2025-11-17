@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { useAuthorization } from './hooks/useAuthorization';
 import { useToast } from './hooks/useToast';
 import SummaryView from './components/SummaryView';
@@ -284,9 +285,11 @@ const AppContent = () => {
 function App({ readOnly = false }) {
   return (
     <AuthProvider>
-      <ExpenseProvider readOnly={readOnly}>
-        <AppContent />
-      </ExpenseProvider>
+      <ThemeProvider>
+        <ExpenseProvider readOnly={readOnly}>
+          <AppContent />
+        </ExpenseProvider>
+      </ThemeProvider>
     </AuthProvider>
   );
 }
