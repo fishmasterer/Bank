@@ -12,9 +12,12 @@
   "dependencies": {
     "chart.js": "^4.5.1",
     "firebase": "^12.4.0",
+    "jspdf": "^3.0.3",
+    "jspdf-autotable": "^5.0.2",
     "react": "^19.1.1",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.1.1",
+    "xlsx": "^0.18.5",
     "zustand": "^5.0.8"
   },
   "devDependencies": {

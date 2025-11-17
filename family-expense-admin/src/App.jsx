@@ -22,7 +22,7 @@ import NotificationBell from './components/NotificationBell';
 import ToastNotification from './components/ToastNotification';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import PWAUpdateNotification from './components/PWAUpdateNotification';
-import { exportToCSV } from './utils/exportData';
+import ExportModal from './components/ExportModal';
 import './App.css';
 
 const AppContent = () => {
@@ -32,6 +32,7 @@ const AppContent = () => {
   const [showCategoryBudgets, setShowCategoryBudgets] = useState(false);
   const [showVarianceReport, setShowVarianceReport] = useState(false);
   const [showFamilyModal, setShowFamilyModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
@@ -81,12 +82,7 @@ const AppContent = () => {
   };
 
   const handleExport = () => {
-    try {
-      exportToCSV(expenses, familyMembers, selectedYear, selectedMonth);
-      success('Expenses exported successfully!');
-    } catch (err) {
-      showError('Failed to export expenses');
-    }
+    setShowExportModal(true);
   };
 
   const handleCopyRecurring = async () => {
@@ -209,7 +205,7 @@ const AppContent = () => {
             📈 Budget Report
           </button>
           <button onClick={handleExport} className="btn-secondary">
-            📊 Export CSV
+            📥 Export
           </button>
         </div>
       </div>
@@ -301,6 +297,15 @@ const AppContent = () => {
           selectedMonth={selectedMonth}
         />
       )}
+
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonth}
+        onSuccess={(message) => success(message)}
+        onError={(message) => showError(message)}
+      />
 
       <ToastNotification />
 
