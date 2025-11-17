@@ -29,7 +29,7 @@
   padding: 1.25rem;
   cursor: pointer;
   transition: all 0.2s;
-  background: white;
+  background: var(--bg-primary);
 }
 
 .format-card:hover {

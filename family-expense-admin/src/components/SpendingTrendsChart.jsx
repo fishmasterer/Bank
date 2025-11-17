@@ -14,6 +14,7 @@ import {
 import { useExpenses } from '../context/ExpenseContext';
 import ChartDrillDown from './ChartDrillDown';
 import { SkeletonChart } from './SkeletonLoader';
+import { getThemeColors, hexToRgba } from '../utils/themeColors';
 import './SpendingTrendsChart.css';
 
 ChartJS.register(
@@ -72,36 +73,39 @@ const SpendingTrendsChart = ({ selectedYear, selectedMonth, loading = false }) =
       return null;
     }
 
+    // Get theme colors dynamically
+    const colors = getThemeColors();
+
     return {
       labels,
       datasets: [
         {
           label: 'Planned',
           data: plannedData,
-          borderColor: 'rgba(59, 130, 246, 1)',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          borderColor: colors.primary,
+          backgroundColor: colors.primaryLight,
           borderWidth: 3,
           tension: 0.4,
           fill: true,
           pointRadius: window.innerWidth < 640 ? 4 : 5,
           pointHoverRadius: window.innerWidth < 640 ? 6 : 8,
-          pointBackgroundColor: 'rgba(59, 130, 246, 1)',
-          pointBorderColor: '#fff',
+          pointBackgroundColor: colors.primary,
+          pointBorderColor: colors.bgPrimary,
           pointBorderWidth: 2,
           pointHoverBorderWidth: 3,
         },
         {
           label: 'Paid',
           data: paidData,
-          borderColor: 'rgba(16, 185, 129, 1)',
-          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          borderColor: colors.success,
+          backgroundColor: colors.successLight,
           borderWidth: 3,
           tension: 0.4,
           fill: true,
           pointRadius: window.innerWidth < 640 ? 4 : 5,
           pointHoverRadius: window.innerWidth < 640 ? 6 : 8,
-          pointBackgroundColor: 'rgba(16, 185, 129, 1)',
-          pointBorderColor: '#fff',
+          pointBackgroundColor: colors.success,
+          pointBorderColor: colors.bgPrimary,
           pointBorderWidth: 2,
           pointHoverBorderWidth: 3,
         }
@@ -164,7 +168,7 @@ const SpendingTrendsChart = ({ selectedYear, selectedMonth, loading = false }) =
         }
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: hexToRgba(getThemeColors().textPrimary, 0.9),
         padding: window.innerWidth < 640 ? 10 : 14,
         titleFont: {
           size: window.innerWidth < 640 ? 12 : 14,
@@ -211,7 +215,7 @@ const SpendingTrendsChart = ({ selectedYear, selectedMonth, loading = false }) =
       y: {
         beginAtZero: true,
         grid: {
-          color: 'rgba(0, 0, 0, 0.05)',
+          color: getThemeColors().borderColor,
         },
         ticks: {
           font: {

@@ -26,7 +26,7 @@
 
 /* Modal */
 .chart-drilldown-modal {
-  background: white;
+  background: var(--bg-primary);
   border-radius: 16px;
   max-width: 900px;
   width: 100%;
@@ -56,7 +56,7 @@
   align-items: flex-start;
   padding: 24px;
   border-bottom: 2px solid #f0f0f0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   color: white;
 }
 
@@ -106,7 +106,7 @@
 }
 
 .stat-card {
-  background: white;
+  background: var(--bg-primary);
   padding: 16px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -173,7 +173,7 @@
 }
 
 .expense-item {
-  background: white;
+  background: var(--bg-primary);
   border: 2px solid #e5e7eb;
   border-radius: 12px;
   padding: 16px;
@@ -181,7 +181,7 @@
 }
 
 .expense-item:hover {
-  border-color: #667eea;
+  border-color: var(--primary-color);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
   transform: translateX(4px);
 }
@@ -306,7 +306,7 @@
 }
 
 .btn-close {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   color: white;
   border: none;
   padding: 12px 32px;

@@ -12,6 +12,7 @@ import {
 import { useExpenses } from '../context/ExpenseContext';
 import ChartDrillDown from './ChartDrillDown';
 import { SkeletonChart } from './SkeletonLoader';
+import { getThemeColors, hexToRgba } from '../utils/themeColors';
 import './CategoryBarChart.css';
 
 ChartJS.register(
@@ -38,14 +39,17 @@ const CategoryBarChart = ({ selectedYear, selectedMonth, loading = false }) => {
       return null;
     }
 
+    // Get theme colors dynamically
+    const colors = getThemeColors();
+
     return {
       labels: categories,
       datasets: [
         {
           label: 'Planned',
           data: categories.map(cat => breakdown[cat].planned),
-          backgroundColor: 'rgba(59, 130, 246, 0.7)',
-          borderColor: 'rgba(59, 130, 246, 1)',
+          backgroundColor: colors.primaryMedium,
+          borderColor: colors.primary,
           borderWidth: 2,
           borderRadius: 6,
           barThickness: 'flex',
@@ -54,8 +58,8 @@ const CategoryBarChart = ({ selectedYear, selectedMonth, loading = false }) => {
         {
           label: 'Paid',
           data: categories.map(cat => breakdown[cat].paid),
-          backgroundColor: 'rgba(16, 185, 129, 0.7)',
-          borderColor: 'rgba(16, 185, 129, 1)',
+          backgroundColor: hexToRgba(colors.success, 0.7),
+          borderColor: colors.success,
           borderWidth: 2,
           borderRadius: 6,
           barThickness: 'flex',
@@ -115,7 +119,7 @@ const CategoryBarChart = ({ selectedYear, selectedMonth, loading = false }) => {
         }
       },
       tooltip: {
-        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        backgroundColor: hexToRgba(getThemeColors().textPrimary, 0.9),
         padding: window.innerWidth < 640 ? 8 : 12,
         titleFont: {
           size: window.innerWidth < 640 ? 12 : 14,
@@ -168,7 +172,7 @@ const CategoryBarChart = ({ selectedYear, selectedMonth, loading = false }) => {
       y: {
         beginAtZero: true,
         grid: {
-          color: 'rgba(0, 0, 0, 0.05)',
+          color: getThemeColors().borderColor,
         },
         ticks: {
           font: {
