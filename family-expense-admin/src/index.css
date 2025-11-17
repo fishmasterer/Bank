@@ -53,6 +53,10 @@
   --bg-tertiary: #F5F5F4;
   --bg-hover: #E7E5E4;
 
+  /* RGB values for glassmorphism */
+  --bg-primary-rgb: 255, 255, 255;
+  --bg-secondary-rgb: 250, 250, 249;
+
   /* Light Mode Text (30% of UI - 4.5:1 contrast minimum) */
   --text-primary: #1C1917;      /* 16.53:1 contrast */
   --text-secondary: #57534E;    /* 6.85:1 contrast */
@@ -91,6 +95,10 @@
   --bg-secondary: #292524;
   --bg-tertiary: #44403C;
   --bg-hover: #57534E;
+
+  /* RGB values for glassmorphism */
+  --bg-primary-rgb: 28, 25, 23;
+  --bg-secondary-rgb: 41, 37, 36;
 
   /* Dark Mode Text (30% of UI - 4.5:1 contrast minimum) */
   --text-primary: #FAFAF9;      /* 16.53:1 contrast */

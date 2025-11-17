@@ -101,12 +101,16 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
       </div>
 
       <div className="members-grid">
-        {familyMembers.map(member => {
+        {familyMembers.map((member, index) => {
           const planned = getMonthlyPlanned(selectedYear, selectedMonth, member.id);
           const paid = getMonthlyTotal(selectedYear, selectedMonth, member.id);
 
           return (
-            <div key={member.id} className="summary-card member-card">
+            <div
+              key={member.id}
+              className="summary-card member-card"
+              style={{ '--member-index': index }}
+            >
               <h3>{member.name}</h3>
               <div className="amount-column">
                 <div className="amount-item">

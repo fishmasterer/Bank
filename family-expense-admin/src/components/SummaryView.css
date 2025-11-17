@@ -2,34 +2,72 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .budget-warning {
   background-color: var(--bg-primary);
-  border-radius: 8px;
+  border-radius: var(--border-radius-lg);
   padding: 1.25rem;
   border: 2px solid;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.budget-warning:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
 }
 
 .budget-good {
-  border-color: #10b981;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%);
+  border-color: var(--success-color);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--success-color) 5%, transparent) 0%,
+    color-mix(in srgb, var(--success-color) 2%, transparent) 100%);
 }
 
 .budget-warning {
-  border-color: #f59e0b;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.03) 100%);
+  border-color: var(--warning-color);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--warning-color) 10%, transparent) 0%,
+    color-mix(in srgb, var(--warning-color) 3%, transparent) 100%);
 }
 
 .budget-critical {
-  border-color: #ef4444;
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.03) 100%);
+  border-color: var(--danger-color);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--danger-color) 10%, transparent) 0%,
+    color-mix(in srgb, var(--danger-color) 3%, transparent) 100%);
 }
 
 .budget-exceeded {
-  border-color: #dc2626;
-  background: linear-gradient(135deg, rgba(220, 38, 38, 0.15) 0%, rgba(220, 38, 38, 0.05) 100%);
+  border-color: var(--danger-color);
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--danger-color) 15%, transparent) 0%,
+    color-mix(in srgb, var(--danger-color) 5%, transparent) 100%);
 }
 
 .budget-header {
@@ -54,14 +92,14 @@
 }
 
 .budget-amount {
-  font-size: 1.25rem;
+  font-size: clamp(1.125rem, 3vw, 1.25rem);
   font-weight: 600;
   color: var(--text-primary);
   letter-spacing: -0.01em;
 }
 
 .budget-percentage {
-  font-size: 1.75rem;
+  font-size: clamp(1.5rem, 4vw, 1.75rem);
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.02em;
@@ -70,65 +108,150 @@
 .budget-bar {
   height: 8px;
   background-color: var(--bg-tertiary);
-  border-radius: 4px;
+  border-radius: var(--border-radius-md);
   overflow: hidden;
   margin-bottom: 0.75rem;
+  position: relative;
 }
 
 .budget-bar-fill {
   height: 100%;
-  transition: width 0.3s ease, background-color 0.3s ease;
-  border-radius: 4px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+  border-radius: var(--border-radius-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.budget-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 100%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .budget-good .budget-bar-fill {
-  background-color: #10b981;
+  background: linear-gradient(90deg, var(--success-color) 0%, color-mix(in srgb, var(--success-color) 80%, white) 100%);
 }
 
 .budget-warning .budget-bar-fill {
-  background-color: #f59e0b;
+  background: linear-gradient(90deg, var(--warning-color) 0%, color-mix(in srgb, var(--warning-color) 80%, white) 100%);
 }
 
 .budget-critical .budget-bar-fill {
-  background-color: #ef4444;
+  background: linear-gradient(90deg, var(--danger-color) 0%, color-mix(in srgb, var(--danger-color) 80%, white) 100%);
 }
 
 .budget-exceeded .budget-bar-fill {
-  background-color: #dc2626;
+  background: linear-gradient(90deg, var(--danger-color) 0%, color-mix(in srgb, var(--danger-color) 70%, black) 100%);
 }
 
 .budget-message {
   font-size: 0.9375rem;
   font-weight: 500;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  background-color: rgba(0, 0, 0, 0.03);
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--border-radius-md);
+  background-color: color-mix(in srgb, var(--text-primary) 3%, transparent);
+  animation: fadeInUp 0.4s ease-out 0.2s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .budget-warning .budget-message {
-  color: #92400e;
+  color: color-mix(in srgb, var(--warning-color) 70%, black);
 }
 
-.budget-critical .budget-message {
-  color: #991b1b;
+:root[data-theme="dark"] .budget-warning .budget-message {
+  color: var(--warning-color);
 }
 
+.budget-critical .budget-message,
 .budget-exceeded .budget-message {
-  color: #991b1b;
+  color: color-mix(in srgb, var(--danger-color) 70%, black);
+}
+
+:root[data-theme="dark"] .budget-critical .budget-message,
+:root[data-theme="dark"] .budget-exceeded .budget-message {
+  color: var(--danger-color);
 }
 
 .summary-card {
   background-color: var(--bg-primary);
-  border-radius: 8px;
+  border-radius: var(--border-radius-lg);
   border: 1px solid var(--border-color);
   padding: 1.5rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0;
+  animation: cardFadeIn 0.5s ease-out forwards;
+}
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.summary-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .total-card {
-  background-color: var(--primary-color);
+  background: linear-gradient(135deg, var(--color-primary-60) 0%, var(--color-primary-hover) 100%);
   color: white;
-  border-color: var(--primary-color);
+  border: none;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.total-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.1) 100%);
+  pointer-events: none;
+}
+
+.total-card:hover {
+  box-shadow: var(--shadow-xl);
+  transform: translateY(-4px) scale(1.01);
 }
 
 .total-card h2 {
@@ -137,6 +260,8 @@
   text-align: center;
   font-weight: 600;
   letter-spacing: -0.01em;
+  position: relative;
+  z-index: 1;
 }
 
 .amount-row {
@@ -144,6 +269,8 @@
   justify-content: space-around;
   flex-wrap: wrap;
   gap: 1rem;
+  position: relative;
+  z-index: 1;
 }
 
 .amount-column {
@@ -157,6 +284,11 @@
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.amount-item:hover {
+  transform: translateX(4px);
 }
 
 .amount-item .label {
@@ -169,10 +301,11 @@
   font-size: 1.125rem;
   font-weight: 600;
   letter-spacing: -0.01em;
+  transition: all 0.2s ease;
 }
 
 .total-card .amount {
-  font-size: 1.375rem;
+  font-size: clamp(1.25rem, 3vw, 1.375rem);
   font-weight: 600;
 }
 
@@ -193,19 +326,23 @@
 }
 
 .member-card .planned {
-  color: var(--primary-light);
+  color: var(--primary-color);
+  font-weight: 700;
 }
 
 .member-card .paid {
   color: var(--success-color);
+  font-weight: 700;
 }
 
 .member-card .over {
   color: var(--danger-color);
+  font-weight: 700;
 }
 
 .member-card .under {
   color: var(--warning-color);
+  font-weight: 700;
 }
 
 .members-grid {
@@ -214,20 +351,29 @@
   gap: 1rem;
 }
 
+.member-card {
+  animation-delay: calc(var(--member-index, 0) * 0.1s);
+}
+
 .member-card h3 {
   font-size: 1.125rem;
   margin-bottom: 1rem;
   color: var(--text-primary);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 2px solid var(--border-color);
   padding-bottom: 0.625rem;
   font-weight: 600;
   letter-spacing: -0.01em;
+  transition: border-color 0.3s ease;
+}
+
+.member-card:hover h3 {
+  border-bottom-color: var(--primary-color);
 }
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .summary-card {
-    padding: 1rem;
+    padding: 1.25rem;
   }
 
   .total-card h2 {
@@ -237,10 +383,16 @@
   .amount-row {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.875rem;
   }
 
   .amount-item {
-    padding: 0.5rem 0;
+    padding: 0.625rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .amount-item:last-child {
+    border-bottom: none;
   }
 
   .amount {
@@ -254,11 +406,27 @@
   .members-grid {
     grid-template-columns: 1fr;
   }
+
+  .budget-warning {
+    padding: 1rem;
+  }
+
+  .budget-amount {
+    font-size: 1.125rem;
+  }
+
+  .budget-percentage {
+    font-size: 1.5rem;
+  }
 }
 
 @media (max-width: 480px) {
+  .summary-card {
+    padding: 1rem;
+  }
+
   .amount-item .label {
-    font-size: 0.9rem;
+    font-size: 0.875rem;
   }
 
   .amount {
@@ -267,5 +435,37 @@
 
   .total-card .amount {
     font-size: 1.2rem;
+  }
+
+  .budget-amount {
+    font-size: 1rem;
+  }
+
+  .budget-percentage {
+    font-size: 1.375rem;
+  }
+}
+
+/* Accessibility: Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .summary-view,
+  .budget-warning,
+  .summary-card,
+  .budget-message {
+    animation: none !important;
+  }
+
+  .budget-bar-fill::after {
+    animation: none !important;
+  }
+
+  .summary-card:hover,
+  .budget-warning:hover,
+  .total-card:hover {
+    transform: none !important;
+  }
+
+  .amount-item:hover {
+    transform: none !important;
   }
 }
