@@ -5,16 +5,20 @@ import { SkeletonDetailedView } from './SkeletonLoader';
 import EmptyState from './EmptyState';
 import MultiSelect from './MultiSelect';
 import FilterPresets from './FilterPresets';
+import BulkActionsBar from './BulkActionsBar';
+import BulkEditModal from './BulkEditModal';
 import './DetailedView.css';
 
 const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense }) => {
-  const { getCategoryBreakdown, familyMembers, deleteExpense, readOnly, loading } = useExpenses();
+  const { getCategoryBreakdown, familyMembers, deleteExpense, readOnly, loading, updateExpense } = useExpenses();
   const { getCategoryBudgetStatus } = useCategoryBudget(selectedYear, selectedMonth);
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [showPresets, setShowPresets] = useState(false);
+  const [selectedExpenseIds, setSelectedExpenseIds] = useState(new Set());
+  const [showBulkEdit, setShowBulkEdit] = useState(false);
 
   const breakdown = getCategoryBreakdown(selectedYear, selectedMonth);
   const allCategories = Object.keys(breakdown).sort();
@@ -99,6 +103,100 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
     selectedCategories,
     selectedMembers
   });
+
+  // Bulk selection functions
+  const toggleExpenseSelection = (expenseId) => {
+    setSelectedExpenseIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(expenseId)) {
+        newSet.delete(expenseId);
+      } else {
+        newSet.add(expenseId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleCategorySelection = (category) => {
+    const categoryExpenses = filteredBreakdown[category].expenses;
+    const categoryExpenseIds = categoryExpenses.map(exp => exp.id);
+    const allSelected = categoryExpenseIds.every(id => selectedExpenseIds.has(id));
+
+    setSelectedExpenseIds(prev => {
+      const newSet = new Set(prev);
+      if (allSelected) {
+        categoryExpenseIds.forEach(id => newSet.delete(id));
+      } else {
+        categoryExpenseIds.forEach(id => newSet.add(id));
+      }
+      return newSet;
+    });
+  };
+
+  const deselectAll = () => {
+    setSelectedExpenseIds(new Set());
+  };
+
+  const getSelectedExpenses = () => {
+    const allExpenses = [];
+    Object.values(filteredBreakdown).forEach(catData => {
+      allExpenses.push(...catData.expenses);
+    });
+    return allExpenses.filter(exp => selectedExpenseIds.has(exp.id));
+  };
+
+  const handleBulkDelete = async () => {
+    const expensesToDelete = Array.from(selectedExpenseIds);
+    for (const expenseId of expensesToDelete) {
+      await deleteExpense(expenseId);
+    }
+    setSelectedExpenseIds(new Set());
+  };
+
+  const handleBulkEdit = () => {
+    setShowBulkEdit(true);
+  };
+
+  const handleBulkEditSave = async (updates) => {
+    const expensesToUpdate = getSelectedExpenses();
+    for (const expense of expensesToUpdate) {
+      const updatedExpense = { ...expense, ...updates };
+      if (updates.paidAmount) {
+        updatedExpense.paidAmount = expense.plannedAmount || 0;
+      }
+      await updateExpense(expense.id, updatedExpense);
+    }
+    setSelectedExpenseIds(new Set());
+    setShowBulkEdit(false);
+  };
+
+  const handleBulkExport = () => {
+    const expensesToExport = getSelectedExpenses();
+    const csv = [
+      ['Name', 'Category', 'Planned Amount', 'Paid Amount', 'Paid By', 'Recurring', 'Year', 'Month', 'Notes'].join(','),
+      ...expensesToExport.map(exp => [
+        `"${exp.name}"`,
+        `"${exp.category}"`,
+        exp.plannedAmount || 0,
+        exp.paidAmount || 0,
+        `"${getMemberName(exp.paidBy)}"`,
+        exp.isRecurring ? 'Yes' : 'No',
+        exp.year,
+        exp.month,
+        `"${exp.notes || ''}"`
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `expenses-${selectedYear}-${selectedMonth}-${Date.now()}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   // Show skeleton while loading
   if (loading) {
@@ -188,17 +286,33 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
             const isExpanded = expandedCategory === category;
             const budgetStatus = getCategoryBudgetStatus(category, data.paid);
 
+            const categoryExpenseIds = data.expenses.map(exp => exp.id);
+            const allCategorySelected = categoryExpenseIds.length > 0 && categoryExpenseIds.every(id => selectedExpenseIds.has(id));
+
             return (
               <div key={category} className="category-card">
-                <div
-                  className="category-header"
-                  onClick={() => toggleCategory(category)}
-                >
-                  <h3>{category}</h3>
-                  <div className="category-totals">
-                    <span className="planned">Planned: ${data.planned.toFixed(2)}</span>
-                    <span className="paid">Paid: ${data.paid.toFixed(2)}</span>
-                    <span className="expand-icon">{isExpanded ? '▼' : '▶'}</span>
+                <div className="category-header">
+                  {!readOnly && data.expenses.length > 0 && (
+                    <div className="category-select-all" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={allCategorySelected}
+                        onChange={() => toggleCategorySelection(category)}
+                        className="category-checkbox"
+                        title={allCategorySelected ? 'Deselect all in category' : 'Select all in category'}
+                      />
+                    </div>
+                  )}
+                  <div
+                    className="category-header-content"
+                    onClick={() => toggleCategory(category)}
+                  >
+                    <h3>{category}</h3>
+                    <div className="category-totals">
+                      <span className="planned">Planned: ${data.planned.toFixed(2)}</span>
+                      <span className="paid">Paid: ${data.paid.toFixed(2)}</span>
+                      <span className="expand-icon">{isExpanded ? '▼' : '▶'}</span>
+                    </div>
                   </div>
                 </div>
 
@@ -241,7 +355,18 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
                 {isExpanded && (
                   <div className="expenses-list">
                     {data.expenses.map(expense => (
-                      <div key={expense.id} className="expense-item">
+                      <div key={expense.id} className={`expense-item ${selectedExpenseIds.has(expense.id) ? 'selected' : ''}`}>
+                        {!readOnly && (
+                          <div className="expense-checkbox-wrapper">
+                            <input
+                              type="checkbox"
+                              checked={selectedExpenseIds.has(expense.id)}
+                              onChange={() => toggleExpenseSelection(expense.id)}
+                              className="expense-checkbox"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
+                        )}
                         <div className="expense-main">
                           <div className="expense-info">
                             <span className="expense-name">{expense.name}</span>
@@ -299,6 +424,25 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
           currentFilters={getCurrentFilters()}
           onLoadPreset={handleLoadPreset}
           onClose={() => setShowPresets(false)}
+        />
+      )}
+
+      {!readOnly && (
+        <BulkActionsBar
+          selectedCount={selectedExpenseIds.size}
+          onDeselectAll={deselectAll}
+          onBulkDelete={handleBulkDelete}
+          onBulkEdit={handleBulkEdit}
+          onBulkExport={handleBulkExport}
+        />
+      )}
+
+      {showBulkEdit && (
+        <BulkEditModal
+          selectedExpenses={getSelectedExpenses()}
+          familyMembers={familyMembers}
+          onSave={handleBulkEditSave}
+          onClose={() => setShowBulkEdit(false)}
         />
       )}
     </div>
