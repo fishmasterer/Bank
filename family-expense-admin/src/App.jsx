@@ -7,6 +7,7 @@ import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
 import ExpenseForm from './components/ExpenseForm';
 import BudgetSettings from './components/BudgetSettings';
+import CategoryBudgetSettings from './components/CategoryBudgetSettings';
 import FamilyMembersModal from './components/FamilyMembersModal';
 import Login from './components/Login';
 import UserProfile from './components/UserProfile';
@@ -20,6 +21,7 @@ const AppContent = () => {
   const [activeTab, setActiveTab] = useState('summary');
   const [showForm, setShowForm] = useState(false);
   const [showBudgetSettings, setShowBudgetSettings] = useState(false);
+  const [showCategoryBudgets, setShowCategoryBudgets] = useState(false);
   const [showFamilyModal, setShowFamilyModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -185,6 +187,9 @@ const AppContent = () => {
               <button onClick={() => setShowBudgetSettings(true)} className="btn-secondary">
                 💰 Set Budget
               </button>
+              <button onClick={() => setShowCategoryBudgets(true)} className="btn-secondary">
+                📊 Category Budgets
+              </button>
               <button onClick={() => setShowFamilyModal(true)} className="btn-secondary">
                 👥 Manage Family
               </button>
@@ -240,6 +245,16 @@ const AppContent = () => {
           selectedYear={selectedYear}
           selectedMonth={selectedMonth}
           onClose={() => setShowBudgetSettings(false)}
+          onSuccess={(message) => success(message)}
+          onError={(message) => showError(message)}
+        />
+      )}
+
+      {showCategoryBudgets && !readOnly && (
+        <CategoryBudgetSettings
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+          onClose={() => setShowCategoryBudgets(false)}
           onSuccess={(message) => success(message)}
           onError={(message) => showError(message)}
         />
