@@ -158,23 +158,31 @@
   color: white;
   border: none;
   font-size: 1.75rem;
+  font-weight: 300;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-2xl);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 99;
   padding: 0;
+  animation: scaleIn 0.4s ease-out;
 }
 
 .fab:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  transform: scale(1.15) rotate(90deg);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
 }
 
 .fab:active {
-  transform: scale(0.95);
+  transform: scale(1.05) rotate(90deg);
+}
+
+.fab:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 4px;
 }
 
 /* Hide FAB on desktop */
@@ -236,7 +244,10 @@
   display: flex;
   justify-content: space-around;
   padding: 0.5rem;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  padding-bottom: calc(0.5rem + env(safe-area-inset-bottom)); /* iOS safe area */
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(20px);
+  background-color: rgba(var(--bg-primary-rgb, 255, 255, 255), 0.95);
   z-index: 100;
 }
 
@@ -254,22 +265,33 @@
   font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   min-height: 56px;
+  position: relative;
+  overflow: visible;
 }
 
 .bottom-nav-item:active {
-  transform: scale(0.95);
+  transform: scale(0.92);
 }
 
 .bottom-nav-item.active {
   color: var(--primary-color);
-  background-color: var(--bg-tertiary);
+  background-color: color-mix(in srgb, var(--primary-color) 12%, transparent);
+}
+
+.bottom-nav-item.active .icon {
+  transform: scale(1.1);
 }
 
 .bottom-nav-item .icon {
   font-size: 1.5rem;
   line-height: 1;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bottom-nav-item:hover .icon {
+  transform: scale(1.05);
 }
 
 /* Hide bottom nav on desktop */
@@ -320,6 +342,10 @@
   margin-top: 1rem;
   color: var(--text-secondary);
   font-size: 1.1rem;
+}
+
+.loading-container .spinner {
+  animation: spin 1s linear infinite, pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .error-container h2 {
