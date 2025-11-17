@@ -367,3 +367,106 @@
     font-size: 0.8rem;
   }
 }
+
+/* Category budget indicators */
+.category-budget-indicator {
+  padding: 0.75rem 1rem;
+  background-color: rgba(0, 0, 0, 0.02);
+  border-top: 1px solid var(--border-color);
+}
+
+.category-budget-indicator.warning {
+  background-color: rgba(251, 191, 36, 0.05);
+  border-top-color: rgba(251, 191, 36, 0.3);
+}
+
+.category-budget-indicator.critical {
+  background-color: rgba(239, 68, 68, 0.05);
+  border-top-color: rgba(239, 68, 68, 0.3);
+}
+
+.category-budget-indicator.exceeded {
+  background-color: rgba(220, 38, 38, 0.1);
+  border-top-color: rgba(220, 38, 38, 0.4);
+}
+
+.category-budget-indicator.good {
+  background-color: rgba(16, 185, 129, 0.05);
+  border-top-color: rgba(16, 185, 129, 0.3);
+}
+
+.budget-bar-small {
+  width: 100%;
+  height: 6px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.budget-bar-fill-small {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+
+.category-budget-indicator.good .budget-bar-fill-small {
+  background: linear-gradient(90deg, #10b981, #059669);
+}
+
+.category-budget-indicator.warning .budget-bar-fill-small {
+  background: linear-gradient(90deg, #fbbf24, #f59e0b);
+}
+
+.category-budget-indicator.critical .budget-bar-fill-small {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+.category-budget-indicator.exceeded .budget-bar-fill-small {
+  background: linear-gradient(90deg, #dc2626, #991b1b);
+}
+
+.budget-info-small {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+}
+
+.budget-label-small {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.budget-status-small {
+  font-weight: 600;
+}
+
+.budget-status-small.exceeded {
+  color: #dc2626;
+}
+
+.budget-status-small.critical {
+  color: #ef4444;
+}
+
+.budget-status-small.warning {
+  color: #f59e0b;
+}
+
+.budget-status-small.good {
+  color: #10b981;
+}
+
+/* Tablet and up */
+@media (min-width: 640px) {
+  .budget-info-small {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .category-budget-indicator {
+    padding: 1rem 1.5rem;
+  }
+}

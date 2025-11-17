@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
+import { db } from '../config/firebase';
+import { collection, addDoc } from 'firebase/firestore';
+import ExpenseTemplates from './ExpenseTemplates';
 import './ExpenseForm.css';
 
 const CATEGORIES = [
@@ -19,6 +22,8 @@ const CATEGORIES = [
 const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
   const { addExpense, updateExpense, familyMembers } = useExpenses();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [saveAsTemplate, setSaveAsTemplate] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -70,6 +75,24 @@ const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
         onSuccess?.('Expense added successfully!');
       }
 
+      // Save as template if checkbox is checked
+      if (saveAsTemplate && !editingExpense) {
+        try {
+          await addDoc(collection(db, 'expense-templates'), {
+            name: formData.name,
+            category: formData.category,
+            plannedAmount: parseFloat(formData.plannedAmount) || 0,
+            isRecurring: formData.isRecurring,
+            notes: formData.notes || '',
+            createdAt: new Date().toISOString()
+          });
+          onSuccess?.('Template saved!');
+        } catch (err) {
+          console.error('Error saving template:', err);
+          // Don't fail the whole operation if template save fails
+        }
+      }
+
       onClose();
     } catch (err) {
       console.error('Error submitting expense:', err);
@@ -77,6 +100,17 @@ const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleUseTemplate = (template) => {
+    setFormData(prev => ({
+      ...prev,
+      name: template.name,
+      category: template.category,
+      plannedAmount: template.plannedAmount || '',
+      isRecurring: template.isRecurring || false,
+      notes: template.notes || ''
+    }));
   };
 
   const handleChange = (e) => {
@@ -94,6 +128,18 @@ const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
           <h2>{editingExpense ? 'Edit Expense' : 'Add New Expense'}</h2>
           <button onClick={onClose} className="close-btn">&times;</button>
         </div>
+
+        {!editingExpense && (
+          <div className="template-actions-bar">
+            <button
+              type="button"
+              onClick={() => setShowTemplates(true)}
+              className="btn-template"
+            >
+              📝 Load Template
+            </button>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="expense-form">
           <div className="form-group">
@@ -219,6 +265,19 @@ const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
             </label>
           </div>
 
+          {!editingExpense && (
+            <div className="form-group checkbox-group">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={saveAsTemplate}
+                  onChange={(e) => setSaveAsTemplate(e.target.checked)}
+                />
+                <span>💾 Save as template for future use</span>
+              </label>
+            </div>
+          )}
+
           <div className="form-group">
             <label htmlFor="notes">Notes</label>
             <textarea
@@ -248,6 +307,15 @@ const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
           </div>
         </form>
       </div>
+
+      {showTemplates && (
+        <ExpenseTemplates
+          onClose={() => setShowTemplates(false)}
+          onUseTemplate={handleUseTemplate}
+          onSuccess={onSuccess}
+          onError={onError}
+        />
+      )}
     </div>
   );
 };

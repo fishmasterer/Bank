@@ -1,0 +1,49 @@
+/* Mobile-first donut chart styling */
+.member-spending-chart-container {
+  width: 100%;
+  background-color: var(--bg-primary);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.member-spending-chart {
+  position: relative;
+  height: 320px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tablet and up */
+@media (min-width: 640px) {
+  .member-spending-chart-container {
+    padding: 1.5rem;
+  }
+
+  .member-spending-chart {
+    height: 350px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .member-spending-chart-container {
+    padding: 2rem;
+  }
+
+  .member-spending-chart {
+    height: 380px;
+  }
+}
+
+/* Touch-friendly hover states */
+@media (hover: hover) {
+  .member-spending-chart-container:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+    transition: all 0.2s ease;
+  }
+}

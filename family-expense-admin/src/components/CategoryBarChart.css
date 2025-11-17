@@ -1,0 +1,82 @@
+/* Mobile-first bar chart styling */
+.category-bar-chart-container {
+  width: 100%;
+  background-color: var(--bg-primary);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.category-bar-chart {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* Empty state */
+.chart-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  border: 2px dashed var(--border-color);
+}
+
+.chart-empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.chart-empty-text {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.chart-empty-hint {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Tablet and up */
+@media (min-width: 640px) {
+  .category-bar-chart-container {
+    padding: 1.5rem;
+  }
+
+  .category-bar-chart {
+    height: 350px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .category-bar-chart-container {
+    padding: 2rem;
+  }
+
+  .category-bar-chart {
+    height: 400px;
+  }
+
+  .chart-empty-state {
+    padding: 4rem 2rem;
+  }
+}
+
+/* Touch-friendly hover states */
+@media (hover: hover) {
+  .category-bar-chart-container:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+    transition: all 0.2s ease;
+  }
+}

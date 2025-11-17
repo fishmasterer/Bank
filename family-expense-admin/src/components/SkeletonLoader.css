@@ -1,0 +1,220 @@
+/* Skeleton animations and styles */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-line,
+.skeleton-chart,
+.skeleton-chart-bar-fill,
+.skeleton-budget,
+.skeleton-summary-card,
+.skeleton-expense-item,
+.skeleton-category-section,
+.skeleton-member-card {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 0%,
+    var(--bg-hover, rgba(0, 0, 0, 0.04)) 50%,
+    var(--bg-secondary) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+.skeleton-line {
+  display: block;
+}
+
+/* Chart skeleton */
+.skeleton-chart-container {
+  width: 100%;
+  background-color: var(--bg-primary);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.skeleton-chart {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 1rem;
+}
+
+.skeleton-chart-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  width: 100%;
+  height: 100%;
+  gap: 0.5rem;
+}
+
+.skeleton-chart-bar {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  height: 100%;
+}
+
+.skeleton-chart-bar-fill {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  animation-delay: calc(var(--i, 0) * 0.1s);
+}
+
+/* Summary card skeleton */
+.skeleton-summary-card {
+  background-color: var(--bg-primary);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.skeleton-amounts {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.skeleton-amount-item {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Expense item skeleton */
+.skeleton-expense-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--bg-secondary);
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-expense-main {
+  flex: 1;
+}
+
+.skeleton-expense-amounts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* Category section skeleton */
+.skeleton-category-section {
+  background-color: var(--bg-primary);
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.skeleton-category-header {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.skeleton-expense-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Detailed view skeleton */
+.skeleton-detailed-view {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Member card skeleton */
+.skeleton-member-card {
+  background-color: var(--bg-primary);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Members grid */
+.skeleton-members-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Budget skeleton */
+.skeleton-budget {
+  background-color: var(--bg-primary);
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Summary view skeleton */
+.skeleton-summary-view {
+  width: 100%;
+}
+
+/* Tablet and up */
+@media (min-width: 640px) {
+  .skeleton-chart-container {
+    padding: 1.5rem;
+  }
+
+  .skeleton-summary-card {
+    padding: 2rem;
+  }
+
+  .skeleton-amounts {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .skeleton-expense-item {
+    padding: 1.25rem;
+  }
+
+  .skeleton-category-section {
+    padding: 2rem;
+  }
+
+  .skeleton-budget {
+    padding: 1.5rem;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .skeleton-chart-container {
+    padding: 2rem;
+  }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-line,
+  .skeleton-chart,
+  .skeleton-chart-bar-fill,
+  .skeleton-budget,
+  .skeleton-summary-card,
+  .skeleton-expense-item,
+  .skeleton-category-section,
+  .skeleton-member-card {
+    animation: none;
+    background: var(--bg-secondary);
+  }
+}

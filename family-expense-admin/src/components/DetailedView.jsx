@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
+import { useCategoryBudget } from '../hooks/useCategoryBudget';
+import { SkeletonDetailedView } from './SkeletonLoader';
 import './DetailedView.css';
 
 const DetailedView = ({ selectedYear, selectedMonth, onEditExpense }) => {
-  const { getCategoryBreakdown, familyMembers, deleteExpense, readOnly, getExpensesByMonth } = useExpenses();
+  const { getCategoryBreakdown, familyMembers, deleteExpense, readOnly, getExpensesByMonth, loading } = useExpenses();
+  const { getCategoryBudgetStatus } = useCategoryBudget(selectedYear, selectedMonth);
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
@@ -76,6 +79,11 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense }) => {
     setFilterMember('all');
   };
 
+  // Show skeleton while loading
+  if (loading) {
+    return <SkeletonDetailedView />;
+  }
+
   return (
     <div className="detailed-view">
       <div className="detailed-header">
@@ -140,6 +148,7 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense }) => {
           {categories.map(category => {
             const data = filteredBreakdown[category];
             const isExpanded = expandedCategory === category;
+            const budgetStatus = getCategoryBudgetStatus(category, data.paid);
 
             return (
               <div key={category} className="category-card">
@@ -154,6 +163,42 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense }) => {
                     <span className="expand-icon">{isExpanded ? '▼' : '▶'}</span>
                   </div>
                 </div>
+
+                {budgetStatus.status !== 'none' && (
+                  <div className={`category-budget-indicator ${budgetStatus.status}`}>
+                    <div className="budget-bar-small">
+                      <div
+                        className="budget-bar-fill-small"
+                        style={{ width: `${budgetStatus.percentage}%` }}
+                      ></div>
+                    </div>
+                    <div className="budget-info-small">
+                      <span className="budget-label-small">
+                        Budget: ${budgetStatus.spent.toFixed(0)} / ${budgetStatus.limit.toFixed(0)}
+                      </span>
+                      {budgetStatus.status === 'exceeded' && (
+                        <span className="budget-status-small exceeded">
+                          ⚠️ Over by ${(budgetStatus.spent - budgetStatus.limit).toFixed(0)}
+                        </span>
+                      )}
+                      {budgetStatus.status === 'critical' && (
+                        <span className="budget-status-small critical">
+                          ⚠️ ${budgetStatus.remaining.toFixed(0)} left
+                        </span>
+                      )}
+                      {budgetStatus.status === 'warning' && (
+                        <span className="budget-status-small warning">
+                          ⚡ ${budgetStatus.remaining.toFixed(0)} left
+                        </span>
+                      )}
+                      {budgetStatus.status === 'good' && (
+                        <span className="budget-status-small good">
+                          ✓ ${budgetStatus.remaining.toFixed(0)} left
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {isExpanded && (
                   <div className="expenses-list">
