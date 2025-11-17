@@ -116,6 +116,8 @@
   color: var(--text-primary);
   border-bottom: 2px solid var(--border-color);
   padding-bottom: 0.5rem;
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.01em;
 }
 
 /* Mobile Responsive */

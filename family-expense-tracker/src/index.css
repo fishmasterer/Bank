@@ -13,14 +13,19 @@
   --spacing-2xl: 48px;
   --spacing-3xl: 64px;
 
-  /* Typography Scale (16px minimum) */
-  --font-xs: 0.875rem;    /* 14px - labels only */
-  --font-sm: 1rem;        /* 16px - body (Android 16sp) */
-  --font-md: 1.0625rem;   /* 17px - body (iOS 17pt) */
-  --font-lg: 1.125rem;    /* 18px - subheadings */
-  --font-xl: 1.25rem;     /* 20px - headings */
-  --font-2xl: 1.5rem;     /* 24px - page titles */
-  --font-3xl: 2rem;       /* 32px - hero */
+  /* Typography Scale (16px minimum) - Fluid scaling */
+  --font-xs: clamp(0.8125rem, 0.75rem + 0.3125vw, 0.875rem);    /* 13-14px - labels only */
+  --font-sm: clamp(0.9375rem, 0.875rem + 0.3125vw, 1rem);       /* 15-16px - small text */
+  --font-md: clamp(1rem, 0.9375rem + 0.3125vw, 1.0625rem);      /* 16-17px - body (Android 16sp, iOS 17pt) */
+  --font-lg: clamp(1.0625rem, 1rem + 0.3125vw, 1.125rem);       /* 17-18px - subheadings */
+  --font-xl: clamp(1.125rem, 1.0625rem + 0.3125vw, 1.25rem);    /* 18-20px - headings */
+  --font-2xl: clamp(1.25rem, 1.125rem + 0.625vw, 1.5rem);       /* 20-24px - page titles */
+  --font-3xl: clamp(1.5rem, 1.25rem + 1.25vw, 2rem);            /* 24-32px - hero */
+
+  /* Line heights for readability */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
 
   /* 60-30-10 Color Rule - Light Mode */
   /* Default: Warm Orange Theme */
@@ -241,4 +246,50 @@ input:focus, select:focus, textarea:focus {
 :root[data-theme="dark"] select:focus,
 :root[data-theme="dark"] textarea:focus {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-light) 20%, transparent);
+}
+
+/* Typography Utilities */
+h1, h2, h3, h4, h5, h6 {
+  line-height: var(--line-height-tight);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: var(--font-3xl); }
+h2 { font-size: var(--font-2xl); }
+h3 { font-size: var(--font-xl); }
+h4 { font-size: var(--font-lg); }
+h5 { font-size: var(--font-md); }
+h6 { font-size: var(--font-sm); }
+
+p, li {
+  line-height: var(--line-height-normal);
+}
+
+/* Text truncation utilities */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

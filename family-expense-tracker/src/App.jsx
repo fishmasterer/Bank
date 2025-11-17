@@ -174,6 +174,18 @@ const AppContent = () => {
         <Settings onClose={() => setShowSettings(false)} />
       )}
 
+      {/* Floating Action Button (Mobile only) */}
+      {!readOnly && (
+        <button
+          onClick={handleAddExpense}
+          className="fab"
+          aria-label="Add expense"
+          title="Add expense"
+        >
+          +
+        </button>
+      )}
+
       {/* Mobile Bottom Navigation */}
       <nav className="bottom-nav">
         <button
