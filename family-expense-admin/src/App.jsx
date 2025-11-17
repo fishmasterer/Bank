@@ -9,6 +9,7 @@ import DetailedView from './components/DetailedView';
 import ExpenseForm from './components/ExpenseForm';
 import BudgetSettings from './components/BudgetSettings';
 import CategoryBudgetSettings from './components/CategoryBudgetSettings';
+import BudgetVarianceReport from './components/BudgetVarianceReport';
 import FamilyMembersModal from './components/FamilyMembersModal';
 import Login from './components/Login';
 import UserProfile from './components/UserProfile';
@@ -23,6 +24,7 @@ const AppContent = () => {
   const [showForm, setShowForm] = useState(false);
   const [showBudgetSettings, setShowBudgetSettings] = useState(false);
   const [showCategoryBudgets, setShowCategoryBudgets] = useState(false);
+  const [showVarianceReport, setShowVarianceReport] = useState(false);
   const [showFamilyModal, setShowFamilyModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -196,6 +198,9 @@ const AppContent = () => {
               </button>
             </>
           )}
+          <button onClick={() => setShowVarianceReport(true)} className="btn-secondary">
+            📈 Budget Report
+          </button>
           <button onClick={handleExport} className="btn-secondary">
             📊 Export CSV
           </button>
@@ -266,6 +271,15 @@ const AppContent = () => {
           onClose={() => setShowFamilyModal(false)}
           onSuccess={(message) => success(message)}
           onError={(message) => showError(message)}
+        />
+      )}
+
+      {showVarianceReport && (
+        <BudgetVarianceReport
+          isOpen={showVarianceReport}
+          onClose={() => setShowVarianceReport(false)}
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
         />
       )}
 
