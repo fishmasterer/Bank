@@ -3,15 +3,18 @@ import { useExpenses } from '../context/ExpenseContext';
 import { useCategoryBudget } from '../hooks/useCategoryBudget';
 import { SkeletonDetailedView } from './SkeletonLoader';
 import EmptyState from './EmptyState';
+import MultiSelect from './MultiSelect';
+import FilterPresets from './FilterPresets';
 import './DetailedView.css';
 
 const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense }) => {
-  const { getCategoryBreakdown, familyMembers, deleteExpense, readOnly, getExpensesByMonth, loading } = useExpenses();
+  const { getCategoryBreakdown, familyMembers, deleteExpense, readOnly, loading } = useExpenses();
   const { getCategoryBudgetStatus } = useCategoryBudget(selectedYear, selectedMonth);
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState('all');
-  const [filterMember, setFilterMember] = useState('all');
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedMembers, setSelectedMembers] = useState([]);
+  const [showPresets, setShowPresets] = useState(false);
 
   const breakdown = getCategoryBreakdown(selectedYear, selectedMonth);
   const allCategories = Object.keys(breakdown).sort();
@@ -29,11 +32,15 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
   const getFilteredBreakdown = () => {
     let filteredBreakdown = { ...breakdown };
 
-    // Filter by category
-    if (filterCategory !== 'all') {
-      filteredBreakdown = {
-        [filterCategory]: breakdown[filterCategory]
-      };
+    // Filter by categories (multi-select)
+    if (selectedCategories.length > 0) {
+      const filtered = {};
+      selectedCategories.forEach(cat => {
+        if (breakdown[cat]) {
+          filtered[cat] = breakdown[cat];
+        }
+      });
+      filteredBreakdown = filtered;
     }
 
     // Apply search and member filter to expenses within each category
@@ -48,9 +55,9 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
         );
       }
 
-      // Filter by member
-      if (filterMember !== 'all') {
-        expenses = expenses.filter(exp => exp.paidBy === parseInt(filterMember));
+      // Filter by members (multi-select)
+      if (selectedMembers.length > 0) {
+        expenses = expenses.filter(exp => selectedMembers.includes(exp.paidBy));
       }
 
       filteredBreakdown[category].expenses = expenses;
@@ -73,17 +80,34 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
   const filteredBreakdown = getFilteredBreakdown();
   const categories = Object.keys(filteredBreakdown).sort();
 
-  const hasFilters = searchTerm.trim() || filterCategory !== 'all' || filterMember !== 'all';
+  const hasFilters = searchTerm.trim() || selectedCategories.length > 0 || selectedMembers.length > 0;
+
   const clearFilters = () => {
     setSearchTerm('');
-    setFilterCategory('all');
-    setFilterMember('all');
+    setSelectedCategories([]);
+    setSelectedMembers([]);
   };
+
+  const handleLoadPreset = (filters) => {
+    setSearchTerm(filters.searchTerm || '');
+    setSelectedCategories(filters.selectedCategories || []);
+    setSelectedMembers(filters.selectedMembers || []);
+  };
+
+  const getCurrentFilters = () => ({
+    searchTerm,
+    selectedCategories,
+    selectedMembers
+  });
 
   // Show skeleton while loading
   if (loading) {
     return <SkeletonDetailedView />;
   }
+
+  // Prepare options for multi-select
+  const categoryOptions = allCategories.map(cat => ({ value: cat, label: cat }));
+  const memberOptions = familyMembers.map(m => ({ value: m.id, label: m.name }));
 
   return (
     <div className="detailed-view">
@@ -110,33 +134,32 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
             )}
           </div>
 
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Categories</option>
-            {allCategories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
+          <MultiSelect
+            options={categoryOptions}
+            selected={selectedCategories}
+            onChange={setSelectedCategories}
+            placeholder="All Categories"
+            label="Categories"
+          />
 
-          <select
-            value={filterMember}
-            onChange={(e) => setFilterMember(e.target.value)}
-            className="filter-select"
-          >
-            <option value="all">All Members</option>
-            {familyMembers.map(member => (
-              <option key={member.id} value={member.id}>{member.name}</option>
-            ))}
-          </select>
+          <MultiSelect
+            options={memberOptions}
+            selected={selectedMembers}
+            onChange={setSelectedMembers}
+            placeholder="All Members"
+            label="Members"
+          />
 
-          {hasFilters && (
-            <button onClick={clearFilters} className="clear-filters-btn">
-              Clear Filters
+          <div className="filter-actions">
+            {hasFilters && (
+              <button onClick={clearFilters} className="clear-filters-btn">
+                Clear Filters
+              </button>
+            )}
+            <button onClick={() => setShowPresets(true)} className="presets-btn">
+              💾 Presets
             </button>
-          )}
+          </div>
         </div>
       </div>
 
@@ -269,6 +292,14 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
             );
           })}
         </div>
+      )}
+
+      {showPresets && (
+        <FilterPresets
+          currentFilters={getCurrentFilters()}
+          onLoadPreset={handleLoadPreset}
+          onClose={() => setShowPresets(false)}
+        />
       )}
     </div>
   );
