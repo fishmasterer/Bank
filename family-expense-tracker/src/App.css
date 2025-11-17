@@ -6,22 +6,45 @@
 }
 
 .app-header {
-  text-align: center;
-  padding: 2rem 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--color-primary-60) 0%, var(--color-primary-hover) 100%);
+  border-radius: var(--border-radius-lg);
   color: white;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-md);
+}
+
+.app-header-content {
+  flex: 1;
+  text-align: left;
 }
 
 .app-header h1 {
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
-  margin-bottom: 0.5rem;
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .subtitle {
-  font-size: clamp(0.875rem, 2vw, 1rem);
+  font-size: clamp(0.8rem, 2vw, 0.95rem);
   opacity: 0.9;
+  margin-top: 0.25rem;
+  font-weight: 400;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.header-actions button {
+  min-height: 40px;
+  white-space: nowrap;
 }
 
 .controls {
@@ -89,31 +112,105 @@
 }
 
 .tabs {
-  display: flex;
+  display: none; /* Hide on mobile, show on desktop */
   gap: 0.5rem;
   margin-bottom: 1.5rem;
   border-bottom: 2px solid var(--border-color);
+  background-color: var(--bg-primary);
+  border-radius: var(--border-radius-lg);
+  padding: 0.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .tab {
   padding: 0.75rem 1.5rem;
-  background: none;
+  background: transparent;
   border: none;
-  border-bottom: 3px solid transparent;
-  color: var(--text-secondary);
+  border-radius: var(--border-radius-md);
+  color: var(--text-primary);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  position: relative;
 }
 
 .tab:hover {
-  color: var(--text-primary);
   background-color: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .tab.active {
+  background-color: var(--primary-color);
+  color: white;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Desktop tabs */
+@media (min-width: 769px) {
+  .tabs {
+    display: flex;
+  }
+}
+
+/* Mobile bottom navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--bg-primary);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-around;
+  padding: 0.5rem;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  border-radius: var(--border-radius-md);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 56px;
+}
+
+.bottom-nav-item:active {
+  transform: scale(0.95);
+}
+
+.bottom-nav-item.active {
   color: var(--primary-color);
-  border-bottom-color: var(--primary-color);
+  background-color: var(--bg-tertiary);
+}
+
+.bottom-nav-item .icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+/* Hide bottom nav on desktop */
+@media (min-width: 769px) {
+  .bottom-nav {
+    display: none;
+  }
+}
+
+/* Add padding to main content on mobile to account for bottom nav */
+@media (max-width: 768px) {
+  .main-content {
+    padding-bottom: 80px; /* Height of bottom nav + some spacing */
+  }
 }
 
 .main-content {
@@ -175,8 +272,20 @@
   }
 
   .app-header {
-    padding: 1.5rem 1rem;
+    padding: 0.75rem;
     margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .app-header-content {
+    flex: 1 1 100%;
+    text-align: center;
+  }
+
+  .header-actions {
+    flex: 1 1 100%;
+    justify-content: center;
   }
 
   .controls {
@@ -200,16 +309,6 @@
 
   .action-buttons button {
     width: 100%;
-  }
-
-  .tabs {
-    overflow-x: auto;
-  }
-
-  .tab {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    font-size: 0.9rem;
   }
 }
 
