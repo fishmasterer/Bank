@@ -20,6 +20,8 @@ import ThemePicker from './components/ThemePicker';
 import Toast from './components/Toast';
 import NotificationBell from './components/NotificationBell';
 import ToastNotification from './components/ToastNotification';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
+import PWAUpdateNotification from './components/PWAUpdateNotification';
 import { exportToCSV } from './utils/exportData';
 import './App.css';
 
@@ -311,6 +313,9 @@ const AppContent = () => {
           onClose={() => hideToast(toast.id)}
         />
       ))}
+
+      <PWAInstallPrompt />
+      <PWAUpdateNotification />
     </div>
   );
 };
