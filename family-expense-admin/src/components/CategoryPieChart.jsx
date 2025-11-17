@@ -7,16 +7,28 @@ import {
   Legend
 } from 'chart.js';
 import { useExpenses } from '../context/ExpenseContext';
+import { SkeletonChart } from './SkeletonLoader';
 import './CategoryPieChart.css';
 
 // Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const CategoryPieChart = ({ selectedYear, selectedMonth }) => {
+const CategoryPieChart = ({ selectedYear, selectedMonth, loading = false }) => {
   const { getCategoryBreakdown } = useExpenses();
 
   const breakdown = getCategoryBreakdown(selectedYear, selectedMonth);
   const categories = Object.keys(breakdown);
+
+  if (loading) {
+    return (
+      <div className="pie-chart-container">
+        <h3 className="chart-title">Spending by Category</h3>
+        <div className="chart-wrapper">
+          <SkeletonChart height="300px" />
+        </div>
+      </div>
+    );
+  }
 
   if (categories.length === 0) {
     return (

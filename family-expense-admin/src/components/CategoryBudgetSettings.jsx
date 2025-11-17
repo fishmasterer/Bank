@@ -9,6 +9,7 @@ const CategoryBudgetSettings = ({ selectedYear, selectedMonth, onClose, onSucces
   const [categoryLimits, setCategoryLimits] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
 
   const breakdown = getCategoryBreakdown(selectedYear, selectedMonth);
   const categories = Object.keys(breakdown).sort();
@@ -40,6 +41,36 @@ const CategoryBudgetSettings = ({ selectedYear, selectedMonth, onClose, onSucces
       ...prev,
       [category]: value === '' ? undefined : parseFloat(value)
     }));
+  };
+
+  const handleCopyFromPrevious = async () => {
+    setIsCopying(true);
+    try {
+      // Calculate previous month
+      let prevMonth = selectedMonth - 1;
+      let prevYear = selectedYear;
+
+      if (prevMonth < 1) {
+        prevMonth = 12;
+        prevYear -= 1;
+      }
+
+      const prevBudgetKey = `${prevYear}-${prevMonth}`;
+      const prevBudgetDoc = await getDoc(doc(db, 'category-budgets', prevBudgetKey));
+
+      if (prevBudgetDoc.exists()) {
+        const prevLimits = prevBudgetDoc.data().limits || {};
+        setCategoryLimits(prevLimits);
+        onSuccess?.(`Copied budgets from ${new Date(prevYear, prevMonth - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`);
+      } else {
+        onError?.('No budget found for previous month');
+      }
+    } catch (err) {
+      console.error('Error copying budgets:', err);
+      onError?.('Failed to copy budgets from previous month');
+    } finally {
+      setIsCopying(false);
+    }
   };
 
   const handleSave = async () => {
@@ -115,9 +146,26 @@ const CategoryBudgetSettings = ({ selectedYear, selectedMonth, onClose, onSucces
           <button onClick={onClose} className="close-button" aria-label="Close">×</button>
         </div>
 
-        <p className="modal-description">
-          Set budget limits for each category in {monthName}
-        </p>
+        <div className="modal-description-row">
+          <p className="modal-description">
+            Set budget limits for each category in {monthName}
+          </p>
+          <button
+            onClick={handleCopyFromPrevious}
+            className="btn-copy-budgets"
+            disabled={isCopying || isSaving}
+            type="button"
+          >
+            {isCopying ? (
+              <>
+                <span className="spinner-small"></span>
+                Copying...
+              </>
+            ) : (
+              <>📋 Copy from Previous</>
+            )}
+          </button>
+        </div>
 
         <div className="category-budget-list">
           {categories.length === 0 ? (

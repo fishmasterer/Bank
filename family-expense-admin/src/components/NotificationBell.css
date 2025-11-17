@@ -1,0 +1,114 @@
+/* Notification Bell Container */
+.notification-bell-container {
+  position: relative;
+}
+
+/* Bell Button */
+.notification-bell {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+}
+
+.notification-bell:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.notification-bell:active {
+  transform: scale(0.95);
+}
+
+.bell-icon {
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Pulse animation for unread notifications */
+.notification-bell.has-unread .bell-icon {
+  animation: bellRing 2s ease-in-out infinite;
+}
+
+@keyframes bellRing {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  10%, 30% {
+    transform: rotate(-10deg);
+  }
+  20%, 40% {
+    transform: rotate(10deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+}
+
+/* Badge */
+.notification-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 0.125rem 0.375rem;
+  border-radius: 10px;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .notification-bell {
+    width: 40px;
+    height: 40px;
+  }
+
+  .bell-icon {
+    font-size: 1.375rem;
+  }
+
+  .notification-badge {
+    font-size: 0.563rem;
+    min-width: 16px;
+    height: 16px;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .notification-bell.has-unread .bell-icon,
+  .notification-badge {
+    animation: none;
+  }
+
+  .notification-bell:active {
+    transform: none;
+  }
+}

@@ -1,0 +1,143 @@
+/* PWA Update Notification */
+.pwa-update-notification {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1001;
+  max-width: 400px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.pwa-update-notification.update {
+  border-left: 4px solid #667eea;
+}
+
+.pwa-update-notification.offline-ready {
+  border-left: 4px solid #10b981;
+}
+
+.pwa-update-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.pwa-update-icon {
+  font-size: 1.75rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.pwa-update-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.pwa-update-text h4 {
+  font-size: 0.938rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem 0;
+}
+
+.pwa-update-text p {
+  font-size: 0.813rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.pwa-update-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.pwa-update-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.813rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.pwa-update-btn.primary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
+}
+
+.pwa-update-btn.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.35);
+}
+
+.pwa-update-btn.primary:active {
+  transform: translateY(0);
+}
+
+.pwa-update-btn.secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.pwa-update-btn.secondary:hover {
+  background: var(--bg-hover);
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .pwa-update-notification {
+    top: 0.5rem;
+    right: 0.5rem;
+    left: 0.5rem;
+    max-width: none;
+  }
+
+  .pwa-update-content {
+    padding: 0.875rem;
+    gap: 0.75rem;
+  }
+
+  .pwa-update-icon {
+    font-size: 1.5rem;
+  }
+
+  .pwa-update-text h4 {
+    font-size: 0.875rem;
+  }
+
+  .pwa-update-text p {
+    font-size: 0.75rem;
+  }
+
+  .pwa-update-actions {
+    flex-direction: row;
+  }
+
+  .pwa-update-btn {
+    flex: 1;
+  }
+}

@@ -1,25 +1,33 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { useExpenses } from '../context/ExpenseContext';
+import ChartDrillDown from './ChartDrillDown';
+import { SkeletonChart } from './SkeletonLoader';
 import './MemberSpendingChart.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const MemberSpendingChart = ({ selectedYear, selectedMonth }) => {
-  const { familyMembers, getMonthlyTotal } = useExpenses();
+const MemberSpendingChart = ({ selectedYear, selectedMonth, loading = false }) => {
+  const { familyMembers, getMonthlyTotal, getExpensesByMonth } = useExpenses();
+  const [drillDown, setDrillDown] = useState({ isOpen: false, member: null, expenses: [] });
 
-  const chartData = useMemo(() => {
+  const memberSpendingData = useMemo(() => {
     const memberSpending = familyMembers.map(member => ({
+      id: member.id,
       name: member.name,
       amount: getMonthlyTotal(selectedYear, selectedMonth, member.id)
     })).filter(m => m.amount > 0);
 
-    if (memberSpending.length === 0) {
+    return memberSpending;
+  }, [familyMembers, getMonthlyTotal, selectedYear, selectedMonth]);
+
+  const chartData = useMemo(() => {
+    if (memberSpendingData.length === 0) {
       return null;
     }
 
-    const total = memberSpending.reduce((sum, m) => sum + m.amount, 0);
+    const total = memberSpendingData.reduce((sum, m) => sum + m.amount, 0);
 
     // Rich color palette for members
     const colors = [
@@ -38,22 +46,38 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth }) => {
     const borderColors = colors.map(c => c.replace('0.8', '1'));
 
     return {
-      labels: memberSpending.map(m => m.name),
+      labels: memberSpendingData.map(m => m.name),
       datasets: [{
         label: 'Amount Paid',
-        data: memberSpending.map(m => m.amount),
-        backgroundColor: colors.slice(0, memberSpending.length),
-        borderColor: borderColors.slice(0, memberSpending.length),
+        data: memberSpendingData.map(m => m.amount),
+        backgroundColor: colors.slice(0, memberSpendingData.length),
+        borderColor: borderColors.slice(0, memberSpendingData.length),
         borderWidth: 3,
         hoverOffset: window.innerWidth < 640 ? 8 : 15,
         spacing: 2,
       }]
     };
-  }, [familyMembers, getMonthlyTotal, selectedYear, selectedMonth]);
+  }, [memberSpendingData]);
+
+  const handleChartClick = useCallback((event, elements) => {
+    if (elements.length > 0) {
+      const index = elements[0].index;
+      const memberInfo = memberSpendingData[index];
+      const allExpenses = getExpensesByMonth(selectedYear, selectedMonth);
+      const memberExpenses = allExpenses.filter(exp => exp.paidBy === memberInfo.id);
+
+      setDrillDown({
+        isOpen: true,
+        member: memberInfo.name,
+        expenses: memberExpenses
+      });
+    }
+  }, [memberSpendingData, getExpensesByMonth, selectedYear, selectedMonth]);
 
   const options = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
+    onClick: handleChartClick,
     cutout: '60%',  // Makes it a donut instead of pie
     plugins: {
       legend: {
@@ -92,7 +116,7 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth }) => {
       },
       title: {
         display: true,
-        text: 'Member Spending Breakdown',
+        text: 'Member Spending Breakdown (Click to drill down)',
         font: {
           size: window.innerWidth < 640 ? 14 : 16,
           weight: 'bold'
@@ -127,8 +151,21 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth }) => {
           }
         }
       }
+    },
+    animation: {
+      animateRotate: true,
+      animateScale: true,
+      duration: 750,
+      easing: 'easeInOutQuart'
+    },
+    hover: {
+      animationDuration: 400
     }
-  }), []);
+  }), [handleChartClick]);
+
+  if (loading) {
+    return <SkeletonChart height="350px" />;
+  }
 
   if (!chartData) {
     return (
@@ -141,11 +178,21 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth }) => {
   }
 
   return (
-    <div className="member-spending-chart-container">
-      <div className="member-spending-chart">
-        <Doughnut data={chartData} options={options} />
+    <>
+      <div className="member-spending-chart-container">
+        <div className="member-spending-chart">
+          <Doughnut data={chartData} options={options} />
+        </div>
       </div>
-    </div>
+
+      <ChartDrillDown
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown({ isOpen: false, member: null, expenses: [] })}
+        title={`${drillDown.member}'s Expenses`}
+        expenses={drillDown.expenses}
+        type="member"
+      />
+    </>
   );
 };
 

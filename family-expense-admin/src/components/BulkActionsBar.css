@@ -1,0 +1,341 @@
+/* Bulk Actions Bar - Floating at bottom */
+.bulk-actions-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  animation: slideUpBar 0.3s ease-out;
+  border-top: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+@keyframes slideUpBar {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.bulk-actions-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 1rem;
+}
+
+/* Info Section */
+.bulk-actions-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+}
+
+.selected-count {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.75rem;
+  border-radius: 8px;
+  min-width: 50px;
+  text-align: center;
+}
+
+.selected-text {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Action Buttons */
+.bulk-actions-buttons {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.bulk-action-btn {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.938rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  white-space: nowrap;
+}
+
+.bulk-action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.bulk-action-btn:active {
+  transform: translateY(0);
+}
+
+.bulk-action-btn.edit {
+  background: white;
+  color: #667eea;
+}
+
+.bulk-action-btn.export {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.bulk-action-btn.export:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.bulk-action-btn.delete {
+  background: #ef4444;
+  color: white;
+}
+
+.bulk-action-btn.delete:hover {
+  background: #dc2626;
+}
+
+.bulk-action-btn.cancel {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.75rem 1rem;
+  font-size: 1.25rem;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.bulk-action-btn.cancel:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Confirmation Dialog */
+.bulk-confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.bulk-confirm-dialog {
+  background: white;
+  border-radius: 16px;
+  max-width: 450px;
+  width: 100%;
+  padding: 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: scaleIn 0.3s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.bulk-confirm-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.bulk-confirm-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.bulk-confirm-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.bulk-confirm-message {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+}
+
+.bulk-confirm-message strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.bulk-confirm-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.bulk-confirm-btn {
+  flex: 1;
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bulk-confirm-btn.cancel {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+}
+
+.bulk-confirm-btn.cancel:hover {
+  background: var(--bg-primary);
+  border-color: var(--text-secondary);
+}
+
+.bulk-confirm-btn.confirm {
+  background: #ef4444;
+  color: white;
+}
+
+.bulk-confirm-btn.confirm:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.bulk-confirm-btn.confirm:active {
+  transform: translateY(0);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .bulk-actions-content {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .bulk-actions-info {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .bulk-actions-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .bulk-action-btn {
+    flex: 1;
+    min-width: 0;
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  .bulk-action-btn.cancel {
+    flex: 0;
+    min-width: 60px;
+  }
+
+  .selected-count {
+    font-size: 1.25rem;
+    min-width: 40px;
+  }
+
+  .selected-text {
+    font-size: 0.938rem;
+  }
+
+  .bulk-confirm-dialog {
+    padding: 1.5rem;
+  }
+
+  .bulk-confirm-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .bulk-confirm-icon {
+    font-size: 3rem;
+  }
+
+  .bulk-confirm-title {
+    font-size: 1.125rem;
+  }
+
+  .bulk-confirm-message {
+    font-size: 0.938rem;
+    text-align: center;
+  }
+
+  .bulk-confirm-actions {
+    flex-direction: column;
+  }
+
+  .bulk-confirm-btn {
+    padding: 0.813rem 1.25rem;
+    font-size: 0.938rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .bulk-actions-buttons {
+    gap: 0.375rem;
+  }
+
+  .bulk-action-btn {
+    padding: 0.625rem 0.75rem;
+    font-size: 0.813rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .bulk-actions-bar,
+  .bulk-confirm-overlay,
+  .bulk-confirm-dialog,
+  .bulk-action-btn {
+    animation: none;
+    transition: none;
+  }
+
+  .bulk-action-btn:hover,
+  .bulk-confirm-btn.confirm:hover {
+    transform: none;
+  }
+}

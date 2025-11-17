@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
+import { useNotifications } from '../context/NotificationContext';
 import { db } from '../config/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import ExpenseTemplates from './ExpenseTemplates';
@@ -21,6 +22,7 @@ const CATEGORIES = [
 
 const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
   const { addExpense, updateExpense, familyMembers } = useExpenses();
+  const { addExpenseAction } = useNotifications();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -69,9 +71,11 @@ const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
 
       if (editingExpense) {
         await updateExpense(editingExpense.id, expenseData);
+        addExpenseAction('updated', expenseData.name, expenseData.category);
         onSuccess?.('Expense updated successfully!');
       } else {
         await addExpense(expenseData);
+        addExpenseAction('added', expenseData.name, expenseData.category);
         onSuccess?.('Expense added successfully!');
       }
 

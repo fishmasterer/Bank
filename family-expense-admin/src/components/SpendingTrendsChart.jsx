@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -12,6 +12,8 @@ import {
   Filler
 } from 'chart.js';
 import { useExpenses } from '../context/ExpenseContext';
+import ChartDrillDown from './ChartDrillDown';
+import { SkeletonChart } from './SkeletonLoader';
 import './SpendingTrendsChart.css';
 
 ChartJS.register(
@@ -25,10 +27,11 @@ ChartJS.register(
   Filler
 );
 
-const SpendingTrendsChart = ({ selectedYear, selectedMonth }) => {
-  const { getMonthlyTotal, getMonthlyPlanned } = useExpenses();
+const SpendingTrendsChart = ({ selectedYear, selectedMonth, loading = false }) => {
+  const { getMonthlyTotal, getMonthlyPlanned, getExpensesByMonth } = useExpenses();
+  const [drillDown, setDrillDown] = useState({ isOpen: false, month: null, year: null, expenses: [] });
 
-  const chartData = useMemo(() => {
+  const monthsData = useMemo(() => {
     const months = [];
     const labels = [];
     const plannedData = [];
@@ -58,6 +61,11 @@ const SpendingTrendsChart = ({ selectedYear, selectedMonth }) => {
       paidData.push(getMonthlyTotal(year, month));
     }
 
+    return { months, labels, plannedData, paidData };
+  }, [getMonthlyTotal, getMonthlyPlanned, selectedYear, selectedMonth]);
+
+  const chartData = useMemo(() => {
+    const { labels, plannedData, paidData } = monthsData;
     const hasData = plannedData.some(v => v > 0) || paidData.some(v => v > 0);
 
     if (!hasData) {
@@ -99,11 +107,31 @@ const SpendingTrendsChart = ({ selectedYear, selectedMonth }) => {
         }
       ]
     };
-  }, [getMonthlyTotal, getMonthlyPlanned, selectedYear, selectedMonth]);
+  }, [monthsData]);
+
+  const handleChartClick = useCallback((event, elements) => {
+    if (elements.length > 0) {
+      const index = elements[0].index;
+      const monthInfo = monthsData.months[index];
+      const expenses = getExpensesByMonth(monthInfo.year, monthInfo.month);
+
+      const date = new Date(monthInfo.year, monthInfo.month - 1);
+      const monthName = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+      setDrillDown({
+        isOpen: true,
+        month: monthInfo.month,
+        year: monthInfo.year,
+        monthName,
+        expenses
+      });
+    }
+  }, [monthsData, getExpensesByMonth]);
 
   const options = useMemo(() => ({
     responsive: true,
     maintainAspectRatio: false,
+    onClick: handleChartClick,
     interaction: {
       mode: 'index',
       intersect: false,
@@ -125,7 +153,7 @@ const SpendingTrendsChart = ({ selectedYear, selectedMonth }) => {
       },
       title: {
         display: true,
-        text: 'Spending Trends (Last 6 Months)',
+        text: 'Spending Trends (Last 6 Months - Click to drill down)',
         font: {
           size: window.innerWidth < 640 ? 14 : 16,
           weight: 'bold'
@@ -194,8 +222,19 @@ const SpendingTrendsChart = ({ selectedYear, selectedMonth }) => {
           }
         }
       }
+    },
+    animation: {
+      duration: 750,
+      easing: 'easeInOutQuart'
+    },
+    hover: {
+      animationDuration: 400
     }
-  }), []);
+  }), [handleChartClick]);
+
+  if (loading) {
+    return <SkeletonChart height="320px" />;
+  }
 
   if (!chartData) {
     return (
@@ -208,11 +247,21 @@ const SpendingTrendsChart = ({ selectedYear, selectedMonth }) => {
   }
 
   return (
-    <div className="spending-trends-chart-container">
-      <div className="spending-trends-chart">
-        <Line data={chartData} options={options} />
+    <>
+      <div className="spending-trends-chart-container">
+        <div className="spending-trends-chart">
+          <Line data={chartData} options={options} />
+        </div>
       </div>
-    </div>
+
+      <ChartDrillDown
+        isOpen={drillDown.isOpen}
+        onClose={() => setDrillDown({ isOpen: false, month: null, year: null, expenses: [] })}
+        title={`${drillDown.monthName} - All Expenses`}
+        expenses={drillDown.expenses}
+        type="month"
+      />
+    </>
   );
 };
 

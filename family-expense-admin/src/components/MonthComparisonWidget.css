@@ -1,0 +1,209 @@
+/* Month Comparison Widget */
+.month-comparison-widget h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
+}
+
+/* Comparison Summary */
+.comparison-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+}
+
+.month-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
+  text-align: center;
+}
+
+.month-card.current {
+  opacity: 1;
+}
+
+.month-card.previous {
+  opacity: 0.7;
+}
+
+.month-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.month-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.month-count {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Comparison Arrow */
+.comparison-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.arrow-up,
+.arrow-down {
+  font-size: 1.5rem;
+}
+
+.arrow-up {
+  color: #ef4444;
+}
+
+.arrow-down {
+  color: #10b981;
+}
+
+.percentage {
+  font-size: 0.813rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.percentage.increase {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.percentage.decrease {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+/* Category Changes */
+.category-changes h4 {
+  font-size: 0.938rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem 0;
+}
+
+.changes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.change-item {
+  padding: 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+}
+
+.change-item:hover {
+  background: var(--bg-hover);
+}
+
+.change-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.change-category {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.change-value {
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.change-value.increase {
+  color: #ef4444;
+}
+
+.change-value.decrease {
+  color: #10b981;
+}
+
+.change-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.change-percent {
+  font-weight: 600;
+}
+
+.change-percent.increase {
+  color: #ef4444;
+}
+
+.change-percent.decrease {
+  color: #10b981;
+}
+
+.no-changes {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .comparison-summary {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .month-card {
+    width: 100%;
+  }
+
+  .month-value {
+    font-size: 1.125rem;
+  }
+
+  .comparison-arrow {
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .arrow-up,
+  .arrow-down {
+    font-size: 1.25rem;
+  }
+
+  .change-item {
+    padding: 0.625rem;
+  }
+
+  .change-category,
+  .change-value {
+    font-size: 0.813rem;
+  }
+}

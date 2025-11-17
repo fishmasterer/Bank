@@ -1,21 +1,28 @@
 import React, { useState } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
+import { NotificationProvider } from './context/NotificationContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { useAuthorization } from './hooks/useAuthorization';
 import { useToast } from './hooks/useToast';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
+import AnalyticsDashboard from './components/AnalyticsDashboard';
 import ExpenseForm from './components/ExpenseForm';
 import BudgetSettings from './components/BudgetSettings';
 import CategoryBudgetSettings from './components/CategoryBudgetSettings';
+import BudgetVarianceReport from './components/BudgetVarianceReport';
 import FamilyMembersModal from './components/FamilyMembersModal';
 import Login from './components/Login';
 import UserProfile from './components/UserProfile';
 import Unauthorized from './components/Unauthorized';
 import ThemePicker from './components/ThemePicker';
 import Toast from './components/Toast';
-import { exportToCSV } from './utils/exportData';
+import NotificationBell from './components/NotificationBell';
+import ToastNotification from './components/ToastNotification';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
+import PWAUpdateNotification from './components/PWAUpdateNotification';
+import ExportModal from './components/ExportModal';
 import './App.css';
 
 const AppContent = () => {
@@ -23,7 +30,9 @@ const AppContent = () => {
   const [showForm, setShowForm] = useState(false);
   const [showBudgetSettings, setShowBudgetSettings] = useState(false);
   const [showCategoryBudgets, setShowCategoryBudgets] = useState(false);
+  const [showVarianceReport, setShowVarianceReport] = useState(false);
   const [showFamilyModal, setShowFamilyModal] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
@@ -73,12 +82,7 @@ const AppContent = () => {
   };
 
   const handleExport = () => {
-    try {
-      exportToCSV(expenses, familyMembers, selectedYear, selectedMonth);
-      success('Expenses exported successfully!');
-    } catch (err) {
-      showError('Failed to export expenses');
-    }
+    setShowExportModal(true);
   };
 
   const handleCopyRecurring = async () => {
@@ -140,6 +144,7 @@ const AppContent = () => {
           </p>
         </div>
         <div className="header-actions">
+          <NotificationBell />
           <ThemePicker />
           <UserProfile />
         </div>
@@ -196,8 +201,11 @@ const AppContent = () => {
               </button>
             </>
           )}
+          <button onClick={() => setShowVarianceReport(true)} className="btn-secondary">
+            📈 Budget Report
+          </button>
           <button onClick={handleExport} className="btn-secondary">
-            📊 Export CSV
+            📥 Export
           </button>
         </div>
       </div>
@@ -215,6 +223,12 @@ const AppContent = () => {
         >
           Detailed Breakdown
         </button>
+        <button
+          className={`tab ${activeTab === 'analytics' ? 'active' : ''}`}
+          onClick={() => setActiveTab('analytics')}
+        >
+          Analytics
+        </button>
       </div>
 
       <main className="main-content">
@@ -223,11 +237,17 @@ const AppContent = () => {
             selectedYear={selectedYear}
             selectedMonth={selectedMonth}
           />
-        ) : (
+        ) : activeTab === 'detailed' ? (
           <DetailedView
             selectedYear={selectedYear}
             selectedMonth={selectedMonth}
             onEditExpense={handleEditExpense}
+            onAddExpense={handleAddExpense}
+          />
+        ) : (
+          <AnalyticsDashboard
+            selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
           />
         )}
       </main>
@@ -269,6 +289,26 @@ const AppContent = () => {
         />
       )}
 
+      {showVarianceReport && (
+        <BudgetVarianceReport
+          isOpen={showVarianceReport}
+          onClose={() => setShowVarianceReport(false)}
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+        />
+      )}
+
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonth}
+        onSuccess={(message) => success(message)}
+        onError={(message) => showError(message)}
+      />
+
+      <ToastNotification />
+
       {toasts.map(toast => (
         <Toast
           key={toast.id}
@@ -278,6 +318,9 @@ const AppContent = () => {
           onClose={() => hideToast(toast.id)}
         />
       ))}
+
+      <PWAInstallPrompt />
+      <PWAUpdateNotification />
     </div>
   );
 };
@@ -287,7 +330,9 @@ function App({ readOnly = false }) {
     <AuthProvider>
       <ThemeProvider>
         <ExpenseProvider readOnly={readOnly}>
-          <AppContent />
+          <NotificationProvider>
+            <AppContent />
+          </NotificationProvider>
         </ExpenseProvider>
       </ThemeProvider>
     </AuthProvider>
