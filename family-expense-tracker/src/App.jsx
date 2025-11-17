@@ -71,7 +71,7 @@ const AppContent = () => {
   return (
     <div className="app">
       <header className="app-header">
-        <div>
+        <div className="app-header-content">
           <h1>💰 Family Expense Tracker</h1>
           <p className="subtitle">
             {readOnly
@@ -84,7 +84,6 @@ const AppContent = () => {
           <button
             onClick={() => setShowSettings(true)}
             className="btn-secondary"
-            style={{ minHeight: '40px' }}
           >
             ⚙️ Settings
           </button>
@@ -174,6 +173,36 @@ const AppContent = () => {
       {showSettings && (
         <Settings onClose={() => setShowSettings(false)} />
       )}
+
+      {/* Floating Action Button (Mobile only) */}
+      {!readOnly && (
+        <button
+          onClick={handleAddExpense}
+          className="fab"
+          aria-label="Add expense"
+          title="Add expense"
+        >
+          +
+        </button>
+      )}
+
+      {/* Mobile Bottom Navigation */}
+      <nav className="bottom-nav">
+        <button
+          className={`bottom-nav-item ${activeTab === 'summary' ? 'active' : ''}`}
+          onClick={() => setActiveTab('summary')}
+        >
+          <span className="icon">📊</span>
+          <span>Summary</span>
+        </button>
+        <button
+          className={`bottom-nav-item ${activeTab === 'detailed' ? 'active' : ''}`}
+          onClick={() => setActiveTab('detailed')}
+        >
+          <span className="icon">📋</span>
+          <span>Details</span>
+        </button>
+      </nav>
     </div>
   );
 };

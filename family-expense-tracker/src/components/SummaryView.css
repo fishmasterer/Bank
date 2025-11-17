@@ -2,24 +2,33 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .summary-card {
   background-color: var(--bg-primary);
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--shadow-md);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  animation: scaleIn 0.3s ease-out;
+}
+
+.summary-card:hover {
+  box-shadow: var(--shadow-lg);
 }
 
 .total-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--color-primary-60) 0%, var(--color-primary-hover) 100%);
   color: white;
 }
 
 .total-card h2 {
-  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
   margin-bottom: 1rem;
   text-align: center;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .amount-row {
@@ -56,20 +65,25 @@
   font-size: 1.5rem;
 }
 
-.planned {
-  color: #93c5fd;
+/* Total card uses lighter colors for contrast on dark gradient background */
+.total-card .planned {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 700;
 }
 
-.paid {
-  color: #86efac;
+.total-card .paid {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 700;
 }
 
-.over {
-  color: #fca5a5;
+.total-card .over {
+  color: #FEE2E2;
+  font-weight: 700;
 }
 
-.under {
-  color: #fde68a;
+.total-card .under {
+  color: #FEF3C7;
+  font-weight: 700;
 }
 
 .member-card .planned {
@@ -94,56 +108,139 @@
   gap: 1rem;
 }
 
+/* Stagger animation for member cards */
+.member-card:nth-child(1) { animation-delay: 0.05s; }
+.member-card:nth-child(2) { animation-delay: 0.1s; }
+.member-card:nth-child(3) { animation-delay: 0.15s; }
+.member-card:nth-child(4) { animation-delay: 0.2s; }
+.member-card:nth-child(5) { animation-delay: 0.25s; }
+.member-card:nth-child(6) { animation-delay: 0.3s; }
+
+.members-grid-header {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.member-card {
+  transition: all 0.3s ease;
+}
+
+.member-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
 .member-card h3 {
   font-size: 1.25rem;
   margin-bottom: 1rem;
   color: var(--text-primary);
   border-bottom: 2px solid var(--border-color);
   padding-bottom: 0.5rem;
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.01em;
 }
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+  .summary-view {
+    gap: 1rem;
+  }
+
   .summary-card {
     padding: 1rem;
+    border-radius: var(--border-radius-md);
+  }
+
+  .total-card {
+    padding: 1.25rem 1rem;
   }
 
   .total-card h2 {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
   }
 
   .amount-row {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.75rem;
   }
 
   .amount-item {
-    padding: 0.5rem 0;
+    padding: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-md);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .total-card .amount-item {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .amount-item .label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.85;
   }
 
   .amount {
-    font-size: 1.1rem;
+    font-size: 1.5rem;
   }
 
   .total-card .amount {
-    font-size: 1.3rem;
+    font-size: 1.75rem;
   }
 
   .members-grid {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .member-card {
+    border-left: 4px solid var(--primary-color);
+  }
+
+  .member-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .amount-column {
+    gap: 0.5rem;
+  }
+
+  .member-card .amount-item {
+    background-color: var(--bg-tertiary);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--border-radius-sm);
   }
 }
 
 @media (max-width: 480px) {
-  .amount-item .label {
-    font-size: 0.9rem;
+  .total-card {
+    padding: 1rem 0.75rem;
   }
 
-  .amount {
+  .total-card h2 {
     font-size: 1rem;
   }
 
+  .amount {
+    font-size: 1.4rem;
+  }
+
   .total-card .amount {
-    font-size: 1.2rem;
+    font-size: 1.6rem;
+  }
+
+  .member-card h3 {
+    font-size: 1rem;
   }
 }
