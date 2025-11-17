@@ -129,4 +129,49 @@ export const SkeletonSummaryView = () => (
   </div>
 );
 
+// Skeleton for Analytics Dashboard
+export const SkeletonAnalyticsDashboard = () => (
+  <div className="skeleton-analytics-dashboard">
+    {/* Header */}
+    <div className="skeleton-analytics-header">
+      <SkeletonLine width="250px" height="2rem" marginBottom="0.5rem" />
+      <SkeletonLine width="150px" height="1rem" />
+    </div>
+
+    {/* Metric Cards */}
+    <div className="skeleton-metrics-grid">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="skeleton-metric-card">
+          <SkeletonLine width="100px" height="0.875rem" marginBottom="0.5rem" />
+          <SkeletonLine width="120px" height="1.5rem" marginBottom="0.5rem" />
+          <SkeletonLine width="140px" height="0.75rem" />
+        </div>
+      ))}
+    </div>
+
+    {/* Charts */}
+    <div className="skeleton-charts-grid">
+      <div className="skeleton-chart-large">
+        <SkeletonChart height="220px" />
+      </div>
+      <div className="skeleton-chart-small">
+        <SkeletonLine width="150px" height="1rem" marginBottom="1rem" />
+        <SkeletonLine width="100%" height="140px" />
+      </div>
+    </div>
+
+    {/* Widgets */}
+    <div className="skeleton-widgets-grid">
+      <div className="skeleton-widget">
+        <SkeletonLine width="200px" height="1rem" marginBottom="1rem" />
+        <SkeletonLine width="100%" height="120px" />
+      </div>
+      <div className="skeleton-widget">
+        <SkeletonLine width="150px" height="1rem" marginBottom="1rem" />
+        <SkeletonLine width="100%" height="120px" />
+      </div>
+    </div>
+  </div>
+);
+
 export default SkeletonLine;

@@ -7,6 +7,7 @@ import { useAuthorization } from './hooks/useAuthorization';
 import { useToast } from './hooks/useToast';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
+import AnalyticsDashboard from './components/AnalyticsDashboard';
 import ExpenseForm from './components/ExpenseForm';
 import BudgetSettings from './components/BudgetSettings';
 import CategoryBudgetSettings from './components/CategoryBudgetSettings';
@@ -224,6 +225,12 @@ const AppContent = () => {
         >
           Detailed Breakdown
         </button>
+        <button
+          className={`tab ${activeTab === 'analytics' ? 'active' : ''}`}
+          onClick={() => setActiveTab('analytics')}
+        >
+          Analytics
+        </button>
       </div>
 
       <main className="main-content">
@@ -232,12 +239,17 @@ const AppContent = () => {
             selectedYear={selectedYear}
             selectedMonth={selectedMonth}
           />
-        ) : (
+        ) : activeTab === 'detailed' ? (
           <DetailedView
             selectedYear={selectedYear}
             selectedMonth={selectedMonth}
             onEditExpense={handleEditExpense}
             onAddExpense={handleAddExpense}
+          />
+        ) : (
+          <AnalyticsDashboard
+            selectedYear={selectedYear}
+            selectedMonth={selectedMonth}
           />
         )}
       </main>

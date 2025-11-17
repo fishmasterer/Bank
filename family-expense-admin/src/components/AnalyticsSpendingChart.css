@@ -1,0 +1,125 @@
+/* Analytics Spending Chart */
+.analytics-spending-chart h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
+}
+
+.chart-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+
+/* Bars Chart */
+.bars-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  height: 220px;
+  gap: 0.5rem;
+  padding: 1rem 0;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.bar-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bar-wrapper {
+  width: 100%;
+  height: 180px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.bar {
+  width: 100%;
+  max-width: 60px;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  border-radius: 6px 6px 0 0;
+  position: relative;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
+
+.bar:hover {
+  opacity: 0.8;
+  transform: translateY(-4px);
+}
+
+.bar.current {
+  background: linear-gradient(180deg, #f093fb 0%, #f5576c 100%);
+  box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4);
+}
+
+.bar-value {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  white-space: nowrap;
+}
+
+.bar-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.bar-month {
+  font-size: 0.813rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bar-year {
+  font-size: 0.688rem;
+  color: var(--text-secondary);
+}
+
+/* Legend */
+.chart-legend {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.813rem;
+  color: var(--text-secondary);
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .bars-chart {
+    height: 180px;
+    gap: 0.25rem;
+  }
+
+  .bar-wrapper {
+    height: 140px;
+  }
+
+  .bar {
+    max-width: 40px;
+  }
+
+  .bar-value {
+    font-size: 0.625rem;
+    padding-top: 0.25rem;
+  }
+
+  .bar-month {
+    font-size: 0.75rem;
+  }
+
+  .bar-year {
+    font-size: 0.625rem;
+  }
+}
