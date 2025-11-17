@@ -11,7 +11,7 @@ import FamilyMembersModal from './components/FamilyMembersModal';
 import Login from './components/Login';
 import UserProfile from './components/UserProfile';
 import Unauthorized from './components/Unauthorized';
-import ThemeToggle from './components/ThemeToggle';
+import ThemePicker from './components/ThemePicker';
 import Toast from './components/Toast';
 import { exportToCSV } from './utils/exportData';
 import './App.css';
@@ -137,7 +137,7 @@ const AppContent = () => {
           </p>
         </div>
         <div className="header-actions">
-          <ThemeToggle />
+          <ThemePicker />
           <UserProfile />
         </div>
       </header>
