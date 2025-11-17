@@ -5,11 +5,17 @@ import CategoryPieChart from './CategoryPieChart';
 import CategoryBarChart from './CategoryBarChart';
 import SpendingTrendsChart from './SpendingTrendsChart';
 import MemberSpendingChart from './MemberSpendingChart';
+import { SkeletonSummaryView } from './SkeletonLoader';
 import './SummaryView.css';
 
 const SummaryView = ({ selectedYear, selectedMonth }) => {
-  const { familyMembers, getMonthlyTotal, getMonthlyPlanned } = useExpenses();
+  const { familyMembers, getMonthlyTotal, getMonthlyPlanned, loading } = useExpenses();
   const { budget, getBudgetStatus } = useBudget(selectedYear, selectedMonth);
+
+  // Show skeleton while loading
+  if (loading) {
+    return <SkeletonSummaryView />;
+  }
 
   const totalPlanned = getMonthlyPlanned(selectedYear, selectedMonth);
   const totalPaid = getMonthlyTotal(selectedYear, selectedMonth);

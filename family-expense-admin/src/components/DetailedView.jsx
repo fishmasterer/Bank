@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
+import { SkeletonDetailedView } from './SkeletonLoader';
 import './DetailedView.css';
 
 const DetailedView = ({ selectedYear, selectedMonth, onEditExpense }) => {
-  const { getCategoryBreakdown, familyMembers, deleteExpense, readOnly, getExpensesByMonth } = useExpenses();
+  const { getCategoryBreakdown, familyMembers, deleteExpense, readOnly, getExpensesByMonth, loading } = useExpenses();
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
@@ -75,6 +76,11 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense }) => {
     setFilterCategory('all');
     setFilterMember('all');
   };
+
+  // Show skeleton while loading
+  if (loading) {
+    return <SkeletonDetailedView />;
+  }
 
   return (
     <div className="detailed-view">
