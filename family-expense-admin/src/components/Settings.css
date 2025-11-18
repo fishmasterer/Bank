@@ -8,6 +8,7 @@
   box-shadow: var(--shadow-lg);
   width: 90%;
   max-width: 500px;
+  max-height: 90vh;
   max-height: 90dvh;
   overflow-y: auto;
   z-index: 1001;

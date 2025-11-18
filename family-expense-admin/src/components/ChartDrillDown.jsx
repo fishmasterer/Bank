@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import './ChartDrillDown.css';
 
 const ChartDrillDown = ({ isOpen, onClose, title, expenses, type = 'category' }) => {
@@ -46,7 +47,7 @@ const ChartDrillDown = ({ isOpen, onClose, title, expenses, type = 'category' })
     return 'on-budget';
   };
 
-  return (
+  return createPortal(
     <div className="chart-drilldown-overlay" onClick={handleBackdropClick}>
       <div className="chart-drilldown-modal">
         <div className="chart-drilldown-header">
@@ -156,7 +157,8 @@ const ChartDrillDown = ({ isOpen, onClose, title, expenses, type = 'category' })
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

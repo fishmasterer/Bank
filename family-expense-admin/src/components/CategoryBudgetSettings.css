@@ -1,6 +1,7 @@
 /* Mobile-first category budget settings */
 .category-budget-modal {
   max-width: 600px;
+  max-height: 90vh;
   max-height: 90dvh;
   overflow-y: auto;
 }

@@ -372,6 +372,7 @@
   .savings-goals-modal {
     width: 100%;
     max-width: none;
+    max-height: 90vh;
     max-height: 90dvh;
     border-radius: 12px 12px 0 0;
     margin-top: auto;

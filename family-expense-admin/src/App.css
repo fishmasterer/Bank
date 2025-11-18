@@ -486,7 +486,8 @@
 }
 
 .bottom-nav-item:active {
-  transform: scale(0.92);
+  transform: scale(0.95);
+  transition: transform 0.1s ease;
 }
 
 .bottom-nav-item.active {
@@ -935,10 +936,13 @@
   .controls {
     position: sticky;
     top: 0;
+    padding-top: calc(0.875rem + env(safe-area-inset-top));
     z-index: 90;
     flex-direction: column;
     gap: 1rem;
-    padding: 0.875rem;
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+    padding-bottom: 0.875rem;
     margin-bottom: 1rem;
     border-radius: var(--border-radius-md);
     backdrop-filter: blur(16px) saturate(180%);

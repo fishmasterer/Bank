@@ -270,7 +270,6 @@ const AppContent = () => {
         </div>
         <div className="header-actions">
           <NotificationBell />
-          <ThemePicker />
           <UserProfile />
         </div>
       </header>
