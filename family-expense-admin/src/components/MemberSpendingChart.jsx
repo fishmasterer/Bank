@@ -98,6 +98,7 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth, loading = false }) =
                 text: `${label}: $${value.toFixed(0)} (${percentage}%)`,
                 fillStyle: data.datasets[0].backgroundColor[i],
                 strokeStyle: data.datasets[0].borderColor[i],
+                fontColor: getThemeColors().textPrimary,
                 lineWidth: 2,
                 hidden: false,
                 index: i
