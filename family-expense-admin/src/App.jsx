@@ -34,6 +34,7 @@ import FloatingActionMenu from './components/FloatingActionMenu';
 import BudgetSection from './components/BudgetSection';
 import RecurringSection from './components/RecurringSection';
 import FamilySection from './components/FamilySection';
+import MemberBudgetSettings from './components/MemberBudgetSettings';
 import './App.css';
 
 // Tab order for navigation (6 sections for better mobile organization)
@@ -54,6 +55,7 @@ const AppContent = () => {
   const [showForm, setShowForm] = useState(false);
   const [showBudgetSettings, setShowBudgetSettings] = useState(false);
   const [showCategoryBudgets, setShowCategoryBudgets] = useState(false);
+  const [showMemberBudgets, setShowMemberBudgets] = useState(false);
   const [showVarianceReport, setShowVarianceReport] = useState(false);
   const [showFamilyModal, setShowFamilyModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
@@ -320,6 +322,9 @@ const AppContent = () => {
               <button onClick={() => setShowCategoryBudgets(true)} className="btn-secondary btn-press hover-lift">
                 📊 Category Budgets
               </button>
+              <button onClick={() => setShowMemberBudgets(true)} className="btn-secondary btn-press hover-lift">
+                👤 Member Budgets
+              </button>
               <button onClick={() => setShowFamilyModal(true)} className="btn-secondary btn-press hover-lift">
                 👥 Manage Family
               </button>
@@ -390,7 +395,8 @@ const AppContent = () => {
               selectedYear={selectedYear}
               selectedMonth={selectedMonth}
               onEditExpense={handleEditExpense}
-              onCopyRecurring={handleCopyRecurring}
+              onSuccess={(message) => success(message)}
+              onError={(message) => showError(message)}
             />
           )}
           {activeTab === 'family' && (
@@ -435,6 +441,16 @@ const AppContent = () => {
           selectedYear={selectedYear}
           selectedMonth={selectedMonth}
           onClose={() => setShowCategoryBudgets(false)}
+          onSuccess={(message) => success(message)}
+          onError={(message) => showError(message)}
+        />
+      )}
+
+      {showMemberBudgets && !readOnly && (
+        <MemberBudgetSettings
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+          onClose={() => setShowMemberBudgets(false)}
           onSuccess={(message) => success(message)}
           onError={(message) => showError(message)}
         />
