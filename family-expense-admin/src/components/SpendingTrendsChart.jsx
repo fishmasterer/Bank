@@ -12,6 +12,7 @@ import {
   Filler
 } from 'chart.js';
 import { useExpenses } from '../context/ExpenseContext';
+import { useTheme } from '../contexts/ThemeContext';
 import ChartDrillDown from './ChartDrillDown';
 import { SkeletonChart } from './SkeletonLoader';
 import { getThemeColors, hexToRgba } from '../utils/themeColors';
@@ -30,6 +31,7 @@ ChartJS.register(
 
 const SpendingTrendsChart = ({ selectedYear, selectedMonth, loading = false }) => {
   const { getMonthlyTotal, getMonthlyPlanned, getExpensesByMonth } = useExpenses();
+  const { colorTheme } = useTheme();
   const [drillDown, setDrillDown] = useState({ isOpen: false, month: null, year: null, expenses: [] });
 
   const monthsData = useMemo(() => {
@@ -111,7 +113,7 @@ const SpendingTrendsChart = ({ selectedYear, selectedMonth, loading = false }) =
         }
       ]
     };
-  }, [monthsData]);
+  }, [monthsData, colorTheme]);
 
   const handleChartClick = useCallback((event, elements) => {
     if (elements.length > 0) {
@@ -234,7 +236,7 @@ const SpendingTrendsChart = ({ selectedYear, selectedMonth, loading = false }) =
     hover: {
       animationDuration: 400
     }
-  }), [handleChartClick]);
+  }), [handleChartClick, colorTheme]);
 
   if (loading) {
     return <SkeletonChart height="320px" />;
