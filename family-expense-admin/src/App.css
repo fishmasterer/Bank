@@ -343,10 +343,27 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
+/* Tab icon and label styles */
+.tab-icon {
+  font-size: 1rem;
+  margin-right: 0.375rem;
+}
+
+.tab-label {
+  font-size: 0.875rem;
+}
+
 /* Desktop tabs */
 @media (min-width: 769px) {
   .tabs {
     display: flex;
+    flex-wrap: wrap;
+  }
+
+  .tab {
+    padding: 0.625rem 1rem;
+    display: flex;
+    align-items: center;
   }
 }
 
@@ -379,17 +396,17 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.5rem;
+  gap: 0.125rem;
+  padding: 0.375rem 0.125rem;
   background: transparent;
   border: none;
-  border-radius: var(--border-radius-md);
+  border-radius: var(--border-radius-sm);
   color: var(--text-secondary);
-  font-size: 0.75rem;
-  font-weight: 500;
+  font-size: 0.625rem;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  min-height: 56px;
+  min-height: 52px;
   position: relative;
   overflow: hidden;
   opacity: 0;
@@ -423,14 +440,26 @@
 
 /* Stagger animation for bottom nav items */
 .bottom-nav-item:nth-child(1) {
-  animation-delay: 0.1s;
+  animation-delay: 0.05s;
 }
 
 .bottom-nav-item:nth-child(2) {
-  animation-delay: 0.2s;
+  animation-delay: 0.1s;
 }
 
 .bottom-nav-item:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.bottom-nav-item:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.bottom-nav-item:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+.bottom-nav-item:nth-child(6) {
   animation-delay: 0.3s;
 }
 
@@ -459,7 +488,7 @@
 }
 
 .bottom-nav-item .icon {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   line-height: 1;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
@@ -889,12 +918,25 @@
   }
 
   .bottom-nav-item {
-    font-size: 0.6875rem;
-    min-height: 52px;
+    font-size: 0.5rem;
+    min-height: 48px;
+    padding: 0.25rem 0;
+    gap: 0.0625rem;
   }
 
   .bottom-nav-item .icon {
-    font-size: 1.25rem;
+    font-size: 1rem;
+  }
+}
+
+/* Medium mobile screens - better readability for 6 items */
+@media (min-width: 376px) and (max-width: 768px) {
+  .bottom-nav-item {
+    font-size: 0.6875rem;
+  }
+
+  .bottom-nav-item .icon {
+    font-size: 1.125rem;
   }
 }
 

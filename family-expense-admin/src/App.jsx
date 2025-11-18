@@ -26,10 +26,23 @@ import PWAUpdateNotification from './components/PWAUpdateNotification';
 import ExportModal from './components/ExportModal';
 import PullToRefresh from './components/PullToRefresh';
 import MobileDrawer from './components/MobileDrawer';
+import BudgetSection from './components/BudgetSection';
+import RecurringSection from './components/RecurringSection';
+import FamilySection from './components/FamilySection';
 import './App.css';
 
-// Tab order for navigation
-const TAB_ORDER = ['summary', 'detailed', 'analytics'];
+// Tab order for navigation (6 sections for better mobile organization)
+const TAB_ORDER = ['summary', 'expenses', 'budget', 'recurring', 'family', 'reports'];
+
+// Tab display names and icons
+const TAB_CONFIG = {
+  summary: { label: 'Home', icon: '🏠', shortLabel: 'Home' },
+  expenses: { label: 'Expenses', icon: '📋', shortLabel: 'Expenses' },
+  budget: { label: 'Budget', icon: '💰', shortLabel: 'Budget' },
+  recurring: { label: 'Recurring', icon: '🔄', shortLabel: 'Recurring' },
+  family: { label: 'Family', icon: '👥', shortLabel: 'Family' },
+  reports: { label: 'Reports', icon: '📊', shortLabel: 'Reports' }
+};
 
 const AppContent = () => {
   const [activeTab, setActiveTab] = useState('summary');
@@ -274,24 +287,16 @@ const AppContent = () => {
       </div>
 
       <div className="tabs">
-        <button
-          className={`tab ${activeTab === 'summary' ? 'active' : ''}`}
-          onClick={() => handleTabChange('summary')}
-        >
-          Summary
-        </button>
-        <button
-          className={`tab ${activeTab === 'detailed' ? 'active' : ''}`}
-          onClick={() => handleTabChange('detailed')}
-        >
-          Detailed Breakdown
-        </button>
-        <button
-          className={`tab ${activeTab === 'analytics' ? 'active' : ''}`}
-          onClick={() => handleTabChange('analytics')}
-        >
-          Analytics
-        </button>
+        {TAB_ORDER.map((tab) => (
+          <button
+            key={tab}
+            className={`tab ${activeTab === tab ? 'active' : ''}`}
+            onClick={() => handleTabChange(tab)}
+          >
+            <span className="tab-icon">{TAB_CONFIG[tab].icon}</span>
+            <span className="tab-label">{TAB_CONFIG[tab].label}</span>
+          </button>
+        ))}
       </div>
 
       {/* Swipe indicator dots for mobile */}
@@ -310,19 +315,44 @@ const AppContent = () => {
           key={activeTab}
           {...swipeHandlers}
         >
-          {activeTab === 'summary' ? (
+          {activeTab === 'summary' && (
             <SummaryView
               selectedYear={selectedYear}
               selectedMonth={selectedMonth}
             />
-          ) : activeTab === 'detailed' ? (
+          )}
+          {activeTab === 'expenses' && (
             <DetailedView
               selectedYear={selectedYear}
               selectedMonth={selectedMonth}
               onEditExpense={handleEditExpense}
               onAddExpense={handleAddExpense}
             />
-          ) : (
+          )}
+          {activeTab === 'budget' && (
+            <BudgetSection
+              selectedYear={selectedYear}
+              selectedMonth={selectedMonth}
+              onSetBudget={() => setShowBudgetSettings(true)}
+              onCategoryBudgets={() => setShowCategoryBudgets(true)}
+            />
+          )}
+          {activeTab === 'recurring' && (
+            <RecurringSection
+              selectedYear={selectedYear}
+              selectedMonth={selectedMonth}
+              onEditExpense={handleEditExpense}
+              onCopyRecurring={handleCopyRecurring}
+            />
+          )}
+          {activeTab === 'family' && (
+            <FamilySection
+              selectedYear={selectedYear}
+              selectedMonth={selectedMonth}
+              onManageFamily={() => setShowFamilyModal(true)}
+            />
+          )}
+          {activeTab === 'reports' && (
             <AnalyticsDashboard
               selectedYear={selectedYear}
               selectedMonth={selectedMonth}
@@ -425,27 +455,16 @@ const AppContent = () => {
 
       {/* Mobile Bottom Navigation */}
       <nav className="bottom-nav">
-        <button
-          className={`bottom-nav-item ${activeTab === 'summary' ? 'active' : ''}`}
-          onClick={() => handleTabChange('summary')}
-        >
-          <span className="icon">📊</span>
-          <span>Summary</span>
-        </button>
-        <button
-          className={`bottom-nav-item ${activeTab === 'detailed' ? 'active' : ''}`}
-          onClick={() => handleTabChange('detailed')}
-        >
-          <span className="icon">📋</span>
-          <span>Details</span>
-        </button>
-        <button
-          className={`bottom-nav-item ${activeTab === 'analytics' ? 'active' : ''}`}
-          onClick={() => handleTabChange('analytics')}
-        >
-          <span className="icon">📈</span>
-          <span>Analytics</span>
-        </button>
+        {TAB_ORDER.map((tab) => (
+          <button
+            key={tab}
+            className={`bottom-nav-item ${activeTab === tab ? 'active' : ''}`}
+            onClick={() => handleTabChange(tab)}
+          >
+            <span className="icon">{TAB_CONFIG[tab].icon}</span>
+            <span>{TAB_CONFIG[tab].shortLabel}</span>
+          </button>
+        ))}
       </nav>
 
       <PWAInstallPrompt />

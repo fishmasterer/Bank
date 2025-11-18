@@ -1,0 +1,303 @@
+.family-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-bottom: 2rem;
+}
+
+/* Header */
+.family-header-card {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.family-header-card h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.family-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0 0;
+}
+
+/* Overview Stats */
+.family-overview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.overview-stat {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  padding: 1.25rem;
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+
+.overview-stat .stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  line-height: 1.2;
+}
+
+.overview-stat .stat-label {
+  display: block;
+  font-size: 0.938rem;
+  color: var(--text-secondary);
+  margin-top: 0.375rem;
+}
+
+/* Member Cards */
+.member-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.member-card {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+.member-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.member-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.member-info {
+  flex: 1;
+}
+
+.member-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.member-contribution {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0 0;
+}
+
+/* Spending Display */
+.member-spending {
+  margin-bottom: 1.25rem;
+}
+
+.spending-main {
+  margin-bottom: 0.75rem;
+}
+
+.spending-amount {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.spending-label {
+  display: block;
+  font-size: 0.938rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+.contribution-bar-container {
+  margin-top: 0.5rem;
+}
+
+.contribution-bar {
+  height: 8px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.contribution-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* Member Details */
+.member-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-label {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.detail-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Category Breakdown */
+.member-categories {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.member-categories h4 {
+  font-size: 0.938rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem 0;
+}
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.category-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.625rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.category-row .category-name {
+  font-size: 0.938rem;
+  color: var(--text-primary);
+}
+
+.category-row .category-amount {
+  font-size: 0.938rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Empty State */
+.empty-family {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+
+.empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.empty-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.empty-hint {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+  .family-section {
+    gap: 1rem;
+  }
+
+  .family-header-card h2 {
+    font-size: 1.375rem;
+  }
+
+  .family-overview {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .overview-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    padding: 1rem;
+  }
+
+  .overview-stat .stat-value {
+    font-size: 1.375rem;
+  }
+
+  .overview-stat .stat-label {
+    font-size: 1rem;
+    margin-top: 0;
+  }
+
+  .member-card {
+    padding: 1.25rem;
+  }
+
+  .member-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+  }
+
+  .member-name {
+    font-size: 1.125rem;
+  }
+
+  .spending-amount {
+    font-size: 1.75rem;
+  }
+
+  .detail-label,
+  .detail-value {
+    font-size: 1.063rem;
+  }
+
+  .category-row .category-name,
+  .category-row .category-amount {
+    font-size: 1rem;
+  }
+}
