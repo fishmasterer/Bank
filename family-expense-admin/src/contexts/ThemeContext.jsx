@@ -14,14 +14,16 @@ export const THEMES = {
   ORANGE: 'orange',
   NATURE: 'nature',
   BLUE: 'blue',
-  OBSIDIAN: 'obsidian'
+  OBSIDIAN: 'obsidian',
+  LAVA: 'lava'
 };
 
 export const THEME_NAMES = {
   [THEMES.ORANGE]: 'Warm Orange',
   [THEMES.NATURE]: 'Soft Nature',
   [THEMES.BLUE]: 'Calm Blue',
-  [THEMES.OBSIDIAN]: 'Obsidian'
+  [THEMES.OBSIDIAN]: 'Obsidian',
+  [THEMES.LAVA]: 'Lava'
 };
 
 // Theme colors for PWA meta tags
@@ -41,6 +43,10 @@ const THEME_COLORS = {
   [THEMES.OBSIDIAN]: {
     light: '#06B6D4',  // Electric cyan
     dark: '#0A0A0F'     // Deep obsidian
+  },
+  [THEMES.LAVA]: {
+    light: '#F97316',  // Bright orange
+    dark: '#1A0A0A'     // Deep volcanic
   }
 };
 

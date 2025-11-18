@@ -24,6 +24,11 @@ export default function ThemePicker() {
       primary: '#06B6D4',
       secondary: '#0891B2',
       tertiary: '#22D3EE'
+    },
+    [THEMES.LAVA]: {
+      primary: '#F97316',
+      secondary: '#EA580C',
+      tertiary: '#FB923C'
     }
   };
 
