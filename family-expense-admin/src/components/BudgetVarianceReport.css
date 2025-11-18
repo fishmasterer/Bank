@@ -35,7 +35,7 @@
   justify-content: space-between;
   align-items: flex-start;
   padding: 28px;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--border-color);
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   color: white;
 }
@@ -94,7 +94,7 @@
 .section-title {
   font-size: 20px;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text-primary);
   margin: 0 0 20px 0;
   display: flex;
   align-items: center;
@@ -109,8 +109,8 @@
 }
 
 .summary-card {
-  background: linear-gradient(135deg, #f9fafb 0%, #ffffff 100%);
-  border: 2px solid #e5e7eb;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
   border-radius: 12px;
   padding: 20px;
   transition: all 0.2s;
@@ -126,7 +126,7 @@
   font-size: 13px;
   font-weight: 600;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--text-secondary);
   letter-spacing: 0.5px;
   margin-bottom: 8px;
 }
@@ -134,7 +134,7 @@
 .summary-value {
   font-size: 26px;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .summary-value.positive {
@@ -211,7 +211,7 @@
 
 .category-variance-item {
   background: var(--bg-primary);
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border-color);
   border-radius: 12px;
   padding: 18px;
   transition: all 0.2s;
@@ -262,7 +262,7 @@
 .category-name {
   font-size: 17px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .category-amounts {
@@ -274,12 +274,12 @@
 
 .amount-paid {
   font-size: 18px;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .amount-budget {
   font-size: 14px;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 /* Category Details */
@@ -297,13 +297,13 @@
 }
 
 .detail-label {
-  color: #6b7280;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
 .detail-value {
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .detail-value.over {
@@ -325,7 +325,7 @@
 .progress-bar-small {
   flex: 1;
   height: 8px;
-  background: #e5e7eb;
+  background: var(--bg-tertiary);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -355,7 +355,7 @@
 .progress-text {
   font-size: 13px;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-secondary);
   min-width: 42px;
   text-align: right;
 }
@@ -363,10 +363,10 @@
 /* Footer */
 .variance-report-footer {
   padding: 20px 28px;
-  border-top: 2px solid #f0f0f0;
+  border-top: 2px solid var(--border-color);
   display: flex;
   justify-content: flex-end;
-  background: #f9fafb;
+  background: var(--bg-secondary);
 }
 
 .btn-close-report {
@@ -395,7 +395,7 @@
 .empty-state {
   text-align: center;
   padding: 48px 24px;
-  color: #9ca3af;
+  color: var(--text-tertiary);
   font-size: 16px;
 }
 

@@ -353,21 +353,37 @@
 
 .member-card {
   animation-delay: calc(var(--member-index, 0) * 0.1s);
+  border-top: 4px solid var(--member-color, var(--primary-color));
+}
+
+.member-header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.625rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.member-color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px var(--bg-primary), 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .member-card h3 {
   font-size: 1.125rem;
-  margin-bottom: 1rem;
+  margin: 0;
   color: var(--text-primary);
-  border-bottom: 2px solid var(--border-color);
-  padding-bottom: 0.625rem;
   font-weight: 600;
   letter-spacing: -0.01em;
-  transition: border-color 0.3s ease;
+  transition: color 0.3s ease;
 }
 
-.member-card:hover h3 {
-  border-bottom-color: var(--primary-color);
+.member-card:hover .member-header {
+  border-bottom-color: var(--member-color, var(--primary-color));
 }
 
 /* Mobile Responsive */

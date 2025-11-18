@@ -140,7 +140,7 @@ export const ExpenseProvider = ({ children, readOnly = false }) => {
     }
   };
 
-  const updateFamilyMember = async (id, name) => {
+  const updateFamilyMember = async (id, updates) => {
     if (readOnly) {
       console.warn('Cannot update family member in read-only mode');
       return;
@@ -150,7 +150,9 @@ export const ExpenseProvider = ({ children, readOnly = false }) => {
       const member = familyMembers.find(m => m.id === id);
       if (member && member.firestoreId) {
         const memberRef = doc(db, 'familyMembers', member.firestoreId);
-        await updateDoc(memberRef, { name });
+        // Support both old signature (id, name) and new signature (id, {name, color})
+        const updateData = typeof updates === 'string' ? { name: updates } : updates;
+        await updateDoc(memberRef, updateData);
       }
     } catch (err) {
       console.error('Error updating family member:', err);
@@ -158,6 +160,18 @@ export const ExpenseProvider = ({ children, readOnly = false }) => {
       throw err;
     }
   };
+
+  // Default color palette for new members
+  const defaultMemberColors = [
+    '#667eea', // Purple
+    '#10b981', // Green
+    '#f59e0b', // Amber
+    '#ef4444', // Red
+    '#3b82f6', // Blue
+    '#8b5cf6', // Violet
+    '#ec4899', // Pink
+    '#06b6d4', // Cyan
+  ];
 
   const addFamilyMember = async () => {
     if (readOnly) {
@@ -167,9 +181,12 @@ export const ExpenseProvider = ({ children, readOnly = false }) => {
 
     try {
       const newId = Math.max(...familyMembers.map(m => m.id), 0) + 1;
+      // Assign a default color based on member index
+      const colorIndex = (newId - 1) % defaultMemberColors.length;
       await addDoc(collection(db, 'familyMembers'), {
         id: newId,
-        name: `Family Member ${newId}`
+        name: `Family Member ${newId}`,
+        color: defaultMemberColors[colorIndex]
       });
     } catch (err) {
       console.error('Error adding family member:', err);
