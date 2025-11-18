@@ -25,7 +25,7 @@ import PWAInstallPrompt from './components/PWAInstallPrompt';
 import PWAUpdateNotification from './components/PWAUpdateNotification';
 import ExportModal from './components/ExportModal';
 import PullToRefresh from './components/PullToRefresh';
-import MobileDrawer from './components/MobileDrawer';
+import FloatingActionMenu from './components/FloatingActionMenu';
 import BudgetSection from './components/BudgetSection';
 import RecurringSection from './components/RecurringSection';
 import FamilySection from './components/FamilySection';
@@ -56,7 +56,6 @@ const AppContent = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [pageAnimation, setPageAnimation] = useState('');
-  const [showDrawer, setShowDrawer] = useState(false);
   const prevTabRef = useRef('summary');
 
   const handleTabChange = useCallback((newTab) => {
@@ -209,17 +208,6 @@ const AppContent = () => {
           </p>
         </div>
         <div className="header-actions">
-          <button
-            className="hamburger-btn"
-            onClick={() => setShowDrawer(true)}
-            aria-label="Open menu"
-          >
-            <div className="hamburger-icon">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </button>
           <NotificationBell />
           <ThemePicker />
           <UserProfile />
@@ -416,19 +404,6 @@ const AppContent = () => {
         onError={(message) => showError(message)}
       />
 
-      <MobileDrawer
-        isOpen={showDrawer}
-        onClose={() => setShowDrawer(false)}
-        onAddExpense={handleAddExpense}
-        onCopyRecurring={handleCopyRecurring}
-        onSetBudget={() => setShowBudgetSettings(true)}
-        onCategoryBudgets={() => setShowCategoryBudgets(true)}
-        onManageFamily={() => setShowFamilyModal(true)}
-        onBudgetReport={() => setShowVarianceReport(true)}
-        onExport={handleExport}
-        readOnly={readOnly}
-      />
-
       <ToastNotification />
 
       {toasts.map(toast => (
@@ -441,17 +416,17 @@ const AppContent = () => {
         />
       ))}
 
-      {/* Floating Action Button (Mobile only) */}
-      {!readOnly && (
-        <button
-          onClick={handleAddExpense}
-          className="fab"
-          aria-label="Add expense"
-          title="Add expense"
-        >
-          +
-        </button>
-      )}
+      {/* Floating Action Menu (Mobile only) */}
+      <FloatingActionMenu
+        onAddExpense={handleAddExpense}
+        onCopyRecurring={handleCopyRecurring}
+        onSetBudget={() => setShowBudgetSettings(true)}
+        onCategoryBudgets={() => setShowCategoryBudgets(true)}
+        onManageFamily={() => setShowFamilyModal(true)}
+        onBudgetReport={() => setShowVarianceReport(true)}
+        onExport={handleExport}
+        readOnly={readOnly}
+      />
 
       {/* Mobile Bottom Navigation */}
       <nav className="bottom-nav">
