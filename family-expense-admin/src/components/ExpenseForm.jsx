@@ -1,59 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
 import { useNotifications } from '../context/NotificationContext';
-import { db } from '../config/firebase';
+import { db, storage } from '../config/firebase';
 import { collection, addDoc } from 'firebase/firestore';
+import { ref, deleteObject } from 'firebase/storage';
 import ExpenseTemplates from './ExpenseTemplates';
+import ImageUpload from './ImageUpload';
+import { useCategories } from '../hooks/useCategories';
 import './ExpenseForm.css';
-
-const CATEGORIES = [
-  'Groceries',
-  'Utilities',
-  'Rent/Mortgage',
-  'Transportation',
-  'Healthcare',
-  'Education',
-  'Entertainment',
-  'Insurance',
-  'Dining Out',
-  'Shopping',
-  'Other'
-];
 
 const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
   const { addExpense, updateExpense, familyMembers } = useExpenses();
   const { addExpenseAction } = useNotifications();
+  const { categories, loading: categoriesLoading } = useCategories();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
-    category: CATEGORIES[0],
+    category: '',
     plannedAmount: '',
     paidAmount: '',
     paidBy: familyMembers[0]?.id || 1,
     isRecurring: false,
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
-    notes: ''
+    notes: '',
+    attachments: []
   });
+
+  // Set default category when categories load
+  useEffect(() => {
+    if (categories.length > 0 && !formData.category && !editingExpense) {
+      setFormData(prev => ({
+        ...prev,
+        category: categories[0]
+      }));
+    }
+  }, [categories, formData.category, editingExpense]);
 
   useEffect(() => {
     if (editingExpense) {
       setFormData({
         name: editingExpense.name || '',
-        category: editingExpense.category || CATEGORIES[0],
+        category: editingExpense.category || (categories[0] || ''),
         plannedAmount: editingExpense.plannedAmount || '',
         paidAmount: editingExpense.paidAmount || '',
         paidBy: editingExpense.paidBy || familyMembers[0]?.id || 1,
         isRecurring: editingExpense.isRecurring || false,
         year: editingExpense.year || new Date().getFullYear(),
         month: editingExpense.month || new Date().getMonth() + 1,
-        notes: editingExpense.notes || ''
+        notes: editingExpense.notes || '',
+        attachments: editingExpense.attachments || []
       });
     }
-  }, [editingExpense, familyMembers]);
+  }, [editingExpense, familyMembers, categories]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,8 +68,26 @@ const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
         paidAmount: parseFloat(formData.paidAmount) || 0,
         paidBy: parseInt(formData.paidBy),
         year: parseInt(formData.year),
-        month: parseInt(formData.month)
+        month: parseInt(formData.month),
+        attachments: formData.attachments || []
       };
+
+      // If editing and attachments were removed, delete them from storage
+      if (editingExpense && editingExpense.attachments) {
+        const oldUrls = new Set(editingExpense.attachments.map(a => a.url));
+        const newUrls = new Set(formData.attachments.map(a => a.url));
+
+        for (const attachment of editingExpense.attachments) {
+          if (!newUrls.has(attachment.url) && attachment.path) {
+            try {
+              const storageRef = ref(storage, attachment.path);
+              await deleteObject(storageRef);
+            } catch (err) {
+              console.warn('Could not delete old attachment:', err);
+            }
+          }
+        }
+      }
 
       if (editingExpense) {
         await updateExpense(editingExpense.id, expenseData);
@@ -125,6 +145,13 @@ const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
     });
   };
 
+  const handleAttachmentsChange = (attachments) => {
+    setFormData(prev => ({
+      ...prev,
+      attachments
+    }));
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -169,9 +196,13 @@ const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
                 onChange={handleChange}
                 required
               >
-                {CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
+                {categoriesLoading ? (
+                  <option value="">Loading...</option>
+                ) : (
+                  categories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))
+                )}
               </select>
             </div>
 
@@ -293,6 +324,14 @@ const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
               placeholder="Additional notes..."
             />
           </div>
+
+          {/* Receipt/Attachment Upload */}
+          <ImageUpload
+            attachments={formData.attachments}
+            onAttachmentsChange={handleAttachmentsChange}
+            maxFiles={5}
+            disabled={isSubmitting}
+          />
 
           <div className="form-actions">
             <button type="button" onClick={onClose} className="btn-secondary" disabled={isSubmitting}>

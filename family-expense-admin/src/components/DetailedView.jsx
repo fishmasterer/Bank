@@ -405,6 +405,37 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
                           {expense.notes && (
                             <span className="notes">Note: {expense.notes}</span>
                           )}
+                          {expense.attachments && expense.attachments.length > 0 && (
+                            <div className="expense-attachments">
+                              <span className="attachments-label">
+                                📎 {expense.attachments.length} {expense.attachments.length === 1 ? 'receipt' : 'receipts'}
+                              </span>
+                              <div className="attachments-thumbnails">
+                                {expense.attachments.slice(0, 3).map((attachment, idx) => (
+                                  <a
+                                    key={idx}
+                                    href={attachment.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="attachment-thumb"
+                                    title={attachment.name}
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    {attachment.type?.startsWith('image/') ? (
+                                      <img src={attachment.url} alt={attachment.name} />
+                                    ) : (
+                                      <span className="thumb-icon">📄</span>
+                                    )}
+                                  </a>
+                                ))}
+                                {expense.attachments.length > 3 && (
+                                  <span className="more-attachments">
+                                    +{expense.attachments.length - 3}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
                         {!readOnly && (
                           <div className="expense-actions">
