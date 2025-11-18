@@ -1,8 +1,11 @@
+/* Import Inter font for sleek, thin typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
 :root {
   /* Typography - Mobile-first (16sp/17pt minimum) */
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  line-height: 1.6;
-  font-weight: 400;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+  font-weight: 300;
 
   /* 8-Point Grid System */
   --spacing-xs: 4px;
@@ -165,6 +168,50 @@
   --color-primary-light: #8AB8E3;   /* Light pastel blue */
 }
 
+/* THEME 4: Obsidian (Futuristic Dark) */
+:root[data-color-theme="obsidian"] {
+  /* Primary: Electric cyan for futuristic feel */
+  --color-primary-60: #06B6D4;     /* Cyan - futuristic accent */
+  --color-primary-hover: #0891B2;   /* Darker cyan for hover */
+  --color-primary-light: #22D3EE;   /* Lighter cyan for accents */
+
+  /* Secondary: Cool slate grays */
+  --color-secondary-30: #64748B;
+  --color-secondary-light: #94A3B8;
+
+  /* Force dark mode aesthetics even in light mode */
+  --bg-primary: #0A0A0F;           /* Deep obsidian black */
+  --bg-secondary: #12121A;          /* Slightly lighter obsidian */
+  --bg-tertiary: #1E1E2E;           /* Card backgrounds */
+  --bg-hover: #2A2A3E;              /* Hover states */
+
+  /* Text colors for dark background */
+  --text-primary: #F8FAFC;          /* Almost white */
+  --text-secondary: #CBD5E1;        /* Light gray */
+  --text-tertiary: #94A3B8;         /* Medium gray */
+  --text-disabled: #64748B;
+
+  /* Borders */
+  --border-color: #2E2E3E;
+  --border-light: #3E3E4E;
+
+  /* Enhanced shadows with glow */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.7);
+
+  /* Glow effects */
+  --glow-primary: 0 0 20px rgba(6, 182, 212, 0.3);
+  --glow-subtle: 0 0 10px rgba(6, 182, 212, 0.15);
+}
+
+:root[data-color-theme="obsidian"][data-theme="dark"] {
+  /* Same as light mode since obsidian is always dark */
+  --color-primary-60: #06B6D4;
+  --color-primary-hover: #0891B2;
+  --color-primary-light: #22D3EE;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -188,16 +235,45 @@ button {
   border: 1px solid transparent;
   padding: var(--spacing-md) var(--spacing-lg); /* 16px 24px */
   font-size: var(--font-md); /* 17px for iOS */
-  font-weight: 500;
+  font-weight: 400;
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.15s ease;
-  letter-spacing: -0.01em;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.01em;
   min-height: 44px; /* iOS touch target minimum */
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--spacing-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Reactive button press effect */
+button:active {
+  transform: scale(0.98);
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Subtle shine effect on hover */
+button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+button:hover::after {
+  left: 100%;
 }
 
 /* Desktop refinement */
@@ -207,6 +283,16 @@ button {
     padding: var(--spacing-sm) var(--spacing-md); /* Smaller on desktop */
     font-size: var(--font-sm);
   }
+}
+
+/* Obsidian theme specific button enhancements */
+:root[data-color-theme="obsidian"] button {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+:root[data-color-theme="obsidian"] button:hover {
+  box-shadow: var(--glow-subtle);
 }
 
 /* Mobile-First Input Styles - 8pt Grid */

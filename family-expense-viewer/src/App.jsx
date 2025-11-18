@@ -107,6 +107,7 @@ const AppContent = () => {
           </p>
         </div>
         <div className="header-actions">
+          {readOnly && <span className="view-only-badge">View Only</span>}
           <ThemeToggle />
           <UserProfile />
         </div>
@@ -143,35 +144,37 @@ const AppContent = () => {
           </button>
         </div>
 
-        <div className="action-buttons">
-          {!readOnly && (
+        {!readOnly && (
+          <div className="action-buttons">
             <button onClick={handleAddExpense} className="btn-primary">
               + Add Expense
             </button>
-          )}
-          <button onClick={handleExport} className="btn-secondary">
-            📊 Export CSV
+            <button onClick={handleExport} className="btn-secondary">
+              📊 Export CSV
+            </button>
+          </div>
+        )}
+      </div>
+
+      {!readOnly && (
+        <div className="tabs">
+          <button
+            className={`tab ${activeTab === 'summary' ? 'active' : ''}`}
+            onClick={() => setActiveTab('summary')}
+          >
+            Summary
+          </button>
+          <button
+            className={`tab ${activeTab === 'detailed' ? 'active' : ''}`}
+            onClick={() => setActiveTab('detailed')}
+          >
+            Detailed Breakdown
           </button>
         </div>
-      </div>
-
-      <div className="tabs">
-        <button
-          className={`tab ${activeTab === 'summary' ? 'active' : ''}`}
-          onClick={() => setActiveTab('summary')}
-        >
-          Summary
-        </button>
-        <button
-          className={`tab ${activeTab === 'detailed' ? 'active' : ''}`}
-          onClick={() => setActiveTab('detailed')}
-        >
-          Detailed Breakdown
-        </button>
-      </div>
+      )}
 
       <main className="main-content">
-        {activeTab === 'summary' ? (
+        {readOnly || activeTab === 'summary' ? (
           <SummaryView
             selectedYear={selectedYear}
             selectedMonth={selectedMonth}
