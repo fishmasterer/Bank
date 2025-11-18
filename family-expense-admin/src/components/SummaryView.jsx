@@ -25,7 +25,7 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
   return (
     <div className="summary-view">
       {budget && budget.monthlyLimit && (
-        <div className={`budget-warning budget-${budgetStatus.status}`}>
+        <div className={`budget-warning budget-${budgetStatus.status} animate-fade-in-up`}>
           <div className="budget-header">
             <div className="budget-info">
               <span className="budget-label">Monthly Budget</span>
@@ -79,7 +79,7 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
         selectedMonth={selectedMonth}
       />
 
-      <div className="summary-card total-card">
+      <div className="summary-card total-card animate-fade-in-up hover-lift">
         <h2>Total for {new Date(selectedYear, selectedMonth - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</h2>
         <div className="amount-row">
           <div className="amount-item">
@@ -100,7 +100,7 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
         </div>
       </div>
 
-      <div className="members-grid">
+      <div className="members-grid stagger-fast">
         {familyMembers.map((member, index) => {
           const planned = getMonthlyPlanned(selectedYear, selectedMonth, member.id);
           const paid = getMonthlyTotal(selectedYear, selectedMonth, member.id);
@@ -108,7 +108,7 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
           return (
             <div
               key={member.id}
-              className="summary-card member-card"
+              className="summary-card member-card stagger-item hover-lift"
               style={{ '--member-index': index }}
             >
               <h3>{member.name}</h3>

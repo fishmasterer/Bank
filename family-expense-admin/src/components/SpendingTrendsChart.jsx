@@ -252,7 +252,7 @@ const SpendingTrendsChart = ({ selectedYear, selectedMonth, loading = false }) =
 
   return (
     <>
-      <div className="spending-trends-chart-container">
+      <div className="spending-trends-chart-container animate-fade-in-up hover-lift">
         <div className="spending-trends-chart">
           <Line data={chartData} options={options} />
         </div>

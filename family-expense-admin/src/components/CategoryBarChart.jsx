@@ -209,7 +209,7 @@ const CategoryBarChart = ({ selectedYear, selectedMonth, loading = false }) => {
 
   return (
     <>
-      <div className="category-bar-chart-container">
+      <div className="category-bar-chart-container animate-fade-in-up hover-lift">
         <div className="category-bar-chart">
           <Bar data={chartData} options={options} />
         </div>

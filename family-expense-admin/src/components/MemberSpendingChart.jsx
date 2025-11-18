@@ -169,7 +169,7 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth, loading = false }) =
 
   return (
     <>
-      <div className="member-spending-chart-container">
+      <div className="member-spending-chart-container animate-fade-in-up hover-lift">
         <div className="member-spending-chart">
           <Doughnut data={chartData} options={options} />
         </div>

@@ -297,8 +297,8 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
           />
         )
       ) : (
-        <div className="categories-list">
-          {categories.map(category => {
+        <div className="categories-list stagger-fast">
+          {categories.map((category, index) => {
             const data = filteredBreakdown[category];
             const isExpanded = expandedCategory === category;
             const budgetStatus = getCategoryBudgetStatus(category, data.paid);
@@ -307,7 +307,7 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
             const allCategorySelected = categoryExpenseIds.length > 0 && categoryExpenseIds.every(id => selectedExpenseIds.has(id));
 
             return (
-              <div key={category} className="category-card">
+              <div key={category} className="category-card stagger-item hover-lift">
                 <div className="category-header">
                   {!readOnly && data.expenses.length > 0 && (
                     <div className="category-select-all" onClick={(e) => e.stopPropagation()}>
@@ -370,9 +370,9 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
                 )}
 
                 {isExpanded && (
-                  <div className="expenses-list">
-                    {data.expenses.map(expense => (
-                      <div key={expense.id} className={`expense-item ${selectedExpenseIds.has(expense.id) ? 'selected' : ''}`}>
+                  <div className="expenses-list stagger-fast">
+                    {data.expenses.map((expense, expIndex) => (
+                      <div key={expense.id} className={`expense-item stagger-item ${selectedExpenseIds.has(expense.id) ? 'selected' : ''}`}>
                         {!readOnly && (
                           <div className="expense-checkbox-wrapper">
                             <input
@@ -441,7 +441,7 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
                           <div className="expense-actions">
                             <button
                               onClick={() => onEditExpense(expense)}
-                              className="btn-edit"
+                              className="btn-edit btn-press"
                             >
                               Edit
                             </button>
@@ -452,7 +452,7 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
                                   addExpenseAction('deleted', expense.name, expense.category);
                                 }
                               }}
-                              className="btn-delete"
+                              className="btn-delete btn-press"
                             >
                               Delete
                             </button>
