@@ -307,6 +307,11 @@
   gap: 0.75rem;
   position: relative;
   overflow: hidden;
+  /* Prevent iOS native long press behaviors */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 }
 
 /* Card hover effect */
