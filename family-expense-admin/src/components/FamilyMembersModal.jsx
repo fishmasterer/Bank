@@ -2,15 +2,29 @@ import React, { useState } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
 import './FamilyMembersModal.css';
 
+// Default color palette for members
+const defaultMemberColors = [
+  '#667eea', // Purple
+  '#10b981', // Green
+  '#f59e0b', // Amber
+  '#ef4444', // Red
+  '#3b82f6', // Blue
+  '#8b5cf6', // Violet
+  '#ec4899', // Pink
+  '#06b6d4', // Cyan
+];
+
 const FamilyMembersModal = ({ onClose, onSuccess, onError }) => {
   const { familyMembers, addFamilyMember, updateFamilyMember, expenses } = useExpenses();
   const [editingId, setEditingId] = useState(null);
   const [editingName, setEditingName] = useState('');
+  const [editingColor, setEditingColor] = useState('#667eea');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleEdit = (member) => {
     setEditingId(member.id);
     setEditingName(member.name);
+    setEditingColor(member.color || defaultMemberColors[(member.id - 1) % defaultMemberColors.length]);
   };
 
   const handleSave = async (memberId) => {
@@ -21,9 +35,13 @@ const FamilyMembersModal = ({ onClose, onSuccess, onError }) => {
 
     setIsSubmitting(true);
     try {
-      await updateFamilyMember(memberId, editingName.trim());
+      await updateFamilyMember(memberId, {
+        name: editingName.trim(),
+        color: editingColor
+      });
       setEditingId(null);
       setEditingName('');
+      setEditingColor('#667eea');
       onSuccess?.('Member updated successfully!');
     } catch (err) {
       onError?.('Failed to update member');
@@ -35,6 +53,7 @@ const FamilyMembersModal = ({ onClose, onSuccess, onError }) => {
   const handleCancel = () => {
     setEditingId(null);
     setEditingName('');
+    setEditingColor('#667eea');
   };
 
   const handleAddMember = async () => {
@@ -85,6 +104,30 @@ const FamilyMembersModal = ({ onClose, onSuccess, onError }) => {
                         if (e.key === 'Escape') handleCancel();
                       }}
                     />
+                    <div className="color-picker-section">
+                      <label className="color-label">Member Color</label>
+                      <div className="color-options">
+                        {defaultMemberColors.map((color) => (
+                          <button
+                            key={color}
+                            type="button"
+                            className={`color-option ${editingColor === color ? 'selected' : ''}`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => setEditingColor(color)}
+                            disabled={isSubmitting}
+                            aria-label={`Select color ${color}`}
+                          />
+                        ))}
+                        <input
+                          type="color"
+                          value={editingColor}
+                          onChange={(e) => setEditingColor(e.target.value)}
+                          className="color-input-custom"
+                          disabled={isSubmitting}
+                          title="Choose custom color"
+                        />
+                      </div>
+                    </div>
                     <div className="edit-actions">
                       <button
                         onClick={() => handleSave(member.id)}
@@ -105,10 +148,16 @@ const FamilyMembersModal = ({ onClose, onSuccess, onError }) => {
                 ) : (
                   <div className="member-display">
                     <div className="member-info">
-                      <span className="member-name">{member.name}</span>
-                      <span className="member-stats">
-                        {getMemberExpenseCount(member.id)} expense{getMemberExpenseCount(member.id) !== 1 ? 's' : ''}
-                      </span>
+                      <span
+                        className="member-color-indicator"
+                        style={{ backgroundColor: member.color || defaultMemberColors[(member.id - 1) % defaultMemberColors.length] }}
+                      />
+                      <div className="member-details">
+                        <span className="member-name">{member.name}</span>
+                        <span className="member-stats">
+                          {getMemberExpenseCount(member.id)} expense{getMemberExpenseCount(member.id) !== 1 ? 's' : ''}
+                        </span>
+                      </div>
                     </div>
                     <button
                       onClick={() => handleEdit(member)}

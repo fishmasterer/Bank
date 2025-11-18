@@ -23,6 +23,7 @@ import ToastNotification from './components/ToastNotification';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import PWAUpdateNotification from './components/PWAUpdateNotification';
 import ExportModal from './components/ExportModal';
+import PullToRefresh from './components/PullToRefresh';
 import './App.css';
 
 const AppContent = () => {
@@ -121,6 +122,12 @@ const AppContent = () => {
     } catch (err) {
       showError('Failed to copy recurring expenses');
     }
+  };
+
+  const handlePullRefresh = async () => {
+    // Simulate refresh - data is already real-time from Firebase
+    await new Promise(resolve => setTimeout(resolve, 800));
+    success('Data refreshed');
   };
 
   const monthName = new Date(selectedYear, selectedMonth - 1).toLocaleDateString('en-US', {
@@ -250,26 +257,28 @@ const AppContent = () => {
         </button>
       </div>
 
-      <main className={`main-content ${pageAnimation}`} key={activeTab}>
-        {activeTab === 'summary' ? (
-          <SummaryView
-            selectedYear={selectedYear}
-            selectedMonth={selectedMonth}
-          />
-        ) : activeTab === 'detailed' ? (
-          <DetailedView
-            selectedYear={selectedYear}
-            selectedMonth={selectedMonth}
-            onEditExpense={handleEditExpense}
-            onAddExpense={handleAddExpense}
-          />
-        ) : (
-          <AnalyticsDashboard
-            selectedYear={selectedYear}
-            selectedMonth={selectedMonth}
-          />
-        )}
-      </main>
+      <PullToRefresh onRefresh={handlePullRefresh}>
+        <main className={`main-content ${pageAnimation}`} key={activeTab}>
+          {activeTab === 'summary' ? (
+            <SummaryView
+              selectedYear={selectedYear}
+              selectedMonth={selectedMonth}
+            />
+          ) : activeTab === 'detailed' ? (
+            <DetailedView
+              selectedYear={selectedYear}
+              selectedMonth={selectedMonth}
+              onEditExpense={handleEditExpense}
+              onAddExpense={handleAddExpense}
+            />
+          ) : (
+            <AnalyticsDashboard
+              selectedYear={selectedYear}
+              selectedMonth={selectedMonth}
+            />
+          )}
+        </main>
+      </PullToRefresh>
 
       {showForm && !readOnly && (
         <ExpenseForm

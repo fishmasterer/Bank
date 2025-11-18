@@ -642,3 +642,118 @@
     animation: none;
   }
 }
+
+/* ----------------------------------------
+   Enhanced Focus States for Accessibility
+   ---------------------------------------- */
+
+/* Global focus visible styles */
+:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Remove default focus outline when using mouse */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Enhanced button focus */
+button:focus-visible,
+.btn-primary:focus-visible,
+.btn-secondary:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.3);
+}
+
+/* Tab focus states */
+.tab:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: -2px;
+  background-color: var(--bg-tertiary);
+}
+
+/* Card focus states */
+.summary-card:focus-visible,
+.category-card:focus-visible,
+.expense-item:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+}
+
+/* Input focus states */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+/* Link focus states */
+a:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Checkbox and radio focus */
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Close button focus */
+.close-btn:focus-visible,
+.modal-close:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.3);
+}
+
+/* Navigation focus */
+.bottom-nav-item:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: -2px;
+  background-color: var(--bg-tertiary);
+}
+
+/* Icon button focus */
+.icon-button:focus-visible,
+.fab:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.3);
+}
+
+/* Skip link for keyboard navigation */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary-color);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 0 0 8px 8px;
+  z-index: 10000;
+  transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* High contrast focus for dark mode */
+:root[data-theme="dark"] :focus-visible {
+  outline-color: var(--primary-color);
+}
+
+:root[data-theme="dark"] button:focus-visible,
+:root[data-theme="dark"] .btn-primary:focus-visible,
+:root[data-theme="dark"] .btn-secondary:focus-visible {
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.4);
+}

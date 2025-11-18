@@ -104,14 +104,24 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
         {familyMembers.map((member, index) => {
           const planned = getMonthlyPlanned(selectedYear, selectedMonth, member.id);
           const paid = getMonthlyTotal(selectedYear, selectedMonth, member.id);
+          // Default colors for members without assigned color
+          const defaultColors = ['#667eea', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899', '#06b6d4'];
+          const memberColor = member.color || defaultColors[(member.id - 1) % defaultColors.length];
 
           return (
             <div
               key={member.id}
               className="summary-card member-card stagger-item hover-lift"
-              style={{ '--member-index': index }}
+              style={{
+                '--member-index': index,
+                '--member-color': memberColor,
+                borderTopColor: memberColor
+              }}
             >
-              <h3>{member.name}</h3>
+              <div className="member-header">
+                <span className="member-color-dot" style={{ backgroundColor: memberColor }} />
+                <h3>{member.name}</h3>
+              </div>
               <div className="amount-column">
                 <div className="amount-item">
                   <span className="label">Planned:</span>

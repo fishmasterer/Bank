@@ -4,7 +4,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { useExpenses } from '../context/ExpenseContext';
 import ChartDrillDown from './ChartDrillDown';
 import { SkeletonChart } from './SkeletonLoader';
-import { getThemeColors, hexToRgba, getChartColorPalette } from '../utils/themeColors';
+import { getThemeColors, hexToRgba } from '../utils/themeColors';
 import './MemberSpendingChart.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -13,11 +13,15 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth, loading = false }) =
   const { familyMembers, getMonthlyTotal, getExpensesByMonth } = useExpenses();
   const [drillDown, setDrillDown] = useState({ isOpen: false, member: null, expenses: [] });
 
+  // Default colors for members without assigned color
+  const defaultColors = ['#667eea', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899', '#06b6d4'];
+
   const memberSpendingData = useMemo(() => {
     const memberSpending = familyMembers.map(member => ({
       id: member.id,
       name: member.name,
-      amount: getMonthlyTotal(selectedYear, selectedMonth, member.id)
+      amount: getMonthlyTotal(selectedYear, selectedMonth, member.id),
+      color: member.color || defaultColors[(member.id - 1) % defaultColors.length]
     })).filter(m => m.amount > 0);
 
     return memberSpending;
@@ -28,20 +32,17 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth, loading = false }) =
       return null;
     }
 
-    const total = memberSpendingData.reduce((sum, m) => sum + m.amount, 0);
-
-    // Use theme color palette
-    const colorPalette = getChartColorPalette();
-    const backgroundColors = colorPalette.map(color => hexToRgba(color, 0.8));
-    const borderColors = colorPalette;
+    // Use member's assigned colors
+    const backgroundColors = memberSpendingData.map(m => hexToRgba(m.color, 0.8));
+    const borderColors = memberSpendingData.map(m => m.color);
 
     return {
       labels: memberSpendingData.map(m => m.name),
       datasets: [{
         label: 'Amount Paid',
         data: memberSpendingData.map(m => m.amount),
-        backgroundColor: backgroundColors.slice(0, memberSpendingData.length),
-        borderColor: borderColors.slice(0, memberSpendingData.length),
+        backgroundColor: backgroundColors,
+        borderColor: borderColors,
         borderWidth: 3,
         hoverOffset: window.innerWidth < 640 ? 8 : 15,
         spacing: 2,

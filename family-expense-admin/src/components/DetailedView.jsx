@@ -2,18 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
 import { useCategoryBudget } from '../hooks/useCategoryBudget';
 import { useNotifications } from '../context/NotificationContext';
+import { useUndoDelete } from '../hooks/useUndoDelete';
 import { SkeletonDetailedView } from './SkeletonLoader';
 import EmptyState from './EmptyState';
 import MultiSelect from './MultiSelect';
 import FilterPresets from './FilterPresets';
 import BulkActionsBar from './BulkActionsBar';
 import BulkEditModal from './BulkEditModal';
+import { getCategoryGradientStyle } from '../utils/categoryColors';
 import './DetailedView.css';
 
 const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense }) => {
   const { getCategoryBreakdown, familyMembers, deleteExpense, readOnly, loading, updateExpense } = useExpenses();
   const { getCategoryBudgetStatus } = useCategoryBudget(selectedYear, selectedMonth);
   const { addExpenseAction, addBudgetAlert } = useNotifications();
+  const { trackDelete, undoDelete, canUndo, deletedItem } = useUndoDelete();
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -21,6 +24,26 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
   const [showPresets, setShowPresets] = useState(false);
   const [selectedExpenseIds, setSelectedExpenseIds] = useState(new Set());
   const [showBulkEdit, setShowBulkEdit] = useState(false);
+  const [showUndoToast, setShowUndoToast] = useState(false);
+
+  // Show/hide undo toast
+  useEffect(() => {
+    if (canUndo) {
+      setShowUndoToast(true);
+      const timer = setTimeout(() => setShowUndoToast(false), 5000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowUndoToast(false);
+    }
+  }, [canUndo, deletedItem]);
+
+  const handleUndo = async () => {
+    const success = await undoDelete();
+    if (success) {
+      addExpenseAction('restored', deletedItem?.name || 'expense', deletedItem?.category || 'Unknown');
+    }
+    setShowUndoToast(false);
+  };
 
   const breakdown = getCategoryBreakdown(selectedYear, selectedMonth);
   const allCategories = Object.keys(breakdown).sort();
@@ -324,7 +347,14 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
                     className="category-header-content"
                     onClick={() => toggleCategory(category)}
                   >
-                    <h3>{category}</h3>
+                    <div className="category-name-wrapper">
+                      <span
+                        className="category-badge"
+                        style={{ background: getCategoryGradientStyle(category) }}
+                      >
+                        {category}
+                      </span>
+                    </div>
                     <div className="category-totals">
                       <span className="planned">Planned: ${data.planned.toFixed(2)}</span>
                       <span className="paid">Paid: ${data.paid.toFixed(2)}</span>
@@ -448,6 +478,7 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
                             <button
                               onClick={() => {
                                 if (window.confirm('Delete this expense?')) {
+                                  trackDelete(expense);
                                   deleteExpense(expense.id);
                                   addExpenseAction('deleted', expense.name, expense.category);
                                 }
@@ -493,6 +524,18 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
           onSave={handleBulkEditSave}
           onClose={() => setShowBulkEdit(false)}
         />
+      )}
+
+      {/* Undo Delete Toast */}
+      {showUndoToast && canUndo && (
+        <div className="undo-toast">
+          <span className="undo-message">
+            Deleted "{deletedItem?.name}"
+          </span>
+          <button onClick={handleUndo} className="undo-button">
+            Undo
+          </button>
+        </div>
       )}
     </div>
   );
