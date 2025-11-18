@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -36,6 +36,25 @@ const AppContent = () => {
   const [editingExpense, setEditingExpense] = useState(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [pageAnimation, setPageAnimation] = useState('');
+  const prevTabRef = useRef('summary');
+
+  const tabOrder = ['summary', 'detailed', 'analytics'];
+
+  const handleTabChange = (newTab) => {
+    if (newTab === activeTab) return;
+
+    const prevIndex = tabOrder.indexOf(prevTabRef.current);
+    const newIndex = tabOrder.indexOf(newTab);
+
+    // Set animation direction based on tab order
+    setPageAnimation(newIndex > prevIndex ? 'page-slide-left' : 'page-slide-right');
+    prevTabRef.current = newTab;
+    setActiveTab(newTab);
+
+    // Reset animation class after animation completes
+    setTimeout(() => setPageAnimation(''), 400);
+  };
 
   const { currentUser, loading: authLoading } = useAuth();
   const { isAuthorized, loading: authorizationLoading } = useAuthorization(currentUser);
@@ -184,27 +203,27 @@ const AppContent = () => {
         <div className="action-buttons">
           {!readOnly && (
             <>
-              <button onClick={handleAddExpense} className="btn-primary">
+              <button onClick={handleAddExpense} className="btn-primary btn-press hover-lift">
                 + Add Expense
               </button>
-              <button onClick={handleCopyRecurring} className="btn-secondary">
+              <button onClick={handleCopyRecurring} className="btn-secondary btn-press hover-lift">
                 🔄 Copy Recurring
               </button>
-              <button onClick={() => setShowBudgetSettings(true)} className="btn-secondary">
+              <button onClick={() => setShowBudgetSettings(true)} className="btn-secondary btn-press hover-lift">
                 💰 Set Budget
               </button>
-              <button onClick={() => setShowCategoryBudgets(true)} className="btn-secondary">
+              <button onClick={() => setShowCategoryBudgets(true)} className="btn-secondary btn-press hover-lift">
                 📊 Category Budgets
               </button>
-              <button onClick={() => setShowFamilyModal(true)} className="btn-secondary">
+              <button onClick={() => setShowFamilyModal(true)} className="btn-secondary btn-press hover-lift">
                 👥 Manage Family
               </button>
             </>
           )}
-          <button onClick={() => setShowVarianceReport(true)} className="btn-secondary">
+          <button onClick={() => setShowVarianceReport(true)} className="btn-secondary btn-press hover-lift">
             📈 Budget Report
           </button>
-          <button onClick={handleExport} className="btn-secondary">
+          <button onClick={handleExport} className="btn-secondary btn-press hover-lift">
             📥 Export
           </button>
         </div>
@@ -213,25 +232,25 @@ const AppContent = () => {
       <div className="tabs">
         <button
           className={`tab ${activeTab === 'summary' ? 'active' : ''}`}
-          onClick={() => setActiveTab('summary')}
+          onClick={() => handleTabChange('summary')}
         >
           Summary
         </button>
         <button
           className={`tab ${activeTab === 'detailed' ? 'active' : ''}`}
-          onClick={() => setActiveTab('detailed')}
+          onClick={() => handleTabChange('detailed')}
         >
           Detailed Breakdown
         </button>
         <button
           className={`tab ${activeTab === 'analytics' ? 'active' : ''}`}
-          onClick={() => setActiveTab('analytics')}
+          onClick={() => handleTabChange('analytics')}
         >
           Analytics
         </button>
       </div>
 
-      <main className="main-content">
+      <main className={`main-content ${pageAnimation}`} key={activeTab}>
         {activeTab === 'summary' ? (
           <SummaryView
             selectedYear={selectedYear}
@@ -335,21 +354,21 @@ const AppContent = () => {
       <nav className="bottom-nav">
         <button
           className={`bottom-nav-item ${activeTab === 'summary' ? 'active' : ''}`}
-          onClick={() => setActiveTab('summary')}
+          onClick={() => handleTabChange('summary')}
         >
           <span className="icon">📊</span>
           <span>Summary</span>
         </button>
         <button
           className={`bottom-nav-item ${activeTab === 'detailed' ? 'active' : ''}`}
-          onClick={() => setActiveTab('detailed')}
+          onClick={() => handleTabChange('detailed')}
         >
           <span className="icon">📋</span>
           <span>Details</span>
         </button>
         <button
           className={`bottom-nav-item ${activeTab === 'analytics' ? 'active' : ''}`}
-          onClick={() => setActiveTab('analytics')}
+          onClick={() => handleTabChange('analytics')}
         >
           <span className="icon">📈</span>
           <span>Analytics</span>

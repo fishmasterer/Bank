@@ -60,6 +60,12 @@ const CategoryPieChart = ({ selectedYear, selectedMonth, loading = false }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: true,
+    animation: {
+      animateScale: true,
+      animateRotate: true,
+      duration: 800,
+      easing: 'easeOutQuart',
+    },
     plugins: {
       legend: {
         position: 'right',
@@ -116,7 +122,7 @@ const CategoryPieChart = ({ selectedYear, selectedMonth, loading = false }) => {
   };
 
   return (
-    <div className="pie-chart-container">
+    <div className="pie-chart-container animate-fade-in-up hover-lift">
       <h3 className="chart-title">Spending by Category</h3>
       <div className="chart-wrapper">
         <Pie data={chartData} options={options} />

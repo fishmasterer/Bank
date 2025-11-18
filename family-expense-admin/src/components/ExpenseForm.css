@@ -10,6 +10,23 @@
   align-items: center;
   z-index: 1000;
   padding: 1rem;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .modal-content {
@@ -21,6 +38,7 @@
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+  animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .modal-header {
@@ -84,7 +102,15 @@
   border: 1px solid var(--border-color);
   border-radius: 6px;
   font-size: 0.9375rem;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.form-group input:hover,
+.form-group select:hover,
+.form-group textarea:hover {
+  border-color: var(--text-tertiary);
 }
 
 .form-group input:focus,
@@ -93,6 +119,20 @@
   border-color: var(--primary-color);
   outline: none;
   box-shadow: 0 0 0 3px rgba(194, 65, 12, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Input validation animation */
+.form-group input:invalid:not(:placeholder-shown),
+.form-group input.error {
+  border-color: var(--danger-color);
+  animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+  20%, 40%, 60%, 80% { transform: translateX(3px); }
 }
 
 .form-group textarea {
@@ -156,7 +196,13 @@
 
 .form-actions .btn-primary:hover {
   background-color: var(--primary-hover);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(194, 65, 12, 0.3);
+  transform: translateY(-2px);
+}
+
+.form-actions .btn-primary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .form-actions .btn-secondary {
@@ -168,11 +214,17 @@
 .form-actions .btn-secondary:hover {
   background-color: var(--bg-tertiary);
   border-color: var(--text-tertiary);
+  transform: translateY(-1px);
+}
+
+.form-actions .btn-secondary:active {
+  transform: translateY(0) scale(0.98);
 }
 
 .form-actions button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none !important;
 }
 
 .spinner-small {
