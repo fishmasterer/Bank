@@ -1,20 +1,101 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 
-export const exportToPDF = (expenses, familyMembers, budgets, categoryBudgets, year, month) => {
+// Helper to filter expenses by date range and members
+const filterExpenses = (expenses, options) => {
+  const { startYear, startMonth, endYear, endMonth, selectedMembers } = options;
+
+  return expenses.filter(exp => {
+    // Check date range
+    const expDate = new Date(exp.year, exp.month - 1);
+    const startDate = new Date(startYear, startMonth - 1);
+    const endDate = new Date(endYear, endMonth - 1);
+
+    if (expDate < startDate || expDate > endDate) {
+      return false;
+    }
+
+    // Check member filter
+    if (selectedMembers && !selectedMembers.includes(exp.paidBy)) {
+      return false;
+    }
+
+    return true;
+  });
+};
+
+// Helper to generate date range label
+const getDateRangeLabel = (options) => {
+  const { startYear, startMonth, endYear, endMonth } = options;
+
+  if (startYear === endYear && startMonth === endMonth) {
+    return new Date(startYear, startMonth - 1).toLocaleDateString('en-US', {
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
+  const start = new Date(startYear, startMonth - 1).toLocaleDateString('en-US', {
+    month: 'short',
+    year: 'numeric'
+  });
+  const end = new Date(endYear, endMonth - 1).toLocaleDateString('en-US', {
+    month: 'short',
+    year: 'numeric'
+  });
+
+  return `${start} - ${end}`;
+};
+
+// Helper to generate filename
+const getFilename = (options) => {
+  const { startYear, startMonth, endYear, endMonth } = options;
+
+  if (startYear === endYear && startMonth === endMonth) {
+    const monthName = new Date(startYear, startMonth - 1).toLocaleDateString('en-US', { month: 'long' });
+    return `family-expenses-${monthName}-${startYear}.pdf`;
+  }
+
+  const startStr = `${startYear}-${String(startMonth).padStart(2, '0')}`;
+  const endStr = `${endYear}-${String(endMonth).padStart(2, '0')}`;
+  return `family-expenses-${startStr}-to-${endStr}.pdf`;
+};
+
+export const exportToPDF = (expenses, familyMembers, budgets, categoryBudgets, options) => {
+  // Handle legacy signature (year, month as separate params)
+  if (typeof options === 'number') {
+    const year = options;
+    const month = arguments[5];
+    options = {
+      startYear: year,
+      startMonth: month,
+      endYear: year,
+      endMonth: month,
+      selectedMembers: familyMembers.map(m => m.id)
+    };
+  }
+
   // Helper to get member name
   const getMemberName = (memberId) => {
     const member = familyMembers.find(m => m.id === memberId);
     return member ? member.name : 'Unknown';
   };
 
-  // Filter expenses for the selected month
-  const filteredExpenses = expenses.filter(exp =>
-    exp.year === year && exp.month === month
+  // Filter expenses by date range and selected members
+  const filteredExpenses = filterExpenses(expenses, options);
+
+  // Get filtered family members
+  const filteredMembers = familyMembers.filter(m =>
+    options.selectedMembers.includes(m.id)
   );
 
-  // Sort by category then name
+  // Sort by date, then category, then name
   filteredExpenses.sort((a, b) => {
+    const dateA = new Date(a.year, a.month - 1);
+    const dateB = new Date(b.year, b.month - 1);
+    if (dateA.getTime() !== dateB.getTime()) {
+      return dateA.getTime() - dateB.getTime();
+    }
     if (a.category !== b.category) return a.category.localeCompare(b.category);
     return a.name.localeCompare(b.name);
   });
@@ -24,13 +105,26 @@ export const exportToPDF = (expenses, familyMembers, budgets, categoryBudgets, y
   const totalPaid = filteredExpenses.reduce((sum, exp) => sum + (exp.paidAmount || 0), 0);
   const totalVariance = totalPaid - totalPlanned;
 
-  // Get budget info
-  const monthBudget = budgets.find(b => b.year === year && b.month === month);
-  const budgetLimit = monthBudget ? monthBudget.limit : null;
+  // Get total budget for date range
+  const getTotalBudget = () => {
+    if (!budgets || budgets.length === 0) return null;
+
+    const relevantBudgets = budgets.filter(b => {
+      const budgetDate = new Date(b.year, b.month - 1);
+      const startDate = new Date(options.startYear, options.startMonth - 1);
+      const endDate = new Date(options.endYear, options.endMonth - 1);
+      return budgetDate >= startDate && budgetDate <= endDate;
+    });
+
+    if (relevantBudgets.length === 0) return null;
+    return relevantBudgets.reduce((sum, b) => sum + b.limit, 0);
+  };
+
+  const budgetLimit = getTotalBudget();
+  const dateLabel = getDateRangeLabel(options);
 
   // Initialize PDF
   const doc = new jsPDF();
-  const monthName = new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   let yPos = 20;
 
@@ -42,7 +136,7 @@ export const exportToPDF = (expenses, familyMembers, budgets, categoryBudgets, y
   yPos += 8;
   doc.setFontSize(12);
   doc.setTextColor(100, 100, 100);
-  doc.text(monthName, 14, yPos);
+  doc.text(dateLabel, 14, yPos);
 
   yPos += 3;
   doc.setDrawColor(102, 126, 234);
@@ -121,20 +215,60 @@ export const exportToPDF = (expenses, familyMembers, budgets, categoryBudgets, y
   doc.setFont(undefined, 'normal');
   yPos += 5;
 
-  const expenseRows = filteredExpenses.map(exp => [
-    exp.name,
-    exp.category,
-    exp.isRecurring ? 'R' : 'O',
-    `$${(exp.plannedAmount || 0).toFixed(2)}`,
-    `$${(exp.paidAmount || 0).toFixed(2)}`,
-    getMemberName(exp.paidBy)
-  ]);
+  const isMultiMonth = options.startYear !== options.endYear || options.startMonth !== options.endMonth;
+
+  const expenseRows = filteredExpenses.map(exp => {
+    const row = [
+      exp.name,
+      exp.category,
+      exp.isRecurring ? 'R' : 'O',
+      `$${(exp.plannedAmount || 0).toFixed(2)}`,
+      `$${(exp.paidAmount || 0).toFixed(2)}`,
+      getMemberName(exp.paidBy)
+    ];
+
+    if (isMultiMonth) {
+      row.splice(2, 0, new Date(exp.year, exp.month - 1).toLocaleDateString('en-US', {
+        month: 'short',
+        year: '2-digit'
+      }));
+    }
+
+    return row;
+  });
+
+  const expenseHeaders = isMultiMonth
+    ? [['Expense', 'Category', 'Month', 'Type', 'Planned', 'Paid', 'Paid By']]
+    : [['Expense', 'Category', 'Type', 'Planned', 'Paid', 'Paid By']];
+
+  const expenseFooter = isMultiMonth
+    ? [['TOTAL', '', '', '', `$${totalPlanned.toFixed(2)}`, `$${totalPaid.toFixed(2)}`, '']]
+    : [['TOTAL', '', '', `$${totalPlanned.toFixed(2)}`, `$${totalPaid.toFixed(2)}`, '']];
+
+  const columnStyles = isMultiMonth
+    ? {
+        0: { cellWidth: 40 },
+        1: { cellWidth: 30 },
+        2: { cellWidth: 20 },
+        3: { cellWidth: 15, halign: 'center' },
+        4: { cellWidth: 22, halign: 'right' },
+        5: { cellWidth: 22, halign: 'right' },
+        6: { cellWidth: 30 }
+      }
+    : {
+        0: { cellWidth: 50 },
+        1: { cellWidth: 35 },
+        2: { cellWidth: 15, halign: 'center' },
+        3: { cellWidth: 25, halign: 'right' },
+        4: { cellWidth: 25, halign: 'right' },
+        5: { cellWidth: 30 }
+      };
 
   doc.autoTable({
     startY: yPos,
-    head: [['Expense', 'Category', 'Type', 'Planned', 'Paid', 'Paid By']],
+    head: expenseHeaders,
     body: expenseRows,
-    foot: [['TOTAL', '', '', `$${totalPlanned.toFixed(2)}`, `$${totalPaid.toFixed(2)}`, '']],
+    foot: expenseFooter,
     theme: 'grid',
     headStyles: {
       fillColor: [102, 126, 234],
@@ -152,14 +286,7 @@ export const exportToPDF = (expenses, familyMembers, budgets, categoryBudgets, y
       fontSize: 8,
       textColor: [60, 60, 60]
     },
-    columnStyles: {
-      0: { cellWidth: 50 },
-      1: { cellWidth: 35 },
-      2: { cellWidth: 15, halign: 'center' },
-      3: { cellWidth: 25, halign: 'right' },
-      4: { cellWidth: 25, halign: 'right' },
-      5: { cellWidth: 30 }
-    },
+    columnStyles,
     margin: { left: 14, right: 14 },
     didDrawPage: (data) => {
       // Add page numbers
@@ -198,18 +325,23 @@ export const exportToPDF = (expenses, familyMembers, budgets, categoryBudgets, y
     categoryBreakdown[exp.category].count += 1;
   });
 
-  const getCategoryBudget = (category) => {
-    const budget = categoryBudgets.find(b =>
-      b.year === year &&
-      b.month === month &&
-      b.category === category
-    );
-    return budget ? budget.limit : null;
+  const getCategoryBudgetAvg = (category) => {
+    if (!categoryBudgets || categoryBudgets.length === 0) return null;
+
+    const relevantBudgets = categoryBudgets.filter(b => {
+      const budgetDate = new Date(b.year, b.month - 1);
+      const startDate = new Date(options.startYear, options.startMonth - 1);
+      const endDate = new Date(options.endYear, options.endMonth - 1);
+      return budgetDate >= startDate && budgetDate <= endDate && b.category === category;
+    });
+
+    if (relevantBudgets.length === 0) return null;
+    return relevantBudgets.reduce((sum, b) => sum + b.limit, 0);
   };
 
   const categoryRows = Object.keys(categoryBreakdown).sort().map(category => {
     const data = categoryBreakdown[category];
-    const budget = getCategoryBudget(category);
+    const budget = getCategoryBudgetAvg(category);
     const status = budget ?
       (data.paid > budget ? 'Over' :
        data.paid >= budget * 0.9 ? 'Warning' :
@@ -267,7 +399,7 @@ export const exportToPDF = (expenses, familyMembers, budgets, categoryBudgets, y
   doc.text('Per Member Summary', 14, yPos);
   yPos += 10;
 
-  const memberRows = familyMembers.map(member => {
+  const memberRows = filteredMembers.map(member => {
     const memberExpenses = filteredExpenses.filter(exp => exp.paidBy === member.id);
     const memberPlanned = memberExpenses.reduce((sum, exp) => sum + (exp.plannedAmount || 0), 0);
     const memberPaid = memberExpenses.reduce((sum, exp) => sum + (exp.paidAmount || 0), 0);
@@ -333,5 +465,5 @@ export const exportToPDF = (expenses, familyMembers, budgets, categoryBudgets, y
   })}`, 14, yPos);
 
   // Save PDF
-  doc.save(`family-expenses-${new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long' })}-${year}.pdf`);
+  doc.save(getFilename(options));
 };

@@ -90,6 +90,7 @@ const CategoryPieChart = ({ selectedYear, selectedMonth, loading = false }) => {
                 return {
                   text: `${label}: $${value.toFixed(0)} (${percentage}%)`,
                   fillStyle: data.datasets[0].backgroundColor[i],
+                  fontColor: getThemeColors().textPrimary,
                   hidden: false,
                   index: i,
                 };
