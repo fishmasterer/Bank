@@ -55,7 +55,7 @@
   justify-content: space-between;
   align-items: flex-start;
   padding: 24px;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid var(--border-color);
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   color: white;
 }
@@ -101,8 +101,8 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   padding: 24px;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .stat-card {
@@ -122,7 +122,7 @@
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--text-secondary);
   margin-bottom: 8px;
   letter-spacing: 0.5px;
 }
@@ -130,7 +130,7 @@
 .stat-value {
   font-size: 22px;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .stat-value.planned {
@@ -150,7 +150,7 @@
 }
 
 .stat-value.on-budget {
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .stat-percent {
@@ -174,7 +174,7 @@
 
 .expense-item {
   background: var(--bg-primary);
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--border-color);
   border-radius: 12px;
   padding: 16px;
   transition: all 0.2s;
@@ -203,7 +203,7 @@
 .expense-name {
   font-size: 16px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary);
 }
 
 .expense-badge {
@@ -243,7 +243,7 @@
 
 .amount-label {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
@@ -271,12 +271,12 @@
 .expense-notes {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border-color);
   display: flex;
   align-items: flex-start;
   gap: 8px;
   font-size: 14px;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .notes-icon {
@@ -292,17 +292,17 @@
 .expense-empty {
   text-align: center;
   padding: 48px 24px;
-  color: #9ca3af;
+  color: var(--text-tertiary);
   font-size: 16px;
 }
 
 /* Footer */
 .chart-drilldown-footer {
   padding: 20px 24px;
-  border-top: 2px solid #f0f0f0;
+  border-top: 2px solid var(--border-color);
   display: flex;
   justify-content: flex-end;
-  background: #f9fafb;
+  background: var(--bg-secondary);
 }
 
 .btn-close {
