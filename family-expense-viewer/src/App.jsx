@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -10,6 +10,8 @@ import Login from './components/Login';
 import UserProfile from './components/UserProfile';
 import Unauthorized from './components/Unauthorized';
 import ThemeToggle from './components/ThemeToggle';
+import FloatingActionButton from './components/FloatingActionButton';
+import StatsPanel from './components/StatsPanel';
 import { exportToCSV } from './utils/exportData';
 import './App.css';
 
@@ -19,10 +21,28 @@ const AppContent = () => {
   const [editingExpense, setEditingExpense] = useState(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [statsView, setStatsView] = useState(null);
 
   const { currentUser, loading: authLoading } = useAuth();
   const { isAuthorized, loading: authorizationLoading } = useAuthorization(currentUser);
   const { expenses, familyMembers, loading, error, readOnly } = useExpenses();
+
+  // FAB handlers
+  const handleMemberExpenses = useCallback(() => {
+    setStatsView('memberExpenses');
+  }, []);
+
+  const handleMonthlyStats = useCallback(() => {
+    setStatsView('monthlyStats');
+  }, []);
+
+  const handleBudgetTracker = useCallback(() => {
+    setStatsView('budgetTracker');
+  }, []);
+
+  const handleCloseStats = useCallback(() => {
+    setStatsView(null);
+  }, []);
 
   // Show loading state while checking authentication
   if (authLoading || authorizationLoading) {
@@ -192,6 +212,23 @@ const AppContent = () => {
         <ExpenseForm
           editingExpense={editingExpense}
           onClose={handleCloseForm}
+        />
+      )}
+
+      {/* Floating Action Button */}
+      <FloatingActionButton
+        onMemberExpenses={handleMemberExpenses}
+        onMonthlyStats={handleMonthlyStats}
+        onBudgetTracker={handleBudgetTracker}
+      />
+
+      {/* Stats Panel */}
+      {statsView && (
+        <StatsPanel
+          view={statsView}
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+          onClose={handleCloseStats}
         />
       )}
     </div>

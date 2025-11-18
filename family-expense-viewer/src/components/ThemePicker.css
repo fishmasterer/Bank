@@ -18,6 +18,17 @@
   gap: var(--spacing-sm);
 }
 
+.theme-display {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  border: 2px solid var(--primary-color);
+  border-radius: var(--border-radius-md);
+  background-color: color-mix(in srgb, var(--primary-color) 5%, var(--bg-primary));
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
 .theme-option {
   display: flex;
   align-items: center;
