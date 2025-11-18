@@ -74,6 +74,7 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth, loading = false }) =
       legend: {
         position: window.innerWidth < 640 ? 'bottom' : 'right',
         labels: {
+          color: getThemeColors().textPrimary,
           padding: window.innerWidth < 640 ? 12 : 20,
           font: {
             size: window.innerWidth < 640 ? 11 : 12,
@@ -108,6 +109,7 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth, loading = false }) =
       title: {
         display: true,
         text: 'Member Spending Breakdown (Click to drill down)',
+        color: getThemeColors().textPrimary,
         font: {
           size: window.innerWidth < 640 ? 14 : 16,
           weight: 'bold'

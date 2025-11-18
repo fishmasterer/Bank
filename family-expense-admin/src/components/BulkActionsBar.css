@@ -6,9 +6,10 @@
   right: 0;
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 100;
+  z-index: 101; /* Above bottom nav */
   animation: slideUpBar 0.3s ease-out;
   border-top: 3px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 @keyframes slideUpBar {
@@ -263,13 +264,15 @@
   .bulk-action-btn {
     flex: 1;
     min-width: 0;
-    padding: 0.75rem 0.875rem;
-    font-size: 0.875rem;
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+    min-height: 44px;
   }
 
   .bulk-action-btn.cancel {
     flex: 0;
-    min-width: 60px;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .selected-count {
@@ -278,7 +281,7 @@
   }
 
   .selected-text {
-    font-size: 0.938rem;
+    font-size: 0.9375rem;
   }
 
   .bulk-confirm-dialog {
@@ -299,7 +302,7 @@
   }
 
   .bulk-confirm-message {
-    font-size: 0.938rem;
+    font-size: 0.9375rem;
     text-align: center;
   }
 
@@ -308,8 +311,9 @@
   }
 
   .bulk-confirm-btn {
-    padding: 0.813rem 1.25rem;
-    font-size: 0.938rem;
+    padding: 0.875rem 1.25rem;
+    font-size: 0.9375rem;
+    min-height: 44px;
   }
 }
 
@@ -319,8 +323,9 @@
   }
 
   .bulk-action-btn {
-    padding: 0.625rem 0.75rem;
-    font-size: 0.813rem;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    min-height: 44px;
   }
 }
 

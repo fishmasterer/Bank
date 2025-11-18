@@ -39,6 +39,27 @@
   }
 }
 
+/* Very small screens */
+@media (max-width: 480px) {
+  .member-spending-chart-container {
+    padding: 0.75rem;
+  }
+
+  .member-spending-chart {
+    height: 280px;
+  }
+}
+
+@media (max-width: 375px) {
+  .member-spending-chart-container {
+    padding: 0.5rem;
+  }
+
+  .member-spending-chart {
+    height: 260px;
+  }
+}
+
 /* Touch-friendly hover states */
 @media (hover: hover) {
   .member-spending-chart-container:hover {

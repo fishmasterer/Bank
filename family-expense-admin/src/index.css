@@ -254,3 +254,43 @@ input:focus, select:focus, textarea:focus {
 :root[data-theme="dark"] textarea:focus {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-light) 20%, transparent);
 }
+
+/* Touch feedback for interactive elements */
+button,
+input,
+select,
+textarea,
+[role="button"],
+.clickable {
+  -webkit-tap-highlight-color: rgba(var(--bg-primary-rgb), 0.3);
+}
+
+/* Active state feedback for touch */
+button:active,
+[role="button"]:active,
+.clickable:active {
+  transform: scale(0.98);
+}
+
+/* Improved scrolling for modals and overflow containers */
+.modal-content,
+.overflow-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Focus visible for keyboard navigation */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Landscape orientation adjustments */
+@media (orientation: landscape) and (max-height: 500px) {
+  .modal-content {
+    max-height: 95vh;
+  }
+}

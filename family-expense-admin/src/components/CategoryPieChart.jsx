@@ -70,6 +70,7 @@ const CategoryPieChart = ({ selectedYear, selectedMonth, loading = false }) => {
       legend: {
         position: 'right',
         labels: {
+          color: getThemeColors().textPrimary,
           padding: 15,
           font: {
             size: 13,
