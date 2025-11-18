@@ -18,7 +18,8 @@ const BudgetSettings = ({ selectedYear, selectedMonth, onClose, onSuccess, onErr
       const budgetDoc = await getDoc(doc(db, 'budgets', budgetId));
 
       if (budgetDoc.exists()) {
-        setMonthlyBudget(budgetDoc.data().monthlyLimit || '');
+        const data = budgetDoc.data();
+        setMonthlyBudget(data.limit || data.monthlyLimit || '');
       }
     } catch (err) {
       console.error('Error loading budget:', err);
@@ -34,7 +35,8 @@ const BudgetSettings = ({ selectedYear, selectedMonth, onClose, onSuccess, onErr
     try {
       const budgetId = `${selectedYear}-${selectedMonth}`;
       const budgetData = {
-        monthlyLimit: parseFloat(monthlyBudget) || 0,
+        limit: parseFloat(monthlyBudget) || 0,
+        monthlyLimit: parseFloat(monthlyBudget) || 0, // Keep both for backward compatibility
         year: selectedYear,
         month: selectedMonth,
         updatedAt: new Date().toISOString()
