@@ -121,7 +121,7 @@ const AppContent = () => {
     setActiveTab(newTab);
 
     // Reset animation class after animation completes
-    setTimeout(() => setPageAnimation(''), 400);
+    setTimeout(() => setPageAnimation(''), 450);
   }, [activeTab]);
 
   // Swipe gesture handlers for tab navigation with edge bounce
@@ -132,7 +132,7 @@ const AppContent = () => {
     } else {
       // Trigger edge bounce effect at right boundary
       setEdgeBounce('right');
-      setTimeout(() => setEdgeBounce(null), 400);
+      setTimeout(() => setEdgeBounce(null), 500);
     }
   }, [activeTab, handleTabChange]);
 
@@ -143,7 +143,7 @@ const AppContent = () => {
     } else {
       // Trigger edge bounce effect at left boundary
       setEdgeBounce('left');
-      setTimeout(() => setEdgeBounce(null), 400);
+      setTimeout(() => setEdgeBounce(null), 500);
     }
   }, [activeTab, handleTabChange]);
 

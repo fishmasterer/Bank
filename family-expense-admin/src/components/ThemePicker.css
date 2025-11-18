@@ -112,3 +112,53 @@
     margin: 0;
   }
 }
+
+/* Display Mode Options */
+.display-mode-options {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.display-mode-option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border: 2px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  background-color: var(--bg-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+  justify-content: center;
+  position: relative;
+}
+
+.display-mode-option:hover {
+  border-color: var(--border-light);
+  background-color: var(--bg-hover);
+  transform: translateY(-1px);
+}
+
+.display-mode-option.active {
+  border-color: var(--primary-color);
+  background-color: color-mix(in srgb, var(--primary-color) 5%, var(--bg-primary));
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.display-mode-icon {
+  font-size: var(--font-lg);
+}
+
+.display-mode-name {
+  font-size: var(--font-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.display-mode-option .check-icon {
+  position: absolute;
+  top: var(--spacing-xs);
+  right: var(--spacing-xs);
+  font-size: var(--font-sm);
+}

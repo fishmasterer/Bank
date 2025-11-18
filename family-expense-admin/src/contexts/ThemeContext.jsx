@@ -26,6 +26,17 @@ export const THEME_NAMES = {
   [THEMES.LAVA]: 'Lava'
 };
 
+// Display modes
+export const DISPLAY_MODES = {
+  COMFORTABLE: 'comfortable',
+  COMPACT: 'compact'
+};
+
+export const DISPLAY_MODE_NAMES = {
+  [DISPLAY_MODES.COMFORTABLE]: 'Comfortable',
+  [DISPLAY_MODES.COMPACT]: 'Compact'
+};
+
 // Theme colors for PWA meta tags
 const THEME_COLORS = {
   [THEMES.ORANGE]: {
@@ -60,6 +71,10 @@ export function ThemeProvider({ children }) {
     }
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
+  const [displayMode, setDisplayMode] = useState(() => {
+    const saved = localStorage.getItem('displayMode');
+    return saved || DISPLAY_MODES.COMFORTABLE;
+  });
   const [loading, setLoading] = useState(true);
 
   // Load theme preference from Firebase when user logs in
@@ -76,6 +91,9 @@ export function ThemeProvider({ children }) {
             if (data.darkMode !== undefined) {
               setDarkMode(data.darkMode);
             }
+            if (data.displayMode && Object.values(DISPLAY_MODES).includes(data.displayMode)) {
+              setDisplayMode(data.displayMode);
+            }
           }
         } catch (error) {
           console.error('Error loading theme preference:', error);
@@ -85,6 +103,10 @@ export function ThemeProvider({ children }) {
         const savedTheme = localStorage.getItem('colorTheme');
         if (savedTheme && Object.values(THEMES).includes(savedTheme)) {
           setColorTheme(savedTheme);
+        }
+        const savedDisplayMode = localStorage.getItem('displayMode');
+        if (savedDisplayMode && Object.values(DISPLAY_MODES).includes(savedDisplayMode)) {
+          setDisplayMode(savedDisplayMode);
         }
       }
       setLoading(false);
@@ -98,8 +120,10 @@ export function ThemeProvider({ children }) {
     const mode = darkMode ? 'dark' : 'light';
     document.documentElement.setAttribute('data-theme', mode);
     document.documentElement.setAttribute('data-color-theme', colorTheme);
+    document.documentElement.setAttribute('data-display-mode', displayMode);
     localStorage.setItem('theme', mode);
     localStorage.setItem('colorTheme', colorTheme);
+    localStorage.setItem('displayMode', displayMode);
 
     // Update theme-color meta tag for PWA
     const themeColor = THEME_COLORS[colorTheme]?.[mode] || THEME_COLORS[THEMES.ORANGE][mode];
@@ -119,10 +143,10 @@ export function ThemeProvider({ children }) {
     if (appleStatusBar) {
       appleStatusBar.setAttribute('content', darkMode ? 'black-translucent' : 'default');
     }
-  }, [darkMode, colorTheme]);
+  }, [darkMode, colorTheme, displayMode]);
 
   // Save theme preference to Firebase
-  const saveThemePreference = async (newColorTheme, newDarkMode) => {
+  const saveThemePreference = async (newColorTheme, newDarkMode, newDisplayMode) => {
     if (currentUser) {
       try {
         await setDoc(
@@ -130,6 +154,7 @@ export function ThemeProvider({ children }) {
           {
             colorTheme: newColorTheme,
             darkMode: newDarkMode,
+            displayMode: newDisplayMode,
             updatedAt: new Date().toISOString()
           },
           { merge: true }
@@ -166,25 +191,37 @@ export function ThemeProvider({ children }) {
     triggerThemeTransition();
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
-    saveThemePreference(colorTheme, newDarkMode);
+    saveThemePreference(colorTheme, newDarkMode, displayMode);
   };
 
   const changeColorTheme = (newTheme) => {
     if (Object.values(THEMES).includes(newTheme)) {
       triggerThemeTransition();
       setColorTheme(newTheme);
-      saveThemePreference(newTheme, darkMode);
+      saveThemePreference(newTheme, darkMode, displayMode);
+    }
+  };
+
+  const changeDisplayMode = (newMode) => {
+    if (Object.values(DISPLAY_MODES).includes(newMode)) {
+      triggerThemeTransition();
+      setDisplayMode(newMode);
+      saveThemePreference(colorTheme, darkMode, newMode);
     }
   };
 
   const value = {
     colorTheme,
     darkMode,
+    displayMode,
     toggleDarkMode,
     changeColorTheme,
+    changeDisplayMode,
     loading,
     THEMES,
-    THEME_NAMES
+    THEME_NAMES,
+    DISPLAY_MODES,
+    DISPLAY_MODE_NAMES
   };
 
   return (

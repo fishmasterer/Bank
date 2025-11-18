@@ -569,42 +569,70 @@
 
 /* Page slide animations for tab transitions */
 .page-slide-left {
-  animation: slideLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideLeft 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .page-slide-right {
-  animation: slideRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: slideRight 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes slideLeft {
-  from {
+  0% {
     opacity: 0;
-    transform: translateX(30px);
+    transform: translateX(60px) scale(0.96);
+    filter: blur(4px);
   }
-  to {
+  40% {
+    opacity: 0.6;
+    filter: blur(2px);
+  }
+  100% {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateX(0) scale(1);
+    filter: blur(0);
   }
 }
 
 @keyframes slideRight {
-  from {
+  0% {
     opacity: 0;
-    transform: translateX(-30px);
+    transform: translateX(-60px) scale(0.96);
+    filter: blur(4px);
   }
-  to {
+  40% {
+    opacity: 0.6;
+    filter: blur(2px);
+  }
+  100% {
     opacity: 1;
-    transform: translateX(0);
+    transform: translateX(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Page entry animation for initial load */
+.page-enter {
+  animation: pageEnter 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes pageEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
 /* Edge bounce animations for swipe boundaries */
 .edge-bounce-left {
-  animation: bounceLeft 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  animation: bounceLeft 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
 .edge-bounce-right {
-  animation: bounceRight 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  animation: bounceRight 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
 @keyframes bounceLeft {

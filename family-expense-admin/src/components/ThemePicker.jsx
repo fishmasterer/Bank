@@ -2,7 +2,16 @@ import { useTheme } from '../contexts/ThemeContext';
 import './ThemePicker.css';
 
 export default function ThemePicker() {
-  const { colorTheme, changeColorTheme, THEMES, THEME_NAMES } = useTheme();
+  const {
+    colorTheme,
+    changeColorTheme,
+    THEMES,
+    THEME_NAMES,
+    displayMode,
+    changeDisplayMode,
+    DISPLAY_MODES,
+    DISPLAY_MODE_NAMES
+  } = useTheme();
 
   const themeColors = {
     [THEMES.ORANGE]: {
@@ -59,6 +68,26 @@ export default function ThemePicker() {
             </div>
             <span className="theme-name">{THEME_NAMES[theme]}</span>
             {colorTheme === theme && (
+              <span className="check-icon" aria-hidden="true">✓</span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      <h3 className="theme-picker-title">Display Density</h3>
+      <div className="display-mode-options">
+        {Object.values(DISPLAY_MODES).map((mode) => (
+          <button
+            key={mode}
+            className={`display-mode-option ${displayMode === mode ? 'active' : ''}`}
+            onClick={() => changeDisplayMode(mode)}
+            aria-label={`Select ${DISPLAY_MODE_NAMES[mode]} display mode`}
+          >
+            <span className="display-mode-icon">
+              {mode === DISPLAY_MODES.COMFORTABLE ? '⬜' : '▪️'}
+            </span>
+            <span className="display-mode-name">{DISPLAY_MODE_NAMES[mode]}</span>
+            {displayMode === mode && (
               <span className="check-icon" aria-hidden="true">✓</span>
             )}
           </button>
