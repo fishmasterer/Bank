@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -9,8 +9,9 @@ import ExpenseForm from './components/ExpenseForm';
 import Login from './components/Login';
 import UserProfile from './components/UserProfile';
 import Unauthorized from './components/Unauthorized';
-import ThemeToggle from './components/ThemeToggle';
-import { exportToCSV } from './utils/exportData';
+import FloatingActionButton from './components/FloatingActionButton';
+import StatsPanel from './components/StatsPanel';
+import ExportModal from './components/ExportModal';
 import './App.css';
 
 const AppContent = () => {
@@ -19,10 +20,37 @@ const AppContent = () => {
   const [editingExpense, setEditingExpense] = useState(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [statsView, setStatsView] = useState(null);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const { currentUser, loading: authLoading } = useAuth();
   const { isAuthorized, loading: authorizationLoading } = useAuthorization(currentUser);
   const { expenses, familyMembers, loading, error, readOnly } = useExpenses();
+
+  // FAB handlers
+  const handleMemberExpenses = useCallback(() => {
+    setStatsView('memberExpenses');
+  }, []);
+
+  const handleMonthlyStats = useCallback(() => {
+    setStatsView('monthlyStats');
+  }, []);
+
+  const handleBudgetTracker = useCallback(() => {
+    setStatsView('budgetTracker');
+  }, []);
+
+  const handleCloseStats = useCallback(() => {
+    setStatsView(null);
+  }, []);
+
+  const handleOpenExport = useCallback(() => {
+    setShowExportModal(true);
+  }, []);
+
+  const handleCloseExport = useCallback(() => {
+    setShowExportModal(false);
+  }, []);
 
   // Show loading state while checking authentication
   if (authLoading || authorizationLoading) {
@@ -64,7 +92,7 @@ const AppContent = () => {
   };
 
   const handleExport = () => {
-    exportToCSV(expenses, familyMembers, selectedYear, selectedMonth);
+    setShowExportModal(true);
   };
 
   const monthName = new Date(selectedYear, selectedMonth - 1).toLocaleDateString('en-US', {
@@ -108,7 +136,6 @@ const AppContent = () => {
         </div>
         <div className="header-actions">
           {readOnly && <span className="view-only-badge">View Only</span>}
-          <ThemeToggle />
           <UserProfile />
         </div>
       </header>
@@ -194,6 +221,32 @@ const AppContent = () => {
           onClose={handleCloseForm}
         />
       )}
+
+      {/* Floating Action Button */}
+      <FloatingActionButton
+        onMemberExpenses={handleMemberExpenses}
+        onMonthlyStats={handleMonthlyStats}
+        onBudgetTracker={handleBudgetTracker}
+        onExport={handleOpenExport}
+      />
+
+      {/* Stats Panel */}
+      {statsView && (
+        <StatsPanel
+          view={statsView}
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+          onClose={handleCloseStats}
+        />
+      )}
+
+      {/* Export Modal */}
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={handleCloseExport}
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonth}
+      />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { doc, getDoc, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
 export const useBudget = (year, month) => {
@@ -31,12 +31,27 @@ export const useBudget = (year, month) => {
     return () => unsubscribe();
   }, [year, month]);
 
+  const saveBudget = async (amount) => {
+    const budgetId = `${year}-${month}`;
+    const budgetRef = doc(db, 'budgets', budgetId);
+
+    const budgetData = {
+      limit: amount,
+      monthlyLimit: amount, // Keep both for backward compatibility
+      year,
+      month,
+      updatedAt: new Date().toISOString()
+    };
+
+    await setDoc(budgetRef, budgetData);
+  };
+
   const getBudgetStatus = (spent) => {
-    if (!budget || !budget.monthlyLimit) {
+    const limit = budget?.monthlyLimit || budget?.limit;
+    if (!budget || !limit) {
       return { status: 'none', percentage: 0 };
     }
 
-    const limit = budget.monthlyLimit;
     const percentage = (spent / limit) * 100;
 
     let status = 'good';
@@ -60,6 +75,7 @@ export const useBudget = (year, month) => {
   return {
     budget,
     loading,
+    saveBudget,
     getBudgetStatus
   };
 };

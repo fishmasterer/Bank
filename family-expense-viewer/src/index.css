@@ -25,21 +25,20 @@
   --font-2xl: 1.5rem;     /* 24px - page titles */
   --font-3xl: 2rem;       /* 32px - hero */
 
-  /* 60-30-10 Color Rule - Light Mode */
-  /* Default: Warm Orange Theme */
-  /* 60% Primary (warm orange) */
-  --color-primary-60: #C2410C;
-  --color-primary-hover: #9A3412;
-  --color-primary-light: #EA580C;
+  /* 60-30-10 Color Rule - Obsidian Theme (Always Dark) */
+  /* 60% Primary (electric cyan) */
+  --color-primary-60: #06B6D4;
+  --color-primary-hover: #0891B2;
+  --color-primary-light: #22D3EE;
 
-  /* 30% Secondary (warm neutrals) */
-  --color-secondary-30: #78716C;
-  --color-secondary-light: #A8A29E;
+  /* 30% Secondary (cool slate grays) */
+  --color-secondary-30: #64748B;
+  --color-secondary-light: #94A3B8;
 
   /* 10% Accent (semantic colors) */
-  --color-accent-success: #059669;
-  --color-accent-danger: #DC2626;
-  --color-accent-warning: #D97706;
+  --color-accent-success: #10B981;
+  --color-accent-danger: #EF4444;
+  --color-accent-warning: #F59E0B;
 
   /* Semantic mappings */
   --primary-color: var(--color-primary-60);
@@ -50,29 +49,33 @@
   --danger-color: var(--color-accent-danger);
   --warning-color: var(--color-accent-warning);
 
-  /* Light Mode Backgrounds (60% of UI) */
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #FAFAF9;
-  --bg-tertiary: #F5F5F4;
-  --bg-hover: #E7E5E4;
+  /* Obsidian Backgrounds (always dark) */
+  --bg-primary: #0A0A0F;
+  --bg-secondary: #12121A;
+  --bg-tertiary: #1E1E2E;
+  --bg-hover: #2A2A3E;
 
-  /* Light Mode Text (30% of UI - 4.5:1 contrast minimum) */
-  --text-primary: #1C1917;      /* 16.53:1 contrast */
-  --text-secondary: #57534E;    /* 6.85:1 contrast */
-  --text-tertiary: #78716C;     /* 4.58:1 contrast */
-  --text-disabled: #A8A29E;
+  /* Obsidian Text */
+  --text-primary: #F8FAFC;
+  --text-secondary: #CBD5E1;
+  --text-tertiary: #94A3B8;
+  --text-disabled: #64748B;
 
   /* Borders & Dividers */
-  --border-color: #E7E5E4;
-  --border-light: #F5F5F4;
+  --border-color: #2E2E3E;
+  --border-light: #3E3E4E;
   --border-radius-sm: 4px;
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.12);
+  /* Enhanced shadows with glow */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.7);
+
+  /* Glow effects */
+  --glow-primary: 0 0 20px rgba(6, 182, 212, 0.3);
+  --glow-subtle: 0 0 10px rgba(6, 182, 212, 0.15);
 
   color: var(--text-primary);
   background-color: var(--bg-secondary);
@@ -85,132 +88,12 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Dark Mode */
+/* Dark Mode - Obsidian theme is always dark */
 :root[data-theme="dark"] {
-  /* Dark Mode Backgrounds (60% of UI) */
-  --bg-primary: #1C1917;
-  --bg-secondary: #292524;
-  --bg-tertiary: #44403C;
-  --bg-hover: #57534E;
-
-  /* Dark Mode Text (30% of UI - 4.5:1 contrast minimum) */
-  --text-primary: #FAFAF9;      /* 16.53:1 contrast */
-  --text-secondary: #D6D3D1;    /* 10.94:1 contrast */
-  --text-tertiary: #A8A29E;     /* 5.89:1 contrast */
-  --text-disabled: #78716C;
-
-  /* Borders & Dividers */
-  --border-color: #44403C;
-  --border-light: #57534E;
-
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.4);
-
-  /* Adjust accent colors for dark mode */
-  --color-primary-light: #FB923C;
-  --color-accent-success: #10B981;
-  --color-accent-danger: #EF4444;
-  --color-accent-warning: #F59E0B;
+  /* Same as default since Obsidian is always dark */
 }
 
-/* ============================= */
-/* COLOR THEME SYSTEM */
-/* ============================= */
-
-/* THEME 1: Warm Orange (Default) */
-:root[data-color-theme="orange"] {
-  --color-primary-60: #C2410C;
-  --color-primary-hover: #9A3412;
-  --color-primary-light: #EA580C;
-}
-
-:root[data-color-theme="orange"][data-theme="dark"] {
-  --color-primary-light: #FB923C;
-}
-
-/* THEME 2: Soft Nature (Animal Crossing Inspired) */
-:root[data-color-theme="nature"] {
-  /* Primary: Soft sage green with good contrast */
-  --color-primary-60: #6B9B7B;     /* Soft sage green - 4.5:1 contrast on white */
-  --color-primary-hover: #557D64;   /* Darker sage for hover */
-  --color-primary-light: #88B799;   /* Lighter sage for accents */
-
-  /* Secondary: Warm earth tones */
-  --color-secondary-30: #8B7D6B;
-  --color-secondary-light: #A89F91;
-}
-
-:root[data-color-theme="nature"][data-theme="dark"] {
-  /* Brighter, more vibrant in dark mode for contrast */
-  --color-primary-60: #7FB093;     /* Brighter sage green */
-  --color-primary-hover: #6B9B7B;   /* Medium sage for hover */
-  --color-primary-light: #A3C9B1;   /* Light pastel green */
-}
-
-/* THEME 3: Calm Blue */
-:root[data-color-theme="blue"] {
-  /* Primary: Soft medium blue with excellent legibility */
-  --color-primary-60: #4A7BA7;     /* Calm blue - 5.5:1 contrast on white */
-  --color-primary-hover: #3A6489;   /* Darker blue for hover */
-  --color-primary-light: #5E93C2;   /* Lighter blue for accents */
-
-  /* Secondary: Cool grays */
-  --color-secondary-30: #6B7B8C;
-  --color-secondary-light: #8E9AAA;
-}
-
-:root[data-color-theme="blue"][data-theme="dark"] {
-  /* Softer, more pastel blues in dark mode */
-  --color-primary-60: #6B9FD4;     /* Soft sky blue */
-  --color-primary-hover: #5A8BC2;   /* Medium blue for hover */
-  --color-primary-light: #8AB8E3;   /* Light pastel blue */
-}
-
-/* THEME 4: Obsidian (Futuristic Dark) */
-:root[data-color-theme="obsidian"] {
-  /* Primary: Electric cyan for futuristic feel */
-  --color-primary-60: #06B6D4;     /* Cyan - futuristic accent */
-  --color-primary-hover: #0891B2;   /* Darker cyan for hover */
-  --color-primary-light: #22D3EE;   /* Lighter cyan for accents */
-
-  /* Secondary: Cool slate grays */
-  --color-secondary-30: #64748B;
-  --color-secondary-light: #94A3B8;
-
-  /* Force dark mode aesthetics even in light mode */
-  --bg-primary: #0A0A0F;           /* Deep obsidian black */
-  --bg-secondary: #12121A;          /* Slightly lighter obsidian */
-  --bg-tertiary: #1E1E2E;           /* Card backgrounds */
-  --bg-hover: #2A2A3E;              /* Hover states */
-
-  /* Text colors for dark background */
-  --text-primary: #F8FAFC;          /* Almost white */
-  --text-secondary: #CBD5E1;        /* Light gray */
-  --text-tertiary: #94A3B8;         /* Medium gray */
-  --text-disabled: #64748B;
-
-  /* Borders */
-  --border-color: #2E2E3E;
-  --border-light: #3E3E4E;
-
-  /* Enhanced shadows with glow */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.6);
-  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.7);
-
-  /* Glow effects */
-  --glow-primary: 0 0 20px rgba(6, 182, 212, 0.3);
-  --glow-subtle: 0 0 10px rgba(6, 182, 212, 0.15);
-}
-
-:root[data-color-theme="obsidian"][data-theme="dark"] {
-  /* Same as light mode since obsidian is always dark */
-  --color-primary-60: #06B6D4;
-  --color-primary-hover: #0891B2;
-  --color-primary-light: #22D3EE;
-}
+/* Theme enhancements for Obsidian - applied globally */
 
 * {
   box-sizing: border-box;
@@ -285,13 +168,13 @@ button:hover::after {
   }
 }
 
-/* Obsidian theme specific button enhancements */
-:root[data-color-theme="obsidian"] button {
+/* Obsidian theme button enhancements (applied globally) */
+button {
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 
-:root[data-color-theme="obsidian"] button:hover {
+button:hover {
   box-shadow: var(--glow-subtle);
 }
 

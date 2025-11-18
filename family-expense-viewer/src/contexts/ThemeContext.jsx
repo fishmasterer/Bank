@@ -11,33 +11,15 @@ export function useTheme() {
 
 // Available themes
 export const THEMES = {
-  ORANGE: 'orange',
-  NATURE: 'nature',
-  BLUE: 'blue',
   OBSIDIAN: 'obsidian'
 };
 
 export const THEME_NAMES = {
-  [THEMES.ORANGE]: 'Warm Orange',
-  [THEMES.NATURE]: 'Soft Nature',
-  [THEMES.BLUE]: 'Calm Blue',
   [THEMES.OBSIDIAN]: 'Obsidian'
 };
 
 // Theme colors for PWA meta tags
 const THEME_COLORS = {
-  [THEMES.ORANGE]: {
-    light: '#C2410C',  // Warm orange
-    dark: '#1C1917'     // Dark background
-  },
-  [THEMES.NATURE]: {
-    light: '#6B9B7B',  // Soft sage green
-    dark: '#1C1917'     // Dark background
-  },
-  [THEMES.BLUE]: {
-    light: '#4A7BA7',  // Calm blue
-    dark: '#1C1917'     // Dark background
-  },
   [THEMES.OBSIDIAN]: {
     light: '#0A0A0F',  // Deep obsidian (always dark)
     dark: '#0A0A0F'     // Deep obsidian
@@ -46,7 +28,7 @@ const THEME_COLORS = {
 
 export function ThemeProvider({ children }) {
   const { currentUser } = useAuth();
-  const [colorTheme, setColorTheme] = useState(THEMES.ORANGE);
+  const [colorTheme, setColorTheme] = useState(THEMES.OBSIDIAN);
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('theme');
     if (saved) {
@@ -96,7 +78,7 @@ export function ThemeProvider({ children }) {
     localStorage.setItem('colorTheme', colorTheme);
 
     // Update theme-color meta tag for PWA
-    const themeColor = THEME_COLORS[colorTheme]?.[mode] || THEME_COLORS[THEMES.ORANGE][mode];
+    const themeColor = THEME_COLORS[colorTheme]?.[mode] || THEME_COLORS[THEMES.OBSIDIAN][mode];
     let metaThemeColor = document.querySelector('meta[name="theme-color"]');
 
     if (metaThemeColor) {
