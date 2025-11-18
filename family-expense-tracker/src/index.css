@@ -54,6 +54,7 @@
 
   /* Light Mode Backgrounds (60% of UI) */
   --bg-primary: #FFFFFF;
+  --bg-primary-rgb: 255, 255, 255;
   --bg-secondary: #FAFAF9;
   --bg-tertiary: #F5F5F4;
   --bg-hover: #E7E5E4;
@@ -94,6 +95,7 @@
 :root[data-theme="dark"] {
   /* Dark Mode Backgrounds (60% of UI) */
   --bg-primary: #1C1917;
+  --bg-primary-rgb: 28, 25, 23;
   --bg-secondary: #292524;
   --bg-tertiary: #44403C;
   --bg-hover: #57534E;
