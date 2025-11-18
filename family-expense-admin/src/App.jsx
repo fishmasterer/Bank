@@ -8,6 +8,7 @@ import { useToast } from './hooks/useToast';
 import useSwipeGesture from './hooks/useSwipeGesture';
 import useScrollDirection from './hooks/useScrollDirection';
 import useDeepLinking from './hooks/useDeepLinking';
+import useScrollPersistence from './hooks/useScrollPersistence';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
@@ -74,6 +75,9 @@ const AppContent = () => {
     setSelectedMonth,
     tabOrder: TAB_ORDER
   });
+
+  // Persist scroll positions between tab switches
+  useScrollPersistence(activeTab, TAB_ORDER);
 
   const handleTabChange = useCallback((newTab) => {
     if (newTab === activeTab) return;
