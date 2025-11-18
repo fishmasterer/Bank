@@ -67,12 +67,24 @@ const useLongPress = (onLongPress, onClick, options = {}) => {
     onTouchStart: (e) => {
       const touch = e.touches[0];
       start(touch.clientX, touch.clientY);
+      // Prevent iOS magnifying glass by preventing default after a short delay
+      // We don't prevent immediately to allow scrolling to still work
     },
     onTouchMove: (e) => {
       const touch = e.touches[0];
       move(touch.clientX, touch.clientY);
+      // If we're in a potential long press state, prevent default to stop iOS behaviors
+      if (timeoutRef.current) {
+        e.preventDefault();
+      }
     },
-    onTouchEnd: end,
+    onTouchEnd: (e) => {
+      // Prevent default if long press was triggered to avoid any follow-up actions
+      if (isLongPressTriggered.current) {
+        e.preventDefault();
+      }
+      end();
+    },
     onTouchCancel: cancel,
     onMouseDown: (e) => {
       start(e.clientX, e.clientY);
@@ -86,9 +98,7 @@ const useLongPress = (onLongPress, onClick, options = {}) => {
     onMouseLeave: cancel,
     onContextMenu: (e) => {
       // Prevent context menu on long press
-      if (isLongPressTriggered.current) {
-        e.preventDefault();
-      }
+      e.preventDefault();
     }
   };
 

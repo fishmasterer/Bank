@@ -67,6 +67,8 @@ const AppContent = () => {
   const [tabIndicator, setTabIndicator] = useState({ left: 0, width: 0 });
   const prevTabRef = useRef('summary');
   const navRef = useRef(null);
+  const prevMonthRef = useRef({ month: selectedMonth, year: selectedYear });
+  const initialLoadRef = useRef(true);
   const createRipple = useRipple();
   const {
     startTransition,
@@ -121,7 +123,7 @@ const AppContent = () => {
     setActiveTab(newTab);
 
     // Reset animation class after animation completes
-    setTimeout(() => setPageAnimation(''), 400);
+    setTimeout(() => setPageAnimation(''), 450);
   }, [activeTab]);
 
   // Swipe gesture handlers for tab navigation with edge bounce
@@ -132,7 +134,7 @@ const AppContent = () => {
     } else {
       // Trigger edge bounce effect at right boundary
       setEdgeBounce('right');
-      setTimeout(() => setEdgeBounce(null), 400);
+      setTimeout(() => setEdgeBounce(null), 500);
     }
   }, [activeTab, handleTabChange]);
 
@@ -143,7 +145,7 @@ const AppContent = () => {
     } else {
       // Trigger edge bounce effect at left boundary
       setEdgeBounce('left');
-      setTimeout(() => setEdgeBounce(null), 400);
+      setTimeout(() => setEdgeBounce(null), 500);
     }
   }, [activeTab, handleTabChange]);
 
@@ -156,8 +158,124 @@ const AppContent = () => {
 
   const { currentUser, loading: authLoading } = useAuth();
   const { isAuthorized, loading: authorizationLoading } = useAuthorization(currentUser);
-  const { expenses, familyMembers, loading, error, readOnly, copyRecurringExpenses } = useExpenses();
+  const { expenses, familyMembers, loading, error, readOnly, copyRecurringExpenses, getMonthlyTotal, budget } = useExpenses();
   const { toasts, hideToast, success, error: showError, info } = useToast();
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Don't trigger shortcuts when typing in inputs
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+        return;
+      }
+
+      // Check if any modal is open
+      const anyModalOpen = showForm || showBudgetSettings || showCategoryBudgets ||
+        showMemberBudgets || showVarianceReport || showFamilyModal || showExportModal;
+
+      switch (e.key) {
+        case 'Escape':
+          // Close any open modal
+          if (showForm) setShowForm(false);
+          else if (showBudgetSettings) setShowBudgetSettings(false);
+          else if (showCategoryBudgets) setShowCategoryBudgets(false);
+          else if (showMemberBudgets) setShowMemberBudgets(false);
+          else if (showVarianceReport) setShowVarianceReport(false);
+          else if (showFamilyModal) setShowFamilyModal(false);
+          else if (showExportModal) setShowExportModal(false);
+          break;
+        case 'n':
+        case 'N':
+          if (!anyModalOpen && !readOnly) {
+            e.preventDefault();
+            setEditingExpense(null);
+            setShowForm(true);
+          }
+          break;
+        case 'b':
+        case 'B':
+          if (!anyModalOpen && !readOnly) {
+            e.preventDefault();
+            setShowBudgetSettings(true);
+          }
+          break;
+        case 'ArrowLeft':
+          if (!anyModalOpen) {
+            e.preventDefault();
+            if (selectedMonth === 1) {
+              setSelectedMonth(12);
+              setSelectedYear(selectedYear - 1);
+            } else {
+              setSelectedMonth(selectedMonth - 1);
+            }
+          }
+          break;
+        case 'ArrowRight':
+          if (!anyModalOpen) {
+            e.preventDefault();
+            if (selectedMonth === 12) {
+              setSelectedMonth(1);
+              setSelectedYear(selectedYear + 1);
+            } else {
+              setSelectedMonth(selectedMonth + 1);
+            }
+          }
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showForm, showBudgetSettings, showCategoryBudgets, showMemberBudgets,
+      showVarianceReport, showFamilyModal, showExportModal, readOnly,
+      selectedMonth, selectedYear]);
+
+  // Month summary toast when navigating months
+  useEffect(() => {
+    // Skip on initial load
+    if (initialLoadRef.current) {
+      initialLoadRef.current = false;
+      return;
+    }
+
+    // Check if month actually changed
+    const prev = prevMonthRef.current;
+    if (prev.month === selectedMonth && prev.year === selectedYear) {
+      return;
+    }
+
+    // Update ref
+    prevMonthRef.current = { month: selectedMonth, year: selectedYear };
+
+    // Wait for data to load
+    if (loading) return;
+
+    // Calculate summary
+    const spent = getMonthlyTotal(selectedYear, selectedMonth);
+    const budgetLimit = budget?.limit || budget?.monthlyLimit || 0;
+
+    const monthName = new Date(selectedYear, selectedMonth - 1).toLocaleDateString('en-US', {
+      month: 'short',
+      year: 'numeric'
+    });
+
+    let summaryMessage = `${monthName}: $${spent.toFixed(0)} spent`;
+
+    if (budgetLimit > 0) {
+      const remaining = budgetLimit - spent;
+      const percentUsed = (spent / budgetLimit) * 100;
+
+      if (remaining >= 0) {
+        summaryMessage += ` • $${remaining.toFixed(0)} remaining (${percentUsed.toFixed(0)}%)`;
+      } else {
+        summaryMessage += ` • $${Math.abs(remaining).toFixed(0)} over budget`;
+      }
+    }
+
+    info(summaryMessage);
+  }, [selectedMonth, selectedYear, loading, getMonthlyTotal, budget, info]);
 
   // Show loading state while checking authentication
   if (authLoading || authorizationLoading) {

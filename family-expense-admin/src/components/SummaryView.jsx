@@ -1,7 +1,9 @@
 import React, { lazy, Suspense, memo } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
 import { useBudget } from '../hooks/useBudget';
+import { useToast } from '../hooks/useToast';
 import { SkeletonSummaryView, SkeletonChart } from './SkeletonLoader';
+import QuickAddWidget from './QuickAddWidget';
 import './SummaryView.css';
 
 // Lazy load heavy chart components for better initial load performance
@@ -20,6 +22,7 @@ const ChartSuspense = ({ children, height = '350px' }) => (
 const SummaryView = ({ selectedYear, selectedMonth }) => {
   const { familyMembers, getMonthlyTotal, getMonthlyPlanned, loading } = useExpenses();
   const { budget, getBudgetStatus } = useBudget(selectedYear, selectedMonth);
+  const { success, error: showError } = useToast();
 
   // Show skeleton while loading
   if (loading) {
@@ -67,6 +70,13 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
           )}
         </div>
       )}
+
+      <QuickAddWidget
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonth}
+        onSuccess={success}
+        onError={showError}
+      />
 
       <ChartSuspense height="350px">
         <CategoryPieChart

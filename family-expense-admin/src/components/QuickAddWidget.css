@@ -1,0 +1,100 @@
+.quick-add-widget {
+  background: var(--bg-secondary);
+  border-radius: var(--card-border-radius, 12px);
+  padding: var(--card-padding, var(--spacing-lg));
+  border: 1px solid var(--border-color);
+}
+
+.quick-add-title {
+  font-size: var(--display-font-md, var(--font-md));
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.quick-add-presets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: var(--spacing-sm);
+}
+
+.quick-add-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--button-border-radius, 8px);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: auto;
+}
+
+.quick-add-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.quick-add-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.quick-add-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.quick-add-btn.adding {
+  border-color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 10%, var(--bg-primary));
+}
+
+.quick-add-btn.adding .preset-icon {
+  animation: pulse 0.6s ease-in-out infinite;
+}
+
+.preset-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.preset-name {
+  font-size: var(--display-font-xs, var(--font-xs));
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.preset-amount {
+  font-size: var(--display-font-xs, var(--font-xs));
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .quick-add-presets {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .quick-add-btn {
+    padding: var(--spacing-sm);
+  }
+
+  .preset-icon {
+    font-size: 1.25rem;
+  }
+}

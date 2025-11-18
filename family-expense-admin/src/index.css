@@ -255,6 +255,168 @@
   --color-primary-light: #22D3EE;
 }
 
+/* THEME 5: Lava (Always Dark, Fiery & Intense) */
+:root[data-color-theme="lava"] {
+  /* Typography - Thin Inter font */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+  font-weight: 300;
+
+  /* Primary: Molten orange */
+  --color-primary-60: #F97316;
+  --color-primary-hover: #EA580C;
+  --color-primary-light: #FB923C;
+
+  /* Secondary: Warm ember grays */
+  --color-secondary-30: #78716C;
+  --color-secondary-light: #A8A29E;
+
+  /* Accent colors */
+  --color-accent-success: #84CC16;
+  --color-accent-danger: #DC2626;
+  --color-accent-warning: #FBBF24;
+
+  /* Force dark volcanic backgrounds */
+  --bg-primary: #1A0A0A;
+  --bg-secondary: #261212;
+  --bg-tertiary: #3D1C1C;
+  --bg-hover: #4A2222;
+
+  /* RGB values for glassmorphism */
+  --bg-primary-rgb: 26, 10, 10;
+  --bg-secondary-rgb: 38, 18, 18;
+
+  /* Text colors */
+  --text-primary: #FEF2F2;
+  --text-secondary: #FECACA;
+  --text-tertiary: #FCA5A5;
+  --text-disabled: #78716C;
+
+  /* Borders */
+  --border-color: #4A2222;
+  --border-light: #5C2D2D;
+
+  /* Shadows with fiery glow */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.7);
+  --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.8);
+  --shadow-2xl: 0 16px 32px rgba(0, 0, 0, 0.9);
+
+  /* Glow effects - fiery orange */
+  --glow-primary: 0 0 20px rgba(249, 115, 22, 0.3);
+  --glow-subtle: 0 0 10px rgba(249, 115, 22, 0.15);
+
+  /* Primary color RGB for effects */
+  --primary-color-rgb: 249, 115, 22;
+}
+
+/* Lava in dark mode (same as light since always dark) */
+:root[data-color-theme="lava"][data-theme="dark"] {
+  /* Same values - Lava is always dark */
+  --bg-primary: #1A0A0A;
+  --bg-secondary: #261212;
+  --bg-tertiary: #3D1C1C;
+  --bg-hover: #4A2222;
+
+  --text-primary: #FEF2F2;
+  --text-secondary: #FECACA;
+  --text-tertiary: #FCA5A5;
+  --text-disabled: #78716C;
+
+  --border-color: #4A2222;
+  --border-light: #5C2D2D;
+
+  --color-primary-light: #FB923C;
+}
+
+/* ============================= */
+/* DISPLAY MODES */
+/* ============================= */
+
+/* Comfortable Mode (Default) - Spacious layout */
+:root,
+:root[data-display-mode="comfortable"] {
+  /* Card spacing */
+  --card-padding: var(--spacing-lg);
+  --card-gap: var(--spacing-md);
+  --card-border-radius: 12px;
+
+  /* Section spacing */
+  --section-gap: var(--spacing-xl);
+  --section-padding: var(--spacing-lg);
+
+  /* List item spacing */
+  --list-item-padding: var(--spacing-md);
+  --list-item-gap: var(--spacing-sm);
+
+  /* Button sizing */
+  --button-padding-y: 12px;
+  --button-padding-x: 20px;
+  --button-font-size: var(--font-sm);
+  --button-border-radius: 8px;
+
+  /* Input sizing */
+  --input-padding: 12px 16px;
+  --input-font-size: var(--font-sm);
+
+  /* Typography scale for display mode */
+  --display-font-xs: var(--font-xs);
+  --display-font-sm: var(--font-sm);
+  --display-font-md: var(--font-md);
+  --display-font-lg: var(--font-lg);
+  --display-font-xl: var(--font-xl);
+
+  /* Chart sizes */
+  --chart-height: 350px;
+  --chart-height-mobile: 280px;
+
+  /* Table density */
+  --table-cell-padding: var(--spacing-md);
+  --table-row-height: 56px;
+}
+
+/* Compact Mode - Dense data view */
+:root[data-display-mode="compact"] {
+  /* Card spacing */
+  --card-padding: var(--spacing-md);
+  --card-gap: var(--spacing-sm);
+  --card-border-radius: 8px;
+
+  /* Section spacing */
+  --section-gap: var(--spacing-lg);
+  --section-padding: var(--spacing-md);
+
+  /* List item spacing */
+  --list-item-padding: var(--spacing-sm);
+  --list-item-gap: var(--spacing-xs);
+
+  /* Button sizing */
+  --button-padding-y: 8px;
+  --button-padding-x: 14px;
+  --button-font-size: var(--font-xs);
+  --button-border-radius: 6px;
+
+  /* Input sizing */
+  --input-padding: 8px 12px;
+  --input-font-size: var(--font-xs);
+
+  /* Typography scale for display mode */
+  --display-font-xs: 0.75rem;     /* 12px */
+  --display-font-sm: 0.875rem;    /* 14px */
+  --display-font-md: 0.9375rem;   /* 15px */
+  --display-font-lg: 1rem;        /* 16px */
+  --display-font-xl: 1.125rem;    /* 18px */
+
+  /* Chart sizes */
+  --chart-height: 280px;
+  --chart-height-mobile: 220px;
+
+  /* Table density */
+  --table-cell-padding: var(--spacing-sm);
+  --table-row-height: 44px;
+}
+
 /* ============================= */
 /* SMOOTH THEME TRANSITIONS */
 /* ============================= */
@@ -359,10 +521,10 @@ body {
 
 /* Mobile-First Button Styles - 8pt Grid */
 button {
-  border-radius: var(--border-radius-md);
+  border-radius: var(--button-border-radius);
   border: 1px solid transparent;
-  padding: var(--spacing-md) var(--spacing-lg); /* 16px 24px */
-  font-size: var(--font-md); /* 17px for iOS */
+  padding: var(--button-padding-y) var(--button-padding-x);
+  font-size: var(--button-font-size);
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
