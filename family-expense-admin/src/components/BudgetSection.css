@@ -240,6 +240,63 @@
   transition: width 0.3s ease;
 }
 
+/* Member Budget List */
+.member-budget-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.member-budget-item {
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+}
+
+.member-budget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.member-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.member-amount {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.member-limit {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.member-progress-bar {
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.member-progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.no-budget-label {
+  font-size: 0.813rem;
+  color: var(--text-tertiary);
+  font-style: italic;
+}
+
 /* Quick Stats Grid */
 .quick-stats-grid {
   display: grid;

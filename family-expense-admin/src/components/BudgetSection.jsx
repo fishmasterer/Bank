@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
 import { useBudget } from '../hooks/useBudget';
 import { useCategoryBudget } from '../hooks/useCategoryBudget';
+import { useMemberBudget } from '../hooks/useMemberBudget';
 import { getThemeColors } from '../utils/themeColors';
 import './BudgetSection.css';
 
 const BudgetSection = ({ selectedYear, selectedMonth, onSuccess, onError }) => {
-  const { expenses, getExpensesByMonth } = useExpenses();
+  const { expenses, getExpensesByMonth, familyMembers, getMonthlyTotal } = useExpenses();
   const { budget, loading: budgetLoading, saveBudget } = useBudget(selectedYear, selectedMonth);
   const { categoryBudgets, loading: categoryLoading } = useCategoryBudget(selectedYear, selectedMonth);
+  const { memberBudgets, loading: memberBudgetLoading, getMemberBudgetStatus } = useMemberBudget(selectedYear, selectedMonth);
 
   const [editingBudget, setEditingBudget] = useState(false);
   const [budgetAmount, setBudgetAmount] = useState('');
@@ -62,13 +64,16 @@ const BudgetSection = ({ selectedYear, selectedMonth, onSuccess, onError }) => {
     year: 'numeric'
   });
 
-  if (budgetLoading || categoryLoading) {
+  if (budgetLoading || categoryLoading || memberBudgetLoading) {
     return (
       <div className="budget-section">
         <div className="loading-state">Loading budget data...</div>
       </div>
     );
   }
+
+  // Check if any member has a budget set
+  const hasMemberBudgets = Object.keys(memberBudgets).length > 0;
 
   return (
     <div className="budget-section">
@@ -221,6 +226,53 @@ const BudgetSection = ({ selectedYear, selectedMonth, onSuccess, onError }) => {
           <p className="empty-state">No expenses this month</p>
         )}
       </div>
+
+      {/* Member Budgets */}
+      {(hasMemberBudgets || familyMembers.length > 0) && (
+        <div className="budget-card">
+          <h2>Member Budgets</h2>
+
+          {familyMembers.length > 0 ? (
+            <div className="member-budget-list">
+              {familyMembers.map(member => {
+                const memberSpent = getMonthlyTotal(selectedYear, selectedMonth, member.id);
+                const memberBudget = memberBudgets[member.id];
+                const memberLimit = memberBudget?.limit || 0;
+                const memberPercent = memberLimit > 0 ? (memberSpent / memberLimit) * 100 : 0;
+
+                return (
+                  <div key={member.id} className="member-budget-item">
+                    <div className="member-budget-header">
+                      <span className="member-name">{member.name}</span>
+                      <span className="member-amount">
+                        ${memberSpent.toLocaleString()}
+                        {memberLimit > 0 && (
+                          <span className="member-limit"> / ${memberLimit.toLocaleString()}</span>
+                        )}
+                      </span>
+                    </div>
+                    {memberLimit > 0 ? (
+                      <div className="member-progress-bar">
+                        <div
+                          className="member-progress-fill"
+                          style={{
+                            width: `${Math.min(memberPercent, 100)}%`,
+                            backgroundColor: getStatusColor(memberPercent)
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <span className="no-budget-label">No budget set</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="empty-state">No family members</p>
+          )}
+        </div>
+      )}
 
       {/* Quick Stats */}
       <div className="budget-card">
