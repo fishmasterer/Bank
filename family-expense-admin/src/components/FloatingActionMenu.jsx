@@ -9,7 +9,8 @@ const FloatingActionMenu = ({
   onManageFamily,
   onBudgetReport,
   onExport,
-  readOnly = false
+  readOnly = false,
+  bottomNavHidden = false
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -75,7 +76,7 @@ const FloatingActionMenu = ({
       />
 
       {/* Menu container */}
-      <div className={`fab-menu-container ${isOpen ? 'open' : ''}`}>
+      <div className={`fab-menu-container ${isOpen ? 'open' : ''} ${bottomNavHidden ? 'nav-hidden' : ''}`}>
         {/* Menu items */}
         <div className="fab-menu-items">
           {menuItems.map((item, index) => (

@@ -6,6 +6,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { useAuthorization } from './hooks/useAuthorization';
 import { useToast } from './hooks/useToast';
 import useSwipeGesture from './hooks/useSwipeGesture';
+import useScrollDirection from './hooks/useScrollDirection';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
@@ -56,7 +57,11 @@ const AppContent = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [pageAnimation, setPageAnimation] = useState('');
+  const [edgeBounce, setEdgeBounce] = useState(null); // 'left' or 'right' for edge bounce
   const prevTabRef = useRef('summary');
+
+  // Track scroll direction for auto-hide bottom nav
+  const { scrollDirection, isAtTop } = useScrollDirection(15);
 
   const handleTabChange = useCallback((newTab) => {
     if (newTab === activeTab) return;
@@ -73,11 +78,15 @@ const AppContent = () => {
     setTimeout(() => setPageAnimation(''), 400);
   }, [activeTab]);
 
-  // Swipe gesture handlers for tab navigation
+  // Swipe gesture handlers for tab navigation with edge bounce
   const handleSwipeLeft = useCallback(() => {
     const currentIndex = TAB_ORDER.indexOf(activeTab);
     if (currentIndex < TAB_ORDER.length - 1) {
       handleTabChange(TAB_ORDER[currentIndex + 1]);
+    } else {
+      // Trigger edge bounce effect at right boundary
+      setEdgeBounce('right');
+      setTimeout(() => setEdgeBounce(null), 400);
     }
   }, [activeTab, handleTabChange]);
 
@@ -85,6 +94,10 @@ const AppContent = () => {
     const currentIndex = TAB_ORDER.indexOf(activeTab);
     if (currentIndex > 0) {
       handleTabChange(TAB_ORDER[currentIndex - 1]);
+    } else {
+      // Trigger edge bounce effect at left boundary
+      setEdgeBounce('left');
+      setTimeout(() => setEdgeBounce(null), 400);
     }
   }, [activeTab, handleTabChange]);
 
@@ -299,7 +312,7 @@ const AppContent = () => {
 
       <PullToRefresh onRefresh={handlePullRefresh}>
         <main
-          className={`main-content ${pageAnimation}`}
+          className={`main-content ${pageAnimation} ${edgeBounce ? `edge-bounce-${edgeBounce}` : ''}`}
           key={activeTab}
           {...swipeHandlers}
         >
@@ -426,10 +439,11 @@ const AppContent = () => {
         onBudgetReport={() => setShowVarianceReport(true)}
         onExport={handleExport}
         readOnly={readOnly}
+        bottomNavHidden={scrollDirection === 'down' && !isAtTop}
       />
 
       {/* Mobile Bottom Navigation */}
-      <nav className="bottom-nav">
+      <nav className={`bottom-nav ${scrollDirection === 'down' && !isAtTop ? 'hidden' : ''}`}>
         {TAB_ORDER.map((tab) => (
           <button
             key={tab}
