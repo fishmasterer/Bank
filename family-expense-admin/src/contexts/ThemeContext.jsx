@@ -128,7 +128,30 @@ export function ThemeProvider({ children }) {
     }
   };
 
+  // Helper function to trigger smooth theme transition
+  const triggerThemeTransition = () => {
+    // Add transitioning class for smooth color transitions
+    document.documentElement.classList.add('theme-transitioning');
+
+    // Create and add overlay element for flash effect
+    const overlay = document.createElement('div');
+    overlay.className = 'theme-transition-overlay';
+    document.body.appendChild(overlay);
+
+    // Remove transitioning class and overlay after animation
+    setTimeout(() => {
+      document.documentElement.classList.remove('theme-transitioning');
+    }, 400);
+
+    setTimeout(() => {
+      if (overlay.parentNode) {
+        overlay.parentNode.removeChild(overlay);
+      }
+    }, 600);
+  };
+
   const toggleDarkMode = () => {
+    triggerThemeTransition();
     const newDarkMode = !darkMode;
     setDarkMode(newDarkMode);
     saveThemePreference(colorTheme, newDarkMode);
@@ -136,6 +159,7 @@ export function ThemeProvider({ children }) {
 
   const changeColorTheme = (newTheme) => {
     if (Object.values(THEMES).includes(newTheme)) {
+      triggerThemeTransition();
       setColorTheme(newTheme);
       saveThemePreference(newTheme, darkMode);
     }

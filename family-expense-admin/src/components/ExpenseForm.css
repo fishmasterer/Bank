@@ -80,6 +80,55 @@
   background-color: var(--bg-tertiary);
 }
 
+/* Also support .close-button class */
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.75rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  border-radius: 6px;
+}
+
+.close-button:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
+}
+
+/* Modal body and footer */
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-primary);
+}
+
+.modal-footer button {
+  padding: 0.625rem 1.25rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 0.9375rem;
+}
+
 .expense-form {
   padding: 1.5rem;
 }
@@ -244,21 +293,37 @@
   to { transform: rotate(360deg); }
 }
 
-/* Mobile Responsive */
+/* Mobile Responsive - Bottom Sheet Style */
 @media (max-width: 768px) {
   .modal-overlay {
     padding: 0;
     align-items: flex-end;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
   }
 
   .modal-content {
     max-width: 100%;
-    border-radius: 12px 12px 0 0;
-    max-height: 95vh;
+    border-radius: 16px 16px 0 0;
+    max-height: 92vh;
+    animation: slideUpSheet 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Bottom sheet drag handle indicator */
+  .modal-content::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    margin: 8px auto 0;
+    opacity: 0.6;
   }
 
   .modal-header {
-    padding: 1rem;
+    padding: 0.75rem 1rem 1rem;
   }
 
   .modal-header h2 {
@@ -279,6 +344,19 @@
 
   .form-actions button {
     width: 100%;
+    min-height: 48px;
+  }
+}
+
+/* Bottom sheet slide-up animation */
+@keyframes slideUpSheet {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -309,6 +387,175 @@
 
   .modal-content {
     margin-bottom: env(safe-area-inset-bottom);
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .modal-footer {
+    padding: 1rem;
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+
+  .modal-footer button {
+    width: 100%;
+    min-height: 48px;
+  }
+}
+
+/* Reduced motion support for bottom sheet */
+@media (prefers-reduced-motion: reduce) {
+  .modal-content {
+    animation: none !important;
+  }
+
+  .modal-overlay {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Shared Element Transition Styles */
+.modal-overlay.shared-transition {
+  background-color: transparent;
+  animation: sharedOverlayFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes sharedOverlayFade {
+  from {
+    background-color: transparent;
+  }
+  to {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+.modal-content.shared-transition {
+  animation: sharedElementExpand 0.5s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  transform-origin: var(--shared-origin-x, 50%) var(--shared-origin-y, 50%);
+}
+
+@keyframes sharedElementExpand {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translate(
+      calc(var(--shared-origin-x, 50vw) - 50vw),
+      calc(var(--shared-origin-y, 50vh) - 50vh)
+    );
+    border-radius: 8px;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate(0, 0);
+    border-radius: 10px;
+  }
+}
+
+/* Closing animation */
+.modal-overlay.shared-transition-exit {
+  animation: sharedOverlayFadeOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes sharedOverlayFadeOut {
+  from {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+.modal-content.shared-transition-exit {
+  animation: sharedElementCollapse 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  transform-origin: var(--shared-origin-x, 50%) var(--shared-origin-y, 50%);
+}
+
+@keyframes sharedElementCollapse {
+  0% {
+    opacity: 1;
+    transform: scale(1) translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3) translate(
+      calc(var(--shared-origin-x, 50vw) - 50vw),
+      calc(var(--shared-origin-y, 50vh) - 50vh)
+    );
+    border-radius: 8px;
+  }
+}
+
+/* Mobile bottom sheet with shared transition */
+@media (max-width: 768px) {
+  .modal-content.shared-transition {
+    animation: sharedElementExpandMobile 0.5s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+
+  @keyframes sharedElementExpandMobile {
+    0% {
+      opacity: 0;
+      transform: translateY(100%) scale(0.95);
+      border-radius: 16px 16px 0 0;
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(20%) scale(0.98);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      border-radius: 16px 16px 0 0;
+    }
+  }
+
+  .modal-content.shared-transition-exit {
+    animation: sharedElementCollapseMobile 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes sharedElementCollapseMobile {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+  }
+}
+
+/* Expense item highlight effect when source of transition */
+.expense-item-transitioning {
+  position: relative;
+}
+
+.expense-item-transitioning::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--primary-color);
+  opacity: 0;
+  border-radius: inherit;
+  animation: itemHighlight 0.5s ease-out;
+  pointer-events: none;
+}
+
+@keyframes itemHighlight {
+  0% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
   }
 }
 

@@ -9,7 +9,14 @@ import ImageUpload from './ImageUpload';
 import { useCategories } from '../hooks/useCategories';
 import './ExpenseForm.css';
 
-const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
+const ExpenseForm = ({
+  editingExpense,
+  onClose,
+  onSuccess,
+  onError,
+  transitionClass = '',
+  transitionStyle = {}
+}) => {
   const { addExpense, updateExpense, familyMembers } = useExpenses();
   const { addExpenseAction } = useNotifications();
   const { categories, loading: categoriesLoading } = useCategories();
@@ -153,8 +160,12 @@ const ExpenseForm = ({ editingExpense, onClose, onSuccess, onError }) => {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className={`modal-overlay ${transitionClass}`} onClick={onClose}>
+      <div
+        className={`modal-content ${transitionClass}`}
+        style={transitionStyle}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <h2>{editingExpense ? 'Edit Expense' : 'Add New Expense'}</h2>
           <button onClick={onClose} className="close-btn">&times;</button>

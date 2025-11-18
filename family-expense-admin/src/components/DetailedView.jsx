@@ -1,16 +1,150 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
 import { useCategoryBudget } from '../hooks/useCategoryBudget';
 import { useNotifications } from '../context/NotificationContext';
 import { useUndoDelete } from '../hooks/useUndoDelete';
+import useLongPress from '../hooks/useLongPress';
 import { SkeletonDetailedView } from './SkeletonLoader';
 import EmptyState from './EmptyState';
 import MultiSelect from './MultiSelect';
 import FilterPresets from './FilterPresets';
 import BulkActionsBar from './BulkActionsBar';
 import BulkEditModal from './BulkEditModal';
+import QuickActionsMenu from './QuickActionsMenu';
 import { getCategoryGradientStyle, getCategoryIcon } from '../utils/categoryColors';
 import './DetailedView.css';
+
+// ExpenseItem component with long press support
+const ExpenseItem = ({
+  expense,
+  isSelected,
+  onToggleSelect,
+  onEdit,
+  onDelete,
+  onLongPress,
+  getMemberName,
+  readOnly,
+  trackDelete,
+  addExpenseAction
+}) => {
+  const { handlers, isPressed } = useLongPress(
+    // Long press handler
+    () => {
+      // Get center position of the item for menu placement
+      const element = document.getElementById(`expense-${expense.id}`);
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        onLongPress(expense, rect.left + rect.width / 2, rect.top + rect.height / 2);
+      }
+    },
+    // Click handler (no-op, let individual elements handle clicks)
+    null,
+    { delay: 500, movementThreshold: 10 }
+  );
+
+  return (
+    <div
+      id={`expense-${expense.id}`}
+      className={`expense-item stagger-item ${isSelected ? 'selected' : ''} ${isPressed ? 'pressed' : ''}`}
+      {...handlers}
+    >
+      {!readOnly && (
+        <div className="expense-checkbox-wrapper">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => onToggleSelect(expense.id)}
+            className="expense-checkbox"
+            onClick={(e) => e.stopPropagation()}
+            aria-label={`Select ${expense.name}`}
+          />
+        </div>
+      )}
+      <div className="expense-main">
+        <div className="expense-info">
+          <span className="expense-name">{expense.name}</span>
+          <span className="expense-type">
+            {expense.isRecurring ? '🔄 Recurring' : '📌 One-time'}
+          </span>
+        </div>
+        <div className="expense-amounts">
+          <span className="planned">
+            Plan: ${(expense.plannedAmount || 0).toFixed(2)}
+          </span>
+          <span className="paid">
+            Paid: ${(expense.paidAmount || 0).toFixed(2)}
+          </span>
+        </div>
+      </div>
+      <div className="expense-meta">
+        <span className="paid-by">👤 {getMemberName(expense.paidBy)}</span>
+        {expense.notes && (
+          <span className="notes">💬 {expense.notes}</span>
+        )}
+        {expense.attachments && expense.attachments.length > 0 && (
+          <div className="expense-attachments">
+            <span className="attachments-label">
+              📎 {expense.attachments.length} {expense.attachments.length === 1 ? 'receipt' : 'receipts'}
+            </span>
+            <div className="attachments-thumbnails">
+              {expense.attachments.slice(0, 3).map((attachment, idx) => (
+                <a
+                  key={idx}
+                  href={attachment.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="attachment-thumb"
+                  title={attachment.name}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {attachment.type?.startsWith('image/') ? (
+                    <img src={attachment.url} alt={attachment.name} />
+                  ) : (
+                    <span className="thumb-icon">📄</span>
+                  )}
+                </a>
+              ))}
+              {expense.attachments.length > 3 && (
+                <span className="more-attachments">
+                  +{expense.attachments.length - 3}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+      {!readOnly && (
+        <div className="expense-actions">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const sourceElement = document.getElementById(`expense-${expense.id}`);
+              onEdit(expense, sourceElement);
+            }}
+            className="btn-edit btn-press"
+            aria-label={`Edit ${expense.name}`}
+          >
+            Edit
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (window.confirm('Delete this expense?')) {
+                trackDelete(expense);
+                onDelete(expense.id);
+                addExpenseAction('deleted', expense.name, expense.category);
+              }
+            }}
+            className="btn-delete btn-press"
+            aria-label={`Delete ${expense.name}`}
+          >
+            Delete
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense }) => {
   const { getCategoryBreakdown, familyMembers, deleteExpense, readOnly, loading, updateExpense } = useExpenses();
@@ -25,6 +159,47 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
   const [selectedExpenseIds, setSelectedExpenseIds] = useState(new Set());
   const [showBulkEdit, setShowBulkEdit] = useState(false);
   const [showUndoToast, setShowUndoToast] = useState(false);
+
+  // Quick actions menu state
+  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
+  const [quickActionsPosition, setQuickActionsPosition] = useState({ x: 0, y: 0 });
+  const [quickActionsExpense, setQuickActionsExpense] = useState(null);
+
+  // Handlers for quick actions menu
+  const handleQuickActionsOpen = useCallback((expense, clientX, clientY) => {
+    setQuickActionsExpense(expense);
+    setQuickActionsPosition({ x: clientX, y: clientY });
+    setQuickActionsOpen(true);
+  }, []);
+
+  const handleQuickActionsClose = useCallback(() => {
+    setQuickActionsOpen(false);
+    setQuickActionsExpense(null);
+  }, []);
+
+  const handleQuickDelete = useCallback((expense) => {
+    if (window.confirm('Delete this expense?')) {
+      trackDelete(expense);
+      deleteExpense(expense.id);
+      addExpenseAction('deleted', expense.name, expense.category);
+    }
+  }, [trackDelete, deleteExpense, addExpenseAction]);
+
+  const handleQuickDuplicate = useCallback((expense) => {
+    // Create a duplicate expense (without ID, so it gets a new one)
+    const duplicateExpense = {
+      ...expense,
+      name: `${expense.name} (Copy)`,
+      id: undefined
+    };
+    onEditExpense(duplicateExpense);
+  }, [onEditExpense]);
+
+  // Wrapper to include source element for shared element transition
+  const handleQuickEdit = useCallback((expense) => {
+    const sourceElement = document.getElementById(`expense-${expense.id}`);
+    onEditExpense(expense, sourceElement);
+  }, [onEditExpense]);
 
   // Show/hide undo toast
   useEffect(() => {
@@ -403,97 +578,19 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
                 {isExpanded && (
                   <div className="expenses-list stagger-fast">
                     {data.expenses.map((expense) => (
-                      <div key={expense.id} className={`expense-item stagger-item ${selectedExpenseIds.has(expense.id) ? 'selected' : ''}`}>
-                        {!readOnly && (
-                          <div className="expense-checkbox-wrapper">
-                            <input
-                              type="checkbox"
-                              checked={selectedExpenseIds.has(expense.id)}
-                              onChange={() => toggleExpenseSelection(expense.id)}
-                              className="expense-checkbox"
-                              onClick={(e) => e.stopPropagation()}
-                              aria-label={`Select ${expense.name}`}
-                            />
-                          </div>
-                        )}
-                        <div className="expense-main">
-                          <div className="expense-info">
-                            <span className="expense-name">{expense.name}</span>
-                            <span className="expense-type">
-                              {expense.isRecurring ? '🔄 Recurring' : '📌 One-time'}
-                            </span>
-                          </div>
-                          <div className="expense-amounts">
-                            <span className="planned">
-                              Plan: ${(expense.plannedAmount || 0).toFixed(2)}
-                            </span>
-                            <span className="paid">
-                              Paid: ${(expense.paidAmount || 0).toFixed(2)}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="expense-meta">
-                          <span className="paid-by">👤 {getMemberName(expense.paidBy)}</span>
-                          {expense.notes && (
-                            <span className="notes">💬 {expense.notes}</span>
-                          )}
-                          {expense.attachments && expense.attachments.length > 0 && (
-                            <div className="expense-attachments">
-                              <span className="attachments-label">
-                                📎 {expense.attachments.length} {expense.attachments.length === 1 ? 'receipt' : 'receipts'}
-                              </span>
-                              <div className="attachments-thumbnails">
-                                {expense.attachments.slice(0, 3).map((attachment, idx) => (
-                                  <a
-                                    key={idx}
-                                    href={attachment.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="attachment-thumb"
-                                    title={attachment.name}
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    {attachment.type?.startsWith('image/') ? (
-                                      <img src={attachment.url} alt={attachment.name} />
-                                    ) : (
-                                      <span className="thumb-icon">📄</span>
-                                    )}
-                                  </a>
-                                ))}
-                                {expense.attachments.length > 3 && (
-                                  <span className="more-attachments">
-                                    +{expense.attachments.length - 3}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        {!readOnly && (
-                          <div className="expense-actions">
-                            <button
-                              onClick={() => onEditExpense(expense)}
-                              className="btn-edit btn-press"
-                              aria-label={`Edit ${expense.name}`}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => {
-                                if (window.confirm('Delete this expense?')) {
-                                  trackDelete(expense);
-                                  deleteExpense(expense.id);
-                                  addExpenseAction('deleted', expense.name, expense.category);
-                                }
-                              }}
-                              className="btn-delete btn-press"
-                              aria-label={`Delete ${expense.name}`}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                      <ExpenseItem
+                        key={expense.id}
+                        expense={expense}
+                        isSelected={selectedExpenseIds.has(expense.id)}
+                        onToggleSelect={toggleExpenseSelection}
+                        onEdit={onEditExpense}
+                        onDelete={deleteExpense}
+                        onLongPress={handleQuickActionsOpen}
+                        getMemberName={getMemberName}
+                        readOnly={readOnly}
+                        trackDelete={trackDelete}
+                        addExpenseAction={addExpenseAction}
+                      />
                     ))}
                   </div>
                 )}
@@ -541,6 +638,18 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
           </button>
         </div>
       )}
+
+      {/* Quick Actions Menu */}
+      <QuickActionsMenu
+        isOpen={quickActionsOpen}
+        onClose={handleQuickActionsClose}
+        position={quickActionsPosition}
+        onEdit={handleQuickEdit}
+        onDelete={handleQuickDelete}
+        onDuplicate={handleQuickDuplicate}
+        expense={quickActionsExpense}
+        readOnly={readOnly}
+      />
     </div>
   );
 };

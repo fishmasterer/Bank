@@ -1,10 +1,54 @@
 /* Skeleton animations and styles */
+
+/* Primary shimmer animation - smooth wave effect */
 @keyframes skeleton-shimmer {
   0% {
     background-position: -200% 0;
   }
   100% {
     background-position: 200% 0;
+  }
+}
+
+/* Pulse animation for subtle breathing effect */
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Wave animation for bars */
+@keyframes skeleton-wave {
+  0%, 100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.85);
+  }
+}
+
+/* Fade in animation for when content loads */
+@keyframes skeleton-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Glow effect for premium feel */
+@keyframes skeleton-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(var(--primary-color-rgb, 59, 130, 246), 0);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(var(--primary-color-rgb, 59, 130, 246), 0.1);
   }
 }
 
@@ -19,12 +63,51 @@
   background: linear-gradient(
     90deg,
     var(--bg-secondary) 0%,
+    var(--skeleton-highlight, rgba(255, 255, 255, 0.5)) 20%,
     var(--bg-hover, rgba(0, 0, 0, 0.04)) 50%,
+    var(--skeleton-highlight, rgba(255, 255, 255, 0.5)) 80%,
     var(--bg-secondary) 100%
   );
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  background-size: 400% 100%;
+  animation:
+    skeleton-shimmer 2s cubic-bezier(0.4, 0, 0.2, 1) infinite,
+    skeleton-pulse 3s ease-in-out infinite;
   border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Add subtle inner glow */
+.skeleton-line::after,
+.skeleton-chart-bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* Staggered animation delays for skeleton lines */
+.skeleton-line:nth-child(1) { animation-delay: 0s, 0s; }
+.skeleton-line:nth-child(2) { animation-delay: 0.1s, 0.15s; }
+.skeleton-line:nth-child(3) { animation-delay: 0.2s, 0.3s; }
+.skeleton-line:nth-child(4) { animation-delay: 0.3s, 0.45s; }
+.skeleton-line:nth-child(5) { animation-delay: 0.4s, 0.6s; }
+
+/* Container fade-in effect */
+.skeleton-summary-view,
+.skeleton-detailed-view,
+.skeleton-analytics-dashboard {
+  animation: skeleton-fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .skeleton-line {
@@ -69,7 +152,30 @@
 .skeleton-chart-bar-fill {
   width: 100%;
   border-radius: 4px 4px 0 0;
-  animation-delay: calc(var(--i, 0) * 0.1s);
+  transform-origin: bottom;
+  animation:
+    skeleton-shimmer 2s cubic-bezier(0.4, 0, 0.2, 1) infinite,
+    skeleton-wave 2s ease-in-out infinite;
+}
+
+/* Staggered delays for chart bars - creates wave effect */
+.skeleton-chart-bar:nth-child(1) .skeleton-chart-bar-fill {
+  animation-delay: 0s, 0s;
+}
+.skeleton-chart-bar:nth-child(2) .skeleton-chart-bar-fill {
+  animation-delay: 0.1s, 0.15s;
+}
+.skeleton-chart-bar:nth-child(3) .skeleton-chart-bar-fill {
+  animation-delay: 0.2s, 0.3s;
+}
+.skeleton-chart-bar:nth-child(4) .skeleton-chart-bar-fill {
+  animation-delay: 0.3s, 0.45s;
+}
+.skeleton-chart-bar:nth-child(5) .skeleton-chart-bar-fill {
+  animation-delay: 0.4s, 0.6s;
+}
+.skeleton-chart-bar:nth-child(6) .skeleton-chart-bar-fill {
+  animation-delay: 0.5s, 0.75s;
 }
 
 /* Summary card skeleton */
@@ -101,7 +207,18 @@
   background-color: var(--bg-secondary);
   border-radius: 8px;
   margin-bottom: 0.75rem;
+  animation:
+    skeleton-shimmer 2s cubic-bezier(0.4, 0, 0.2, 1) infinite,
+    skeleton-pulse 3s ease-in-out infinite,
+    skeleton-fade-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
 }
+
+/* Staggered fade-in for expense items */
+.skeleton-expense-item:nth-child(1) { animation-delay: 0s, 0s, 0.1s; }
+.skeleton-expense-item:nth-child(2) { animation-delay: 0.1s, 0.1s, 0.2s; }
+.skeleton-expense-item:nth-child(3) { animation-delay: 0.2s, 0.2s, 0.3s; }
+.skeleton-expense-item:nth-child(4) { animation-delay: 0.3s, 0.3s, 0.4s; }
+.skeleton-expense-item:nth-child(5) { animation-delay: 0.4s, 0.4s, 0.5s; }
 
 .skeleton-expense-main {
   flex: 1;
@@ -120,7 +237,15 @@
   border-radius: 12px;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  animation:
+    skeleton-glow 4s ease-in-out infinite,
+    skeleton-fade-in 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
 }
+
+/* Staggered fade-in for category sections */
+.skeleton-category-section:nth-child(1) { animation-delay: 0s, 0.1s; }
+.skeleton-category-section:nth-child(2) { animation-delay: 1s, 0.3s; }
+.skeleton-category-section:nth-child(3) { animation-delay: 2s, 0.5s; }
 
 .skeleton-category-header {
   margin-bottom: 1rem;
@@ -145,7 +270,16 @@
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  animation:
+    skeleton-glow 4s ease-in-out infinite,
+    skeleton-fade-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) backwards;
 }
+
+/* Staggered fade-in for member cards */
+.skeleton-member-card:nth-child(1) { animation-delay: 0s, 0.2s; }
+.skeleton-member-card:nth-child(2) { animation-delay: 1.5s, 0.35s; }
+.skeleton-member-card:nth-child(3) { animation-delay: 3s, 0.5s; }
+.skeleton-member-card:nth-child(4) { animation-delay: 0.5s, 0.65s; }
 
 /* Members grid */
 .skeleton-members-grid {
@@ -227,7 +361,16 @@
   background: var(--bg-primary);
   border-radius: 12px;
   border: 2px solid var(--border-color);
+  animation:
+    skeleton-glow 4s ease-in-out infinite,
+    skeleton-fade-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) backwards;
 }
+
+/* Staggered fade-in for metric cards */
+.skeleton-metric-card:nth-child(1) { animation-delay: 0s, 0.1s; }
+.skeleton-metric-card:nth-child(2) { animation-delay: 1s, 0.2s; }
+.skeleton-metric-card:nth-child(3) { animation-delay: 2s, 0.3s; }
+.skeleton-metric-card:nth-child(4) { animation-delay: 3s, 0.4s; }
 
 .skeleton-charts-grid {
   display: grid;
@@ -293,8 +436,28 @@
   .skeleton-expense-item,
   .skeleton-category-section,
   .skeleton-member-card,
-  .skeleton-metric-card {
+  .skeleton-metric-card,
+  .skeleton-summary-view,
+  .skeleton-detailed-view,
+  .skeleton-analytics-dashboard,
+  .skeleton-chart-large,
+  .skeleton-chart-small,
+  .skeleton-widget {
     animation: none;
     background: var(--bg-secondary);
+    opacity: 1;
+    transform: none;
+  }
+
+  .skeleton-line::after,
+  .skeleton-chart-bar-fill::after {
+    display: none;
+  }
+}
+
+/* Dark mode skeleton highlight adjustment */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --skeleton-highlight: rgba(255, 255, 255, 0.08);
   }
 }

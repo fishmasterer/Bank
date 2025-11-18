@@ -1,0 +1,168 @@
+/* Quick Actions Menu Styles */
+
+.quick-actions-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.quick-actions-menu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 180px;
+  max-width: 280px;
+  background: var(--bg-primary);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  animation: scaleIn 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  transform-origin: top left;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Header showing expense info */
+.quick-actions-header {
+  padding: 0.875rem 1rem;
+  background: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.quick-actions-amount {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.quick-actions-category {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Divider */
+.quick-actions-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0;
+}
+
+/* Action items */
+.quick-action-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.quick-action-item:hover {
+  background: var(--bg-hover);
+}
+
+.quick-action-item:active {
+  background: var(--bg-tertiary);
+  transform: scale(0.98);
+}
+
+.quick-action-icon {
+  font-size: 1rem;
+  width: 1.5rem;
+  text-align: center;
+}
+
+/* Danger action (delete) */
+.quick-action-danger {
+  color: var(--danger-color);
+}
+
+.quick-action-danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Read only message */
+.quick-actions-readonly {
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .quick-actions-menu {
+    min-width: 200px;
+  }
+
+  .quick-action-item {
+    padding: 1rem;
+    min-height: 48px;
+  }
+
+  .quick-actions-header {
+    padding: 1rem;
+  }
+
+  .quick-actions-amount {
+    font-size: 1.25rem;
+  }
+}
+
+/* Dark theme adjustments */
+:root[data-theme="dark"] .quick-actions-menu {
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-theme="dark"] .quick-actions-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .quick-actions-menu {
+    animation: none;
+  }
+
+  .quick-actions-backdrop {
+    animation: none;
+  }
+
+  .quick-action-item:active {
+    transform: none;
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -6,6 +6,11 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { useAuthorization } from './hooks/useAuthorization';
 import { useToast } from './hooks/useToast';
 import useSwipeGesture from './hooks/useSwipeGesture';
+import useScrollDirection from './hooks/useScrollDirection';
+import useDeepLinking from './hooks/useDeepLinking';
+import useScrollPersistence from './hooks/useScrollPersistence';
+import useRipple from './hooks/useRipple';
+import useSharedElementTransition from './hooks/useSharedElementTransition';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
@@ -25,7 +30,7 @@ import PWAInstallPrompt from './components/PWAInstallPrompt';
 import PWAUpdateNotification from './components/PWAUpdateNotification';
 import ExportModal from './components/ExportModal';
 import PullToRefresh from './components/PullToRefresh';
-import MobileDrawer from './components/MobileDrawer';
+import FloatingActionMenu from './components/FloatingActionMenu';
 import BudgetSection from './components/BudgetSection';
 import RecurringSection from './components/RecurringSection';
 import FamilySection from './components/FamilySection';
@@ -56,8 +61,51 @@ const AppContent = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [pageAnimation, setPageAnimation] = useState('');
-  const [showDrawer, setShowDrawer] = useState(false);
+  const [edgeBounce, setEdgeBounce] = useState(null); // 'left' or 'right' for edge bounce
+  const [tabIndicator, setTabIndicator] = useState({ left: 0, width: 0 });
   const prevTabRef = useRef('summary');
+  const navRef = useRef(null);
+  const createRipple = useRipple();
+  const {
+    startTransition,
+    endTransition,
+    getTransitionStyles,
+    isTransitioning
+  } = useSharedElementTransition();
+
+  // Track scroll direction for auto-hide bottom nav
+  const { scrollDirection, isAtTop } = useScrollDirection(15);
+
+  // Deep linking for shareable URLs and back button support
+  useDeepLinking({
+    activeTab,
+    setActiveTab,
+    selectedYear,
+    setSelectedYear,
+    selectedMonth,
+    setSelectedMonth,
+    tabOrder: TAB_ORDER
+  });
+
+  // Persist scroll positions between tab switches
+  useScrollPersistence(activeTab, TAB_ORDER);
+
+  // Update tab indicator position
+  useEffect(() => {
+    if (navRef.current) {
+      const activeIndex = TAB_ORDER.indexOf(activeTab);
+      const navItems = navRef.current.querySelectorAll('.bottom-nav-item');
+      if (navItems[activeIndex]) {
+        const item = navItems[activeIndex];
+        const navRect = navRef.current.getBoundingClientRect();
+        const itemRect = item.getBoundingClientRect();
+        setTabIndicator({
+          left: itemRect.left - navRect.left,
+          width: itemRect.width
+        });
+      }
+    }
+  }, [activeTab]);
 
   const handleTabChange = useCallback((newTab) => {
     if (newTab === activeTab) return;
@@ -74,11 +122,15 @@ const AppContent = () => {
     setTimeout(() => setPageAnimation(''), 400);
   }, [activeTab]);
 
-  // Swipe gesture handlers for tab navigation
+  // Swipe gesture handlers for tab navigation with edge bounce
   const handleSwipeLeft = useCallback(() => {
     const currentIndex = TAB_ORDER.indexOf(activeTab);
     if (currentIndex < TAB_ORDER.length - 1) {
       handleTabChange(TAB_ORDER[currentIndex + 1]);
+    } else {
+      // Trigger edge bounce effect at right boundary
+      setEdgeBounce('right');
+      setTimeout(() => setEdgeBounce(null), 400);
     }
   }, [activeTab, handleTabChange]);
 
@@ -86,6 +138,10 @@ const AppContent = () => {
     const currentIndex = TAB_ORDER.indexOf(activeTab);
     if (currentIndex > 0) {
       handleTabChange(TAB_ORDER[currentIndex - 1]);
+    } else {
+      // Trigger edge bounce effect at left boundary
+      setEdgeBounce('left');
+      setTimeout(() => setEdgeBounce(null), 400);
     }
   }, [activeTab, handleTabChange]);
 
@@ -129,8 +185,11 @@ const AppContent = () => {
     setShowForm(true);
   };
 
-  const handleEditExpense = (expense) => {
+  const handleEditExpense = (expense, sourceElement = null) => {
     if (readOnly) return;
+    if (sourceElement) {
+      startTransition(sourceElement);
+    }
     setEditingExpense(expense);
     setShowForm(true);
   };
@@ -138,6 +197,7 @@ const AppContent = () => {
   const handleCloseForm = () => {
     setShowForm(false);
     setEditingExpense(null);
+    endTransition();
   };
 
   const handleExport = () => {
@@ -209,17 +269,6 @@ const AppContent = () => {
           </p>
         </div>
         <div className="header-actions">
-          <button
-            className="hamburger-btn"
-            onClick={() => setShowDrawer(true)}
-            aria-label="Open menu"
-          >
-            <div className="hamburger-icon">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </button>
           <NotificationBell />
           <ThemePicker />
           <UserProfile />
@@ -311,7 +360,7 @@ const AppContent = () => {
 
       <PullToRefresh onRefresh={handlePullRefresh}>
         <main
-          className={`main-content ${pageAnimation}`}
+          className={`main-content ${pageAnimation} ${edgeBounce ? `edge-bounce-${edgeBounce}` : ''}`}
           key={activeTab}
           {...swipeHandlers}
         >
@@ -367,6 +416,8 @@ const AppContent = () => {
           onClose={handleCloseForm}
           onSuccess={(message) => success(message)}
           onError={(message) => showError(message)}
+          transitionClass={isTransitioning ? 'shared-transition' : ''}
+          transitionStyle={isTransitioning ? getTransitionStyles(true) : {}}
         />
       )}
 
@@ -416,19 +467,6 @@ const AppContent = () => {
         onError={(message) => showError(message)}
       />
 
-      <MobileDrawer
-        isOpen={showDrawer}
-        onClose={() => setShowDrawer(false)}
-        onAddExpense={handleAddExpense}
-        onCopyRecurring={handleCopyRecurring}
-        onSetBudget={() => setShowBudgetSettings(true)}
-        onCategoryBudgets={() => setShowCategoryBudgets(true)}
-        onManageFamily={() => setShowFamilyModal(true)}
-        onBudgetReport={() => setShowVarianceReport(true)}
-        onExport={handleExport}
-        readOnly={readOnly}
-      />
-
       <ToastNotification />
 
       {toasts.map(toast => (
@@ -441,27 +479,43 @@ const AppContent = () => {
         />
       ))}
 
-      {/* Floating Action Button (Mobile only) */}
-      {!readOnly && (
-        <button
-          onClick={handleAddExpense}
-          className="fab"
-          aria-label="Add expense"
-          title="Add expense"
-        >
-          +
-        </button>
-      )}
+      {/* Floating Action Menu (Mobile only) */}
+      <FloatingActionMenu
+        onAddExpense={handleAddExpense}
+        onCopyRecurring={handleCopyRecurring}
+        onSetBudget={() => setShowBudgetSettings(true)}
+        onCategoryBudgets={() => setShowCategoryBudgets(true)}
+        onManageFamily={() => setShowFamilyModal(true)}
+        onBudgetReport={() => setShowVarianceReport(true)}
+        onExport={handleExport}
+        readOnly={readOnly}
+        bottomNavHidden={scrollDirection === 'down' && !isAtTop}
+      />
 
       {/* Mobile Bottom Navigation */}
-      <nav className="bottom-nav">
+      <nav
+        ref={navRef}
+        className={`bottom-nav ${scrollDirection === 'down' && !isAtTop ? 'hidden' : ''}`}
+      >
+        <div
+          className="bottom-nav-indicator"
+          style={{
+            left: tabIndicator.left,
+            width: tabIndicator.width
+          }}
+        />
         {TAB_ORDER.map((tab) => (
           <button
             key={tab}
-            className={`bottom-nav-item ${activeTab === tab ? 'active' : ''}`}
-            onClick={() => handleTabChange(tab)}
+            className={`bottom-nav-item ripple-container ${activeTab === tab ? 'active' : ''}`}
+            onClick={(e) => {
+              createRipple(e, true);
+              handleTabChange(tab);
+            }}
           >
-            <span className="icon">{TAB_CONFIG[tab].icon}</span>
+            <span className={`icon ${activeTab === tab ? 'icon-active' : ''}`}>
+              {TAB_CONFIG[tab].icon}
+            </span>
             <span>{TAB_CONFIG[tab].shortLabel}</span>
           </button>
         ))}
