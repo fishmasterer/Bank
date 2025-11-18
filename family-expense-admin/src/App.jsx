@@ -7,6 +7,7 @@ import { useAuthorization } from './hooks/useAuthorization';
 import { useToast } from './hooks/useToast';
 import useSwipeGesture from './hooks/useSwipeGesture';
 import useScrollDirection from './hooks/useScrollDirection';
+import useDeepLinking from './hooks/useDeepLinking';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
@@ -62,6 +63,17 @@ const AppContent = () => {
 
   // Track scroll direction for auto-hide bottom nav
   const { scrollDirection, isAtTop } = useScrollDirection(15);
+
+  // Deep linking for shareable URLs and back button support
+  useDeepLinking({
+    activeTab,
+    setActiveTab,
+    selectedYear,
+    setSelectedYear,
+    selectedMonth,
+    setSelectedMonth,
+    tabOrder: TAB_ORDER
+  });
 
   const handleTabChange = useCallback((newTab) => {
     if (newTab === activeTab) return;
