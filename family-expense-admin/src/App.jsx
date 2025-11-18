@@ -1,10 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { useAuthorization } from './hooks/useAuthorization';
 import { useToast } from './hooks/useToast';
+import useSwipeGesture from './hooks/useSwipeGesture';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
@@ -24,7 +25,11 @@ import PWAInstallPrompt from './components/PWAInstallPrompt';
 import PWAUpdateNotification from './components/PWAUpdateNotification';
 import ExportModal from './components/ExportModal';
 import PullToRefresh from './components/PullToRefresh';
+import MobileDrawer from './components/MobileDrawer';
 import './App.css';
+
+// Tab order for navigation
+const TAB_ORDER = ['summary', 'detailed', 'analytics'];
 
 const AppContent = () => {
   const [activeTab, setActiveTab] = useState('summary');
@@ -38,15 +43,14 @@ const AppContent = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [pageAnimation, setPageAnimation] = useState('');
+  const [showDrawer, setShowDrawer] = useState(false);
   const prevTabRef = useRef('summary');
 
-  const tabOrder = ['summary', 'detailed', 'analytics'];
-
-  const handleTabChange = (newTab) => {
+  const handleTabChange = useCallback((newTab) => {
     if (newTab === activeTab) return;
 
-    const prevIndex = tabOrder.indexOf(prevTabRef.current);
-    const newIndex = tabOrder.indexOf(newTab);
+    const prevIndex = TAB_ORDER.indexOf(prevTabRef.current);
+    const newIndex = TAB_ORDER.indexOf(newTab);
 
     // Set animation direction based on tab order
     setPageAnimation(newIndex > prevIndex ? 'page-slide-left' : 'page-slide-right');
@@ -55,7 +59,29 @@ const AppContent = () => {
 
     // Reset animation class after animation completes
     setTimeout(() => setPageAnimation(''), 400);
-  };
+  }, [activeTab]);
+
+  // Swipe gesture handlers for tab navigation
+  const handleSwipeLeft = useCallback(() => {
+    const currentIndex = TAB_ORDER.indexOf(activeTab);
+    if (currentIndex < TAB_ORDER.length - 1) {
+      handleTabChange(TAB_ORDER[currentIndex + 1]);
+    }
+  }, [activeTab, handleTabChange]);
+
+  const handleSwipeRight = useCallback(() => {
+    const currentIndex = TAB_ORDER.indexOf(activeTab);
+    if (currentIndex > 0) {
+      handleTabChange(TAB_ORDER[currentIndex - 1]);
+    }
+  }, [activeTab, handleTabChange]);
+
+  const swipeHandlers = useSwipeGesture({
+    onSwipeLeft: handleSwipeLeft,
+    onSwipeRight: handleSwipeRight,
+    threshold: 50,
+    velocityThreshold: 0.3
+  });
 
   const { currentUser, loading: authLoading } = useAuth();
   const { isAuthorized, loading: authorizationLoading } = useAuthorization(currentUser);
@@ -170,6 +196,17 @@ const AppContent = () => {
           </p>
         </div>
         <div className="header-actions">
+          <button
+            className="hamburger-btn"
+            onClick={() => setShowDrawer(true)}
+            aria-label="Open menu"
+          >
+            <div className="hamburger-icon">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </button>
           <NotificationBell />
           <ThemePicker />
           <UserProfile />
@@ -257,8 +294,22 @@ const AppContent = () => {
         </button>
       </div>
 
+      {/* Swipe indicator dots for mobile */}
+      <div className="swipe-indicator">
+        {TAB_ORDER.map((tab) => (
+          <span
+            key={tab}
+            className={`swipe-indicator-dot ${activeTab === tab ? 'active' : ''}`}
+          />
+        ))}
+      </div>
+
       <PullToRefresh onRefresh={handlePullRefresh}>
-        <main className={`main-content ${pageAnimation}`} key={activeTab}>
+        <main
+          className={`main-content ${pageAnimation}`}
+          key={activeTab}
+          {...swipeHandlers}
+        >
           {activeTab === 'summary' ? (
             <SummaryView
               selectedYear={selectedYear}
@@ -333,6 +384,19 @@ const AppContent = () => {
         selectedMonth={selectedMonth}
         onSuccess={(message) => success(message)}
         onError={(message) => showError(message)}
+      />
+
+      <MobileDrawer
+        isOpen={showDrawer}
+        onClose={() => setShowDrawer(false)}
+        onAddExpense={handleAddExpense}
+        onCopyRecurring={handleCopyRecurring}
+        onSetBudget={() => setShowBudgetSettings(true)}
+        onCategoryBudgets={() => setShowCategoryBudgets(true)}
+        onManageFamily={() => setShowFamilyModal(true)}
+        onBudgetReport={() => setShowVarianceReport(true)}
+        onExport={handleExport}
+        readOnly={readOnly}
       />
 
       <ToastNotification />

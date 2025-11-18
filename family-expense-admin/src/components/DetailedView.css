@@ -216,6 +216,7 @@
 .category-badge {
   display: inline-flex;
   align-items: center;
+  gap: 0.375rem;
   padding: 0.375rem 0.875rem;
   border-radius: 20px;
   font-size: 0.9375rem;
@@ -224,6 +225,17 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease;
+}
+
+.category-icon {
+  font-size: 1rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2));
+  transition: transform 0.2s ease;
+}
+
+.category-header-content:hover .category-icon {
+  transform: scale(1.15);
 }
 
 .category-header-content:hover .category-badge {
@@ -265,49 +277,78 @@
 .expenses-list {
   padding: 1rem;
   background-color: var(--bg-primary);
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+}
+
+/* Responsive grid for expense items - 2 columns on tablet+ */
+@media (min-width: 640px) {
+  .expenses-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 3 columns on larger screens */
+@media (min-width: 1024px) {
+  .expenses-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .expense-item {
   padding: 1rem;
   border: 1px solid var(--border-color);
-  border-radius: 6px;
-  margin-bottom: 0.75rem;
-  transition: all 0.15s ease;
+  border-radius: 8px;
+  transition: all 0.2s ease;
   background-color: var(--bg-primary);
   display: flex;
+  flex-direction: column;
   gap: 0.75rem;
+  position: relative;
+  overflow: hidden;
 }
 
+/* Card hover effect */
 .expense-item:hover {
   border-color: var(--text-tertiary);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
 }
 
 .expense-item.selected {
   border-color: var(--primary-color);
   background-color: rgba(102, 126, 234, 0.05);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
 }
 
-.expense-item:last-child {
-  margin-bottom: 0;
+/* Selected indicator */
+.expense-item.selected::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
 }
 
 .expense-checkbox-wrapper {
-  display: flex;
-  align-items: flex-start;
-  padding-top: 0.125rem;
-  flex-shrink: 0;
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 1;
 }
 
 .expense-checkbox {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
   border-radius: 4px;
   border: 2px solid var(--border-color);
   transition: all 0.2s ease;
   flex-shrink: 0;
+  background: var(--bg-primary);
 }
 
 .expense-checkbox:hover {
@@ -325,10 +366,8 @@
 
 .expense-main {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 0.75rem;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .expense-info {
@@ -351,15 +390,20 @@
 
 .expense-amounts {
   display: flex;
-  gap: 1rem;
-  flex-direction: column;
-  align-items: flex-end;
+  gap: 0.75rem;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-tertiary);
+  padding: 0.625rem 0.75rem;
+  border-radius: 6px;
+  margin-top: 0.25rem;
 }
 
 .expense-amounts .planned {
   color: var(--primary-light);
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
 }
 
 .expense-amounts .paid {
@@ -370,11 +414,11 @@
 
 .expense-meta {
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 0.75rem;
-  padding-top: 0.75rem;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
   border-top: 1px solid var(--border-color);
+  font-size: 0.8125rem;
 }
 
 .paid-by {
@@ -557,44 +601,44 @@
 
   .expenses-list {
     padding: 0.75rem;
+    grid-template-columns: 1fr; /* Single column on mobile */
   }
 
   .expense-item {
-    padding: 0.75rem;
-    gap: 0.625rem;
+    padding: 1rem;
+  }
+
+  /* Touch-friendly hover state */
+  .expense-item:hover {
+    transform: none;
+  }
+
+  .expense-item:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .expense-checkbox-wrapper {
+    top: 0.875rem;
+    right: 0.875rem;
   }
 
   .expense-checkbox {
-    width: 20px;
-    height: 20px;
-    min-width: 20px;
-  }
-
-  .expense-main {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .expense-amounts {
-    flex-direction: row;
-    align-items: center;
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .expense-meta {
-    flex-direction: column;
-    gap: 0.5rem;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
   }
 
   .expense-actions {
-    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
   }
 
   .btn-edit,
   .btn-delete {
-    flex: 1;
     min-height: 44px;
+    justify-content: center;
   }
 }
 
@@ -607,6 +651,7 @@
 
   .expense-name {
     font-size: 1rem;
+    padding-right: 2rem; /* Space for checkbox */
   }
 
   .expense-type {
@@ -623,6 +668,10 @@
 
   .expense-name {
     font-size: 0.9375rem;
+  }
+
+  .expense-item {
+    padding: 0.875rem;
   }
 }
 

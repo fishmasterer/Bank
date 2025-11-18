@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Pie } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -132,4 +132,5 @@ const CategoryPieChart = ({ selectedYear, selectedMonth, loading = false }) => {
   );
 };
 
-export default CategoryPieChart;
+// Memoize to prevent unnecessary re-renders
+export default memo(CategoryPieChart);

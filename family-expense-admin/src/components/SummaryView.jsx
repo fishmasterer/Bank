@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { lazy, Suspense, memo } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
 import { useBudget } from '../hooks/useBudget';
-import CategoryPieChart from './CategoryPieChart';
-import CategoryBarChart from './CategoryBarChart';
-import SpendingTrendsChart from './SpendingTrendsChart';
-import MemberSpendingChart from './MemberSpendingChart';
-import { SkeletonSummaryView } from './SkeletonLoader';
+import { SkeletonSummaryView, SkeletonChart } from './SkeletonLoader';
 import './SummaryView.css';
+
+// Lazy load heavy chart components for better initial load performance
+const CategoryPieChart = lazy(() => import('./CategoryPieChart'));
+const CategoryBarChart = lazy(() => import('./CategoryBarChart'));
+const SpendingTrendsChart = lazy(() => import('./SpendingTrendsChart'));
+const MemberSpendingChart = lazy(() => import('./MemberSpendingChart'));
+
+// Chart wrapper with suspense fallback
+const ChartSuspense = ({ children, height = '350px' }) => (
+  <Suspense fallback={<SkeletonChart height={height} />}>
+    {children}
+  </Suspense>
+);
 
 const SummaryView = ({ selectedYear, selectedMonth }) => {
   const { familyMembers, getMonthlyTotal, getMonthlyPlanned, loading } = useExpenses();
@@ -59,25 +68,33 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
         </div>
       )}
 
-      <CategoryPieChart
-        selectedYear={selectedYear}
-        selectedMonth={selectedMonth}
-      />
+      <ChartSuspense height="350px">
+        <CategoryPieChart
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+        />
+      </ChartSuspense>
 
-      <CategoryBarChart
-        selectedYear={selectedYear}
-        selectedMonth={selectedMonth}
-      />
+      <ChartSuspense height="320px">
+        <CategoryBarChart
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+        />
+      </ChartSuspense>
 
-      <SpendingTrendsChart
-        selectedYear={selectedYear}
-        selectedMonth={selectedMonth}
-      />
+      <ChartSuspense height="350px">
+        <SpendingTrendsChart
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+        />
+      </ChartSuspense>
 
-      <MemberSpendingChart
-        selectedYear={selectedYear}
-        selectedMonth={selectedMonth}
-      />
+      <ChartSuspense height="380px">
+        <MemberSpendingChart
+          selectedYear={selectedYear}
+          selectedMonth={selectedMonth}
+        />
+      </ChartSuspense>
 
       <div className="summary-card total-card animate-fade-in-up hover-lift">
         <h2>Total for {new Date(selectedYear, selectedMonth - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</h2>
@@ -149,4 +166,5 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
   );
 };
 
-export default SummaryView;
+// Memoize to prevent unnecessary re-renders when parent state changes
+export default memo(SummaryView);
