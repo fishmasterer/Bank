@@ -8,7 +8,7 @@ import './BudgetSection.css';
 const BudgetSection = ({ selectedYear, selectedMonth, onSuccess, onError }) => {
   const { expenses, getExpensesByMonth } = useExpenses();
   const { budget, loading: budgetLoading, saveBudget } = useBudget(selectedYear, selectedMonth);
-  const { limits, loading: categoryLoading } = useCategoryBudget(selectedYear, selectedMonth);
+  const { categoryBudgets, loading: categoryLoading } = useCategoryBudget(selectedYear, selectedMonth);
 
   const [editingBudget, setEditingBudget] = useState(false);
   const [budgetAmount, setBudgetAmount] = useState('');
@@ -16,7 +16,7 @@ const BudgetSection = ({ selectedYear, selectedMonth, onSuccess, onError }) => {
   const monthExpenses = getExpensesByMonth(selectedYear, selectedMonth);
   const totalPlanned = monthExpenses.reduce((sum, exp) => sum + (exp.plannedAmount || 0), 0);
   const totalPaid = monthExpenses.reduce((sum, exp) => sum + (exp.paidAmount || 0), 0);
-  const budgetLimit = budget?.limit || 0;
+  const budgetLimit = budget?.limit || budget?.monthlyLimit || 0;
   const remaining = budgetLimit - totalPaid;
   const utilizationPercent = budgetLimit > 0 ? (totalPaid / budgetLimit) * 100 : 0;
 
@@ -186,7 +186,7 @@ const BudgetSection = ({ selectedYear, selectedMonth, onSuccess, onError }) => {
             {Object.entries(categoryBreakdown)
               .sort((a, b) => b[1].paid - a[1].paid)
               .map(([category, data]) => {
-                const categoryLimit = limits?.[category] || 0;
+                const categoryLimit = categoryBudgets?.[category] || 0;
                 const categoryPercent = categoryLimit > 0
                   ? (data.paid / categoryLimit) * 100
                   : 0;
