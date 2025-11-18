@@ -38,6 +38,17 @@
   align-items: center;
 }
 
+.view-only-badge {
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  padding: 0.25rem 0.625rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid var(--border-color);
+  letter-spacing: 0.02em;
+}
+
 .controls {
   display: flex;
   flex-wrap: wrap;
