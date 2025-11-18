@@ -10,6 +10,7 @@ import useScrollDirection from './hooks/useScrollDirection';
 import useDeepLinking from './hooks/useDeepLinking';
 import useScrollPersistence from './hooks/useScrollPersistence';
 import useRipple from './hooks/useRipple';
+import useSharedElementTransition from './hooks/useSharedElementTransition';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
@@ -65,6 +66,12 @@ const AppContent = () => {
   const prevTabRef = useRef('summary');
   const navRef = useRef(null);
   const createRipple = useRipple();
+  const {
+    startTransition,
+    endTransition,
+    getTransitionStyles,
+    isTransitioning
+  } = useSharedElementTransition();
 
   // Track scroll direction for auto-hide bottom nav
   const { scrollDirection, isAtTop } = useScrollDirection(15);
@@ -178,8 +185,11 @@ const AppContent = () => {
     setShowForm(true);
   };
 
-  const handleEditExpense = (expense) => {
+  const handleEditExpense = (expense, sourceElement = null) => {
     if (readOnly) return;
+    if (sourceElement) {
+      startTransition(sourceElement);
+    }
     setEditingExpense(expense);
     setShowForm(true);
   };
@@ -187,6 +197,7 @@ const AppContent = () => {
   const handleCloseForm = () => {
     setShowForm(false);
     setEditingExpense(null);
+    endTransition();
   };
 
   const handleExport = () => {
@@ -405,6 +416,8 @@ const AppContent = () => {
           onClose={handleCloseForm}
           onSuccess={(message) => success(message)}
           onError={(message) => showError(message)}
+          transitionClass={isTransitioning ? 'shared-transition' : ''}
+          transitionStyle={isTransitioning ? getTransitionStyles(true) : {}}
         />
       )}
 

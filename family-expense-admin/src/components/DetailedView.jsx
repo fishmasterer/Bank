@@ -118,7 +118,8 @@ const ExpenseItem = ({
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onEdit(expense);
+              const sourceElement = document.getElementById(`expense-${expense.id}`);
+              onEdit(expense, sourceElement);
             }}
             className="btn-edit btn-press"
             aria-label={`Edit ${expense.name}`}
@@ -192,6 +193,12 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
       id: undefined
     };
     onEditExpense(duplicateExpense);
+  }, [onEditExpense]);
+
+  // Wrapper to include source element for shared element transition
+  const handleQuickEdit = useCallback((expense) => {
+    const sourceElement = document.getElementById(`expense-${expense.id}`);
+    onEditExpense(expense, sourceElement);
   }, [onEditExpense]);
 
   // Show/hide undo toast
@@ -637,7 +644,7 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
         isOpen={quickActionsOpen}
         onClose={handleQuickActionsClose}
         position={quickActionsPosition}
-        onEdit={onEditExpense}
+        onEdit={handleQuickEdit}
         onDelete={handleQuickDelete}
         onDuplicate={handleQuickDuplicate}
         expense={quickActionsExpense}

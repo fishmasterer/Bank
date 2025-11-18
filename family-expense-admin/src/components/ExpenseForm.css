@@ -417,6 +417,148 @@
   }
 }
 
+/* Shared Element Transition Styles */
+.modal-overlay.shared-transition {
+  background-color: transparent;
+  animation: sharedOverlayFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes sharedOverlayFade {
+  from {
+    background-color: transparent;
+  }
+  to {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+.modal-content.shared-transition {
+  animation: sharedElementExpand 0.5s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  transform-origin: var(--shared-origin-x, 50%) var(--shared-origin-y, 50%);
+}
+
+@keyframes sharedElementExpand {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translate(
+      calc(var(--shared-origin-x, 50vw) - 50vw),
+      calc(var(--shared-origin-y, 50vh) - 50vh)
+    );
+    border-radius: 8px;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate(0, 0);
+    border-radius: 10px;
+  }
+}
+
+/* Closing animation */
+.modal-overlay.shared-transition-exit {
+  animation: sharedOverlayFadeOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes sharedOverlayFadeOut {
+  from {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+.modal-content.shared-transition-exit {
+  animation: sharedElementCollapse 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  transform-origin: var(--shared-origin-x, 50%) var(--shared-origin-y, 50%);
+}
+
+@keyframes sharedElementCollapse {
+  0% {
+    opacity: 1;
+    transform: scale(1) translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3) translate(
+      calc(var(--shared-origin-x, 50vw) - 50vw),
+      calc(var(--shared-origin-y, 50vh) - 50vh)
+    );
+    border-radius: 8px;
+  }
+}
+
+/* Mobile bottom sheet with shared transition */
+@media (max-width: 768px) {
+  .modal-content.shared-transition {
+    animation: sharedElementExpandMobile 0.5s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+
+  @keyframes sharedElementExpandMobile {
+    0% {
+      opacity: 0;
+      transform: translateY(100%) scale(0.95);
+      border-radius: 16px 16px 0 0;
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(20%) scale(0.98);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      border-radius: 16px 16px 0 0;
+    }
+  }
+
+  .modal-content.shared-transition-exit {
+    animation: sharedElementCollapseMobile 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes sharedElementCollapseMobile {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+  }
+}
+
+/* Expense item highlight effect when source of transition */
+.expense-item-transitioning {
+  position: relative;
+}
+
+.expense-item-transitioning::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--primary-color);
+  opacity: 0;
+  border-radius: inherit;
+  animation: itemHighlight 0.5s ease-out;
+  pointer-events: none;
+}
+
+@keyframes itemHighlight {
+  0% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+
 /* Template actions bar */
 .template-actions-bar {
   padding: 1rem 1.5rem;
