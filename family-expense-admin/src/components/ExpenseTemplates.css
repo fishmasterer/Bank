@@ -2,7 +2,7 @@
 .expense-templates-modal,
 .template-edit-modal {
   max-width: 650px;
-  max-height: 90vh;
+  max-height: 90dvh;
   overflow-y: auto;
 }
 
