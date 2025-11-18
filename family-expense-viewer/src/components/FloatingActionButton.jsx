@@ -4,7 +4,8 @@ import './FloatingActionButton.css';
 export default function FloatingActionButton({
   onMemberExpenses,
   onMonthlyStats,
-  onBudgetTracker
+  onBudgetTracker,
+  onExport
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -32,8 +33,16 @@ export default function FloatingActionButton({
       <div className={`fab-menu ${isOpen ? 'open' : ''}`}>
         <button
           className="fab-menu-item"
+          onClick={() => handleOptionClick(onExport)}
+          style={{ transitionDelay: isOpen ? '0.15s' : '0s' }}
+        >
+          <span className="fab-menu-icon">^</span>
+          <span className="fab-menu-label">Export Data</span>
+        </button>
+        <button
+          className="fab-menu-item"
           onClick={() => handleOptionClick(onBudgetTracker)}
-          style={{ transitionDelay: isOpen ? '0.1s' : '0s' }}
+          style={{ transitionDelay: isOpen ? '0.1s' : '0.05s' }}
         >
           <span className="fab-menu-icon">$</span>
           <span className="fab-menu-label">Budget Tracker</span>
@@ -41,7 +50,7 @@ export default function FloatingActionButton({
         <button
           className="fab-menu-item"
           onClick={() => handleOptionClick(onMonthlyStats)}
-          style={{ transitionDelay: isOpen ? '0.05s' : '0.05s' }}
+          style={{ transitionDelay: isOpen ? '0.05s' : '0.1s' }}
         >
           <span className="fab-menu-icon">+/-</span>
           <span className="fab-menu-label">Monthly Stats</span>
@@ -49,7 +58,7 @@ export default function FloatingActionButton({
         <button
           className="fab-menu-item"
           onClick={() => handleOptionClick(onMemberExpenses)}
-          style={{ transitionDelay: isOpen ? '0s' : '0.1s' }}
+          style={{ transitionDelay: isOpen ? '0s' : '0.15s' }}
         >
           <span className="fab-menu-icon">@</span>
           <span className="fab-menu-label">Member Expenses</span>

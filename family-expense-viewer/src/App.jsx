@@ -12,7 +12,7 @@ import Unauthorized from './components/Unauthorized';
 import ThemeToggle from './components/ThemeToggle';
 import FloatingActionButton from './components/FloatingActionButton';
 import StatsPanel from './components/StatsPanel';
-import { exportToCSV } from './utils/exportData';
+import ExportModal from './components/ExportModal';
 import './App.css';
 
 const AppContent = () => {
@@ -22,6 +22,7 @@ const AppContent = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [statsView, setStatsView] = useState(null);
+  const [showExportModal, setShowExportModal] = useState(false);
 
   const { currentUser, loading: authLoading } = useAuth();
   const { isAuthorized, loading: authorizationLoading } = useAuthorization(currentUser);
@@ -42,6 +43,14 @@ const AppContent = () => {
 
   const handleCloseStats = useCallback(() => {
     setStatsView(null);
+  }, []);
+
+  const handleOpenExport = useCallback(() => {
+    setShowExportModal(true);
+  }, []);
+
+  const handleCloseExport = useCallback(() => {
+    setShowExportModal(false);
   }, []);
 
   // Show loading state while checking authentication
@@ -84,7 +93,7 @@ const AppContent = () => {
   };
 
   const handleExport = () => {
-    exportToCSV(expenses, familyMembers, selectedYear, selectedMonth);
+    setShowExportModal(true);
   };
 
   const monthName = new Date(selectedYear, selectedMonth - 1).toLocaleDateString('en-US', {
@@ -220,6 +229,7 @@ const AppContent = () => {
         onMemberExpenses={handleMemberExpenses}
         onMonthlyStats={handleMonthlyStats}
         onBudgetTracker={handleBudgetTracker}
+        onExport={handleOpenExport}
       />
 
       {/* Stats Panel */}
@@ -231,6 +241,14 @@ const AppContent = () => {
           onClose={handleCloseStats}
         />
       )}
+
+      {/* Export Modal */}
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={handleCloseExport}
+        selectedYear={selectedYear}
+        selectedMonth={selectedMonth}
+      />
     </div>
   );
 };
