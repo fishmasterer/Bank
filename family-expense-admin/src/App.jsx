@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -9,6 +9,7 @@ import useSwipeGesture from './hooks/useSwipeGesture';
 import useScrollDirection from './hooks/useScrollDirection';
 import useDeepLinking from './hooks/useDeepLinking';
 import useScrollPersistence from './hooks/useScrollPersistence';
+import useRipple from './hooks/useRipple';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
@@ -60,7 +61,10 @@ const AppContent = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [pageAnimation, setPageAnimation] = useState('');
   const [edgeBounce, setEdgeBounce] = useState(null); // 'left' or 'right' for edge bounce
+  const [tabIndicator, setTabIndicator] = useState({ left: 0, width: 0 });
   const prevTabRef = useRef('summary');
+  const navRef = useRef(null);
+  const createRipple = useRipple();
 
   // Track scroll direction for auto-hide bottom nav
   const { scrollDirection, isAtTop } = useScrollDirection(15);
@@ -78,6 +82,23 @@ const AppContent = () => {
 
   // Persist scroll positions between tab switches
   useScrollPersistence(activeTab, TAB_ORDER);
+
+  // Update tab indicator position
+  useEffect(() => {
+    if (navRef.current) {
+      const activeIndex = TAB_ORDER.indexOf(activeTab);
+      const navItems = navRef.current.querySelectorAll('.bottom-nav-item');
+      if (navItems[activeIndex]) {
+        const item = navItems[activeIndex];
+        const navRect = navRef.current.getBoundingClientRect();
+        const itemRect = item.getBoundingClientRect();
+        setTabIndicator({
+          left: itemRect.left - navRect.left,
+          width: itemRect.width
+        });
+      }
+    }
+  }, [activeTab]);
 
   const handleTabChange = useCallback((newTab) => {
     if (newTab === activeTab) return;
@@ -459,14 +480,29 @@ const AppContent = () => {
       />
 
       {/* Mobile Bottom Navigation */}
-      <nav className={`bottom-nav ${scrollDirection === 'down' && !isAtTop ? 'hidden' : ''}`}>
+      <nav
+        ref={navRef}
+        className={`bottom-nav ${scrollDirection === 'down' && !isAtTop ? 'hidden' : ''}`}
+      >
+        <div
+          className="bottom-nav-indicator"
+          style={{
+            left: tabIndicator.left,
+            width: tabIndicator.width
+          }}
+        />
         {TAB_ORDER.map((tab) => (
           <button
             key={tab}
-            className={`bottom-nav-item ${activeTab === tab ? 'active' : ''}`}
-            onClick={() => handleTabChange(tab)}
+            className={`bottom-nav-item ripple-container ${activeTab === tab ? 'active' : ''}`}
+            onClick={(e) => {
+              createRipple(e, true);
+              handleTabChange(tab);
+            }}
           >
-            <span className="icon">{TAB_CONFIG[tab].icon}</span>
+            <span className={`icon ${activeTab === tab ? 'icon-active' : ''}`}>
+              {TAB_CONFIG[tab].icon}
+            </span>
             <span>{TAB_CONFIG[tab].shortLabel}</span>
           </button>
         ))}
