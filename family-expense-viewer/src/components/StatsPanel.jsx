@@ -3,7 +3,7 @@ import { useExpenses } from '../context/ExpenseContext';
 import './StatsPanel.css';
 
 export default function StatsPanel({ view, selectedYear, selectedMonth, onClose }) {
-  const { familyMembers, getMonthlyTotal, getMonthlyPlanned } = useExpenses();
+  const { familyMembers, getMonthlyTotal, getMonthlyPlanned, getCategoryBreakdown } = useExpenses();
 
   // Get previous month
   const prevMonth = selectedMonth === 1 ? 12 : selectedMonth - 1;
@@ -115,6 +115,11 @@ export default function StatsPanel({ view, selectedYear, selectedMonth, onClose 
     const percentUsed = budget > 0 ? (used / budget) * 100 : 0;
     const isOverBudget = remaining < 0;
 
+    // Get category breakdown
+    const categoryBreakdown = getCategoryBreakdown(selectedYear, selectedMonth);
+    const categories = Object.entries(categoryBreakdown)
+      .sort((a, b) => b[1].paid - a[1].paid);
+
     return (
       <div className="stats-content">
         <h3 className="stats-subtitle">Budget vs Actual</h3>
@@ -162,6 +167,35 @@ export default function StatsPanel({ view, selectedYear, selectedMonth, onClose 
             <span className="budget-item-value">${Math.abs(remaining).toFixed(2)}</span>
           </div>
         </div>
+
+        {/* Category Breakdown */}
+        {categories.length > 0 && (
+          <div className="category-breakdown">
+            <h4>By Category</h4>
+            <div className="category-list">
+              {categories.map(([category, data]) => {
+                const categoryPercent = used > 0 ? (data.paid / used) * 100 : 0;
+                return (
+                  <div key={category} className="category-item">
+                    <div className="category-info">
+                      <span className="category-name">{category}</span>
+                      <span className="category-amount">${data.paid.toFixed(2)}</span>
+                    </div>
+                    <div className="category-bar">
+                      <div
+                        className="category-bar-fill"
+                        style={{
+                          width: `${categoryPercent}%`
+                        }}
+                      />
+                    </div>
+                    <span className="category-percent">{categoryPercent.toFixed(1)}%</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     );
   };

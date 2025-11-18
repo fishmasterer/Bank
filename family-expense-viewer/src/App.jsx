@@ -9,7 +9,6 @@ import ExpenseForm from './components/ExpenseForm';
 import Login from './components/Login';
 import UserProfile from './components/UserProfile';
 import Unauthorized from './components/Unauthorized';
-import ThemeToggle from './components/ThemeToggle';
 import FloatingActionButton from './components/FloatingActionButton';
 import StatsPanel from './components/StatsPanel';
 import ExportModal from './components/ExportModal';
@@ -137,7 +136,6 @@ const AppContent = () => {
         </div>
         <div className="header-actions">
           {readOnly && <span className="view-only-badge">View Only</span>}
-          <ThemeToggle />
           <UserProfile />
         </div>
       </header>

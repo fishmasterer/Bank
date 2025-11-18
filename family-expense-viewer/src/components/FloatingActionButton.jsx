@@ -36,7 +36,7 @@ export default function FloatingActionButton({
           onClick={() => handleOptionClick(onExport)}
           style={{ transitionDelay: isOpen ? '0.15s' : '0s' }}
         >
-          <span className="fab-menu-icon">^</span>
+          <span className="fab-menu-icon">📤</span>
           <span className="fab-menu-label">Export Data</span>
         </button>
         <button
@@ -44,7 +44,7 @@ export default function FloatingActionButton({
           onClick={() => handleOptionClick(onBudgetTracker)}
           style={{ transitionDelay: isOpen ? '0.1s' : '0.05s' }}
         >
-          <span className="fab-menu-icon">$</span>
+          <span className="fab-menu-icon">💰</span>
           <span className="fab-menu-label">Budget Tracker</span>
         </button>
         <button
@@ -52,7 +52,7 @@ export default function FloatingActionButton({
           onClick={() => handleOptionClick(onMonthlyStats)}
           style={{ transitionDelay: isOpen ? '0.05s' : '0.1s' }}
         >
-          <span className="fab-menu-icon">+/-</span>
+          <span className="fab-menu-icon">📊</span>
           <span className="fab-menu-label">Monthly Stats</span>
         </button>
         <button
@@ -60,7 +60,7 @@ export default function FloatingActionButton({
           onClick={() => handleOptionClick(onMemberExpenses)}
           style={{ transitionDelay: isOpen ? '0s' : '0.15s' }}
         >
-          <span className="fab-menu-icon">@</span>
+          <span className="fab-menu-icon">👥</span>
           <span className="fab-menu-label">Member Expenses</span>
         </button>
       </div>
