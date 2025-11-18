@@ -1,25 +1,88 @@
-export const exportToCSV = (expenses, familyMembers, year, month) => {
+// Helper to filter expenses by date range and members
+const filterExpenses = (expenses, options) => {
+  const { startYear, startMonth, endYear, endMonth, selectedMembers } = options;
+
+  return expenses.filter(exp => {
+    // Check date range
+    const expDate = new Date(exp.year, exp.month - 1);
+    const startDate = new Date(startYear, startMonth - 1);
+    const endDate = new Date(endYear, endMonth - 1);
+
+    if (expDate < startDate || expDate > endDate) {
+      return false;
+    }
+
+    // Check member filter
+    if (selectedMembers && !selectedMembers.includes(exp.paidBy)) {
+      return false;
+    }
+
+    return true;
+  });
+};
+
+// Helper to generate filename
+const getFilename = (options) => {
+  const { startYear, startMonth, endYear, endMonth } = options;
+
+  if (startYear === endYear && startMonth === endMonth) {
+    const monthName = new Date(startYear, startMonth - 1).toLocaleDateString('en-US', { month: 'long' });
+    return `family-expenses-${monthName}-${startYear}.csv`;
+  }
+
+  const startStr = `${startYear}-${String(startMonth).padStart(2, '0')}`;
+  const endStr = `${endYear}-${String(endMonth).padStart(2, '0')}`;
+  return `family-expenses-${startStr}-to-${endStr}.csv`;
+};
+
+export const exportToCSV = (expenses, familyMembers, options) => {
+  // Handle legacy signature (year, month as separate params)
+  if (typeof options === 'number') {
+    const year = options;
+    const month = arguments[3];
+    options = {
+      startYear: year,
+      startMonth: month,
+      endYear: year,
+      endMonth: month,
+      selectedMembers: familyMembers.map(m => m.id)
+    };
+  }
+
   // Helper to get member name
   const getMemberName = (memberId) => {
     const member = familyMembers.find(m => m.id === memberId);
     return member ? member.name : 'Unknown';
   };
 
-  // Filter expenses for the selected month
-  const filteredExpenses = expenses.filter(exp =>
-    exp.year === year && exp.month === month
+  // Filter expenses by date range and selected members
+  const filteredExpenses = filterExpenses(expenses, options);
+
+  // Get filtered family members
+  const filteredMembers = familyMembers.filter(m =>
+    options.selectedMembers.includes(m.id)
   );
+
+  // Sort by date, then category, then name
+  filteredExpenses.sort((a, b) => {
+    const dateA = new Date(a.year, a.month - 1);
+    const dateB = new Date(b.year, b.month - 1);
+    if (dateA.getTime() !== dateB.getTime()) {
+      return dateA.getTime() - dateB.getTime();
+    }
+    if (a.category !== b.category) return a.category.localeCompare(b.category);
+    return a.name.localeCompare(b.name);
+  });
 
   // Create CSV header
   const headers = [
     'Expense Name',
     'Category',
     'Type',
+    'Month',
     'Planned Amount',
     'Paid Amount',
     'Paid By',
-    'Year',
-    'Month',
     'Notes'
   ];
 
@@ -28,11 +91,13 @@ export const exportToCSV = (expenses, familyMembers, year, month) => {
     exp.name,
     exp.category,
     exp.isRecurring ? 'Recurring' : 'One-time',
+    new Date(exp.year, exp.month - 1).toLocaleDateString('en-US', {
+      month: 'short',
+      year: 'numeric'
+    }),
     (exp.plannedAmount || 0).toFixed(2),
     (exp.paidAmount || 0).toFixed(2),
     getMemberName(exp.paidBy),
-    exp.year,
-    exp.month,
     exp.notes || ''
   ]);
 
@@ -42,12 +107,12 @@ export const exportToCSV = (expenses, familyMembers, year, month) => {
 
   // Add summary rows
   rows.push([]);
-  rows.push(['TOTAL', '', '', totalPlanned.toFixed(2), totalPaid.toFixed(2), '', '', '', '']);
+  rows.push(['TOTAL', '', '', '', totalPlanned.toFixed(2), totalPaid.toFixed(2), '', '']);
 
   // Add per-member summary
   rows.push([]);
   rows.push(['PER MEMBER SUMMARY']);
-  familyMembers.forEach(member => {
+  filteredMembers.forEach(member => {
     const memberExpenses = filteredExpenses.filter(exp => exp.paidBy === member.id);
     const memberPlanned = memberExpenses.reduce((sum, exp) => sum + (exp.plannedAmount || 0), 0);
     const memberPaid = memberExpenses.reduce((sum, exp) => sum + (exp.paidAmount || 0), 0);
@@ -55,10 +120,9 @@ export const exportToCSV = (expenses, familyMembers, year, month) => {
       member.name,
       '',
       '',
+      '',
       memberPlanned.toFixed(2),
       memberPaid.toFixed(2),
-      '',
-      '',
       '',
       ''
     ]);
@@ -82,9 +146,8 @@ export const exportToCSV = (expenses, familyMembers, year, month) => {
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
 
-  const monthName = new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long' });
   link.setAttribute('href', url);
-  link.setAttribute('download', `family-expenses-${monthName}-${year}.csv`);
+  link.setAttribute('download', getFilename(options));
   link.style.visibility = 'hidden';
 
   document.body.appendChild(link);

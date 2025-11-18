@@ -1,40 +1,130 @@
 import * as XLSX from 'xlsx';
 
-export const exportToExcel = (expenses, familyMembers, budgets, categoryBudgets, year, month) => {
+// Helper to filter expenses by date range and members
+const filterExpenses = (expenses, options) => {
+  const { startYear, startMonth, endYear, endMonth, selectedMembers } = options;
+
+  return expenses.filter(exp => {
+    // Check date range
+    const expDate = new Date(exp.year, exp.month - 1);
+    const startDate = new Date(startYear, startMonth - 1);
+    const endDate = new Date(endYear, endMonth - 1);
+
+    if (expDate < startDate || expDate > endDate) {
+      return false;
+    }
+
+    // Check member filter
+    if (selectedMembers && !selectedMembers.includes(exp.paidBy)) {
+      return false;
+    }
+
+    return true;
+  });
+};
+
+// Helper to generate date range label
+const getDateRangeLabel = (options) => {
+  const { startYear, startMonth, endYear, endMonth } = options;
+
+  if (startYear === endYear && startMonth === endMonth) {
+    return new Date(startYear, startMonth - 1).toLocaleDateString('en-US', {
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
+  const start = new Date(startYear, startMonth - 1).toLocaleDateString('en-US', {
+    month: 'short',
+    year: 'numeric'
+  });
+  const end = new Date(endYear, endMonth - 1).toLocaleDateString('en-US', {
+    month: 'short',
+    year: 'numeric'
+  });
+
+  return `${start} - ${end}`;
+};
+
+// Helper to generate filename
+const getFilename = (options) => {
+  const { startYear, startMonth, endYear, endMonth } = options;
+
+  if (startYear === endYear && startMonth === endMonth) {
+    const monthName = new Date(startYear, startMonth - 1).toLocaleDateString('en-US', { month: 'long' });
+    return `family-expenses-${monthName}-${startYear}.xlsx`;
+  }
+
+  const startStr = `${startYear}-${String(startMonth).padStart(2, '0')}`;
+  const endStr = `${endYear}-${String(endMonth).padStart(2, '0')}`;
+  return `family-expenses-${startStr}-to-${endStr}.xlsx`;
+};
+
+export const exportToExcel = (expenses, familyMembers, budgets, categoryBudgets, options) => {
+  // Handle legacy signature (year, month as separate params)
+  if (typeof options === 'number') {
+    const year = options;
+    const month = arguments[5];
+    options = {
+      startYear: year,
+      startMonth: month,
+      endYear: year,
+      endMonth: month,
+      selectedMembers: familyMembers.map(m => m.id)
+    };
+  }
+
   // Helper to get member name
   const getMemberName = (memberId) => {
     const member = familyMembers.find(m => m.id === memberId);
     return member ? member.name : 'Unknown';
   };
 
-  // Filter expenses for the selected month
-  const filteredExpenses = expenses.filter(exp =>
-    exp.year === year && exp.month === month
+  // Filter expenses by date range and selected members
+  const filteredExpenses = filterExpenses(expenses, options);
+
+  // Get filtered family members
+  const filteredMembers = familyMembers.filter(m =>
+    options.selectedMembers.includes(m.id)
   );
 
-  // Sort by category then name
+  // Sort by date, then category, then name
   filteredExpenses.sort((a, b) => {
+    // First by date
+    const dateA = new Date(a.year, a.month - 1);
+    const dateB = new Date(b.year, b.month - 1);
+    if (dateA.getTime() !== dateB.getTime()) {
+      return dateA.getTime() - dateB.getTime();
+    }
+    // Then by category
     if (a.category !== b.category) return a.category.localeCompare(b.category);
+    // Then by name
     return a.name.localeCompare(b.name);
   });
 
   // Create workbook
   const workbook = XLSX.utils.book_new();
+  const dateLabel = getDateRangeLabel(options);
 
   // ============= SHEET 1: EXPENSES ===============
   const expenseData = [
     ['Family Expense Report'],
-    [`${new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`],
+    [dateLabel],
     [],
-    ['Expense Name', 'Category', 'Type', 'Planned Amount', 'Paid Amount', 'Variance', 'Paid By', 'Notes']
+    ['Expense Name', 'Category', 'Type', 'Month', 'Planned Amount', 'Paid Amount', 'Variance', 'Paid By', 'Notes']
   ];
 
   filteredExpenses.forEach(exp => {
     const variance = (exp.paidAmount || 0) - (exp.plannedAmount || 0);
+    const monthLabel = new Date(exp.year, exp.month - 1).toLocaleDateString('en-US', {
+      month: 'short',
+      year: 'numeric'
+    });
     expenseData.push([
       exp.name,
       exp.category,
       exp.isRecurring ? 'Recurring' : 'One-time',
+      monthLabel,
       exp.plannedAmount || 0,
       exp.paidAmount || 0,
       variance,
@@ -49,7 +139,7 @@ export const exportToExcel = (expenses, familyMembers, budgets, categoryBudgets,
   const totalVariance = totalPaid - totalPlanned;
 
   expenseData.push([]);
-  expenseData.push(['TOTAL', '', '', totalPlanned, totalPaid, totalVariance, '', '']);
+  expenseData.push(['TOTAL', '', '', '', totalPlanned, totalPaid, totalVariance, '', '']);
 
   const expenseSheet = XLSX.utils.aoa_to_sheet(expenseData);
 
@@ -58,6 +148,7 @@ export const exportToExcel = (expenses, familyMembers, budgets, categoryBudgets,
     { wch: 25 }, // Expense Name
     { wch: 15 }, // Category
     { wch: 12 }, // Type
+    { wch: 12 }, // Month
     { wch: 15 }, // Planned
     { wch: 15 }, // Paid
     { wch: 12 }, // Variance
@@ -70,12 +161,12 @@ export const exportToExcel = (expenses, familyMembers, budgets, categoryBudgets,
   // ============= SHEET 2: PER MEMBER SUMMARY ===============
   const memberData = [
     ['Per Member Summary'],
-    [`${new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`],
+    [dateLabel],
     [],
     ['Member', 'Expense Count', 'Planned Amount', 'Paid Amount', 'Variance']
   ];
 
-  familyMembers.forEach(member => {
+  filteredMembers.forEach(member => {
     const memberExpenses = filteredExpenses.filter(exp => exp.paidBy === member.id);
     const memberPlanned = memberExpenses.reduce((sum, exp) => sum + (exp.plannedAmount || 0), 0);
     const memberPaid = memberExpenses.reduce((sum, exp) => sum + (exp.paidAmount || 0), 0);
@@ -118,25 +209,30 @@ export const exportToExcel = (expenses, familyMembers, budgets, categoryBudgets,
 
   const categoryData = [
     ['Category Breakdown'],
-    [`${new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`],
+    [dateLabel],
     [],
-    ['Category', 'Expense Count', 'Planned Amount', 'Paid Amount', 'Variance', 'Budget', 'Budget Status']
+    ['Category', 'Expense Count', 'Planned Amount', 'Paid Amount', 'Variance', 'Avg Budget', 'Budget Status']
   ];
 
-  // Get category budget for this month
-  const getCategoryBudget = (category) => {
-    const budget = categoryBudgets.find(b =>
-      b.year === year &&
-      b.month === month &&
-      b.category === category
-    );
-    return budget ? budget.limit : null;
+  // Get category budget for the date range (average if multiple months)
+  const getCategoryBudgetAvg = (category) => {
+    if (!categoryBudgets || categoryBudgets.length === 0) return null;
+
+    const relevantBudgets = categoryBudgets.filter(b => {
+      const budgetDate = new Date(b.year, b.month - 1);
+      const startDate = new Date(options.startYear, options.startMonth - 1);
+      const endDate = new Date(options.endYear, options.endMonth - 1);
+      return budgetDate >= startDate && budgetDate <= endDate && b.category === category;
+    });
+
+    if (relevantBudgets.length === 0) return null;
+    return relevantBudgets.reduce((sum, b) => sum + b.limit, 0) / relevantBudgets.length;
   };
 
   Object.keys(categoryBreakdown).sort().forEach(category => {
     const data = categoryBreakdown[category];
     const variance = data.paid - data.planned;
-    const budget = getCategoryBudget(category);
+    const budget = getCategoryBudgetAvg(category);
     const budgetStatus = budget ?
       (data.paid > budget ? `Over by $${(data.paid - budget).toFixed(2)}` :
        data.paid >= budget * 0.9 ? `${((data.paid / budget) * 100).toFixed(0)}% used` :
@@ -149,7 +245,7 @@ export const exportToExcel = (expenses, familyMembers, budgets, categoryBudgets,
       data.planned,
       data.paid,
       variance,
-      budget || 'N/A',
+      budget ? budget.toFixed(2) : 'N/A',
       budgetStatus
     ]);
   });
@@ -171,20 +267,84 @@ export const exportToExcel = (expenses, familyMembers, budgets, categoryBudgets,
 
   XLSX.utils.book_append_sheet(workbook, categorySheet, 'Categories');
 
-  // ============= SHEET 4: BUDGET COMPARISON ===============
-  const monthBudget = budgets.find(b => b.year === year && b.month === month);
-  const budgetLimit = monthBudget ? monthBudget.limit : null;
+  // ============= SHEET 4: MONTHLY BREAKDOWN (for date ranges) ===============
+  if (options.startYear !== options.endYear || options.startMonth !== options.endMonth) {
+    const monthlyData = [
+      ['Monthly Breakdown'],
+      [dateLabel],
+      [],
+      ['Month', 'Expense Count', 'Planned Amount', 'Paid Amount', 'Variance']
+    ];
+
+    // Group by month
+    const monthlyBreakdown = {};
+    filteredExpenses.forEach(exp => {
+      const key = `${exp.year}-${String(exp.month).padStart(2, '0')}`;
+      if (!monthlyBreakdown[key]) {
+        monthlyBreakdown[key] = { year: exp.year, month: exp.month, planned: 0, paid: 0, count: 0 };
+      }
+      monthlyBreakdown[key].planned += exp.plannedAmount || 0;
+      monthlyBreakdown[key].paid += exp.paidAmount || 0;
+      monthlyBreakdown[key].count += 1;
+    });
+
+    Object.keys(monthlyBreakdown).sort().forEach(key => {
+      const data = monthlyBreakdown[key];
+      const monthLabel = new Date(data.year, data.month - 1).toLocaleDateString('en-US', {
+        month: 'long',
+        year: 'numeric'
+      });
+      monthlyData.push([
+        monthLabel,
+        data.count,
+        data.planned,
+        data.paid,
+        data.paid - data.planned
+      ]);
+    });
+
+    monthlyData.push([]);
+    monthlyData.push(['TOTAL', filteredExpenses.length, totalPlanned, totalPaid, totalVariance]);
+
+    const monthlySheet = XLSX.utils.aoa_to_sheet(monthlyData);
+    monthlySheet['!cols'] = [
+      { wch: 20 }, // Month
+      { wch: 15 }, // Count
+      { wch: 18 }, // Planned
+      { wch: 18 }, // Paid
+      { wch: 15 }  // Variance
+    ];
+
+    XLSX.utils.book_append_sheet(workbook, monthlySheet, 'Monthly');
+  }
+
+  // ============= SHEET 5: BUDGET COMPARISON ===============
+  const getTotalBudget = () => {
+    if (!budgets || budgets.length === 0) return null;
+
+    const relevantBudgets = budgets.filter(b => {
+      const budgetDate = new Date(b.year, b.month - 1);
+      const startDate = new Date(options.startYear, options.startMonth - 1);
+      const endDate = new Date(options.endYear, options.endMonth - 1);
+      return budgetDate >= startDate && budgetDate <= endDate;
+    });
+
+    if (relevantBudgets.length === 0) return null;
+    return relevantBudgets.reduce((sum, b) => sum + b.limit, 0);
+  };
+
+  const budgetLimit = getTotalBudget();
 
   const budgetData = [
     ['Budget Comparison'],
-    [`${new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`],
+    [dateLabel],
     [],
     ['Metric', 'Amount'],
-    ['Total Budget', budgetLimit || 'Not Set'],
-    ['Total Planned', totalPlanned],
-    ['Total Paid', totalPaid],
-    ['Budget Variance', budgetLimit ? totalPaid - budgetLimit : 'N/A'],
-    ['Plan Variance', totalVariance],
+    ['Total Budget', budgetLimit ? budgetLimit.toFixed(2) : 'Not Set'],
+    ['Total Planned', totalPlanned.toFixed(2)],
+    ['Total Paid', totalPaid.toFixed(2)],
+    ['Budget Variance', budgetLimit ? (totalPaid - budgetLimit).toFixed(2) : 'N/A'],
+    ['Plan Variance', totalVariance.toFixed(2)],
     [],
     ['Budget Utilization', budgetLimit ? `${((totalPaid / budgetLimit) * 100).toFixed(1)}%` : 'N/A'],
     ['Planned vs Budget', budgetLimit ? `${((totalPlanned / budgetLimit) * 100).toFixed(1)}%` : 'N/A'],
@@ -204,6 +364,5 @@ export const exportToExcel = (expenses, familyMembers, budgets, categoryBudgets,
   XLSX.utils.book_append_sheet(workbook, budgetSheet, 'Budget');
 
   // Write file
-  const monthName = new Date(year, month - 1).toLocaleDateString('en-US', { month: 'long' });
-  XLSX.writeFile(workbook, `family-expenses-${monthName}-${year}.xlsx`);
+  XLSX.writeFile(workbook, getFilename(options));
 };
