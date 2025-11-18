@@ -53,4 +53,20 @@
   .chart-title {
     font-size: 0.9375rem;
   }
+
+  .chart-wrapper {
+    max-width: 100%;
+    padding: 0.25rem 0;
+  }
+}
+
+@media (max-width: 375px) {
+  .pie-chart-container {
+    padding: 0.5rem;
+  }
+
+  .chart-title {
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+  }
 }
