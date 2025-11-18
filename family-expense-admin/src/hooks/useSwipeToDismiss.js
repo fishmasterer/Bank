@@ -6,9 +6,10 @@ import { useState, useRef, useCallback } from 'react';
  */
 const useSwipeToDismiss = (onDismiss, options = {}) => {
   const {
-    threshold = 100,        // Distance to trigger dismiss
-    velocityThreshold = 0.5, // Velocity to trigger dismiss
-    resistance = 0.4        // Resistance factor for overscroll
+    threshold = 200,        // Distance to trigger dismiss (high for low sensitivity)
+    velocityThreshold = 1.0, // Velocity to trigger dismiss (high for low sensitivity)
+    resistance = 0.35,       // Resistance factor for overscroll (lower = harder to pull)
+    minDragDistance = 30     // Minimum drag before considering dismiss
   } = options;
 
   const [translateY, setTranslateY] = useState(0);
@@ -29,6 +30,11 @@ const useSwipeToDismiss = (onDismiss, options = {}) => {
     // Check if we're at the top of the scroll container
     const scrollTop = modalContent.scrollTop || 0;
     if (scrollTop > 5) return; // Don't start drag if scrolled down
+
+    // Only start drag if touching the top 80px of modal (drag handle area)
+    const modalRect = modalContent.getBoundingClientRect();
+    const touchY = touch.clientY - modalRect.top;
+    if (touchY > 80) return; // Don't start drag if not in handle area
 
     startY.current = touch.clientY;
     startTime.current = Date.now();
@@ -69,7 +75,12 @@ const useSwipeToDismiss = (onDismiss, options = {}) => {
     setIsDragging(false);
 
     // Check if should dismiss
-    if (deltaY > threshold || velocity > velocityThreshold) {
+    // Must drag at least minDragDistance to prevent accidental dismisses
+    // Then check either distance threshold or velocity threshold
+    const shouldDismiss = deltaY >= minDragDistance &&
+      (deltaY > threshold || velocity > velocityThreshold);
+
+    if (shouldDismiss) {
       // Animate out
       setTranslateY(window.innerHeight);
       setTimeout(() => {
@@ -80,7 +91,7 @@ const useSwipeToDismiss = (onDismiss, options = {}) => {
       // Snap back
       setTranslateY(0);
     }
-  }, [isDragging, threshold, velocityThreshold, onDismiss]);
+  }, [isDragging, threshold, velocityThreshold, minDragDistance, onDismiss]);
 
   const handleTouchCancel = useCallback(() => {
     setIsDragging(false);
