@@ -322,6 +322,13 @@
   box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
 }
 
+/* Long press visual feedback */
+.expense-item.pressed {
+  transform: scale(0.98);
+  background-color: var(--bg-hover);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
 /* Selected indicator */
 .expense-item.selected::before {
   content: '';
