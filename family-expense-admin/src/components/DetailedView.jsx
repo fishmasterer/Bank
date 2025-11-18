@@ -9,7 +9,7 @@ import MultiSelect from './MultiSelect';
 import FilterPresets from './FilterPresets';
 import BulkActionsBar from './BulkActionsBar';
 import BulkEditModal from './BulkEditModal';
-import { getCategoryGradientStyle } from '../utils/categoryColors';
+import { getCategoryGradientStyle, getCategoryIcon } from '../utils/categoryColors';
 import './DetailedView.css';
 
 const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense }) => {
@@ -352,6 +352,7 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
                         className="category-badge"
                         style={{ background: getCategoryGradientStyle(category) }}
                       >
+                        <span className="category-icon">{getCategoryIcon(category)}</span>
                         {category}
                       </span>
                     </div>
