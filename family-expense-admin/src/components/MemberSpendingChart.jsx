@@ -2,6 +2,7 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { useExpenses } from '../context/ExpenseContext';
+import { useTheme } from '../contexts/ThemeContext';
 import ChartDrillDown from './ChartDrillDown';
 import { SkeletonChart } from './SkeletonLoader';
 import { getThemeColors, hexToRgba } from '../utils/themeColors';
@@ -11,6 +12,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const MemberSpendingChart = ({ selectedYear, selectedMonth, loading = false }) => {
   const { familyMembers, getMonthlyTotal, getExpensesByMonth } = useExpenses();
+  const { colorTheme } = useTheme();
   const [drillDown, setDrillDown] = useState({ isOpen: false, member: null, expenses: [] });
 
   // Default colors for members without assigned color
@@ -48,7 +50,7 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth, loading = false }) =
         spacing: 2,
       }]
     };
-  }, [memberSpendingData]);
+  }, [memberSpendingData, colorTheme]);
 
   const handleChartClick = useCallback((event, elements) => {
     if (elements.length > 0) {
@@ -155,7 +157,7 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth, loading = false }) =
     hover: {
       animationDuration: 400
     }
-  }), [handleChartClick]);
+  }), [handleChartClick, colorTheme]);
 
   if (loading) {
     return <SkeletonChart height="350px" />;

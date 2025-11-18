@@ -19,6 +19,11 @@ export default function ThemePicker() {
       primary: '#4A7BA7',
       secondary: '#5E93C2',
       tertiary: '#8AB8E3'
+    },
+    [THEMES.OBSIDIAN]: {
+      primary: '#06B6D4',
+      secondary: '#0891B2',
+      tertiary: '#22D3EE'
     }
   };
 

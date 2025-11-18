@@ -10,6 +10,7 @@ import {
   Legend
 } from 'chart.js';
 import { useExpenses } from '../context/ExpenseContext';
+import { useTheme } from '../contexts/ThemeContext';
 import ChartDrillDown from './ChartDrillDown';
 import { SkeletonChart } from './SkeletonLoader';
 import { getThemeColors, hexToRgba } from '../utils/themeColors';
@@ -26,6 +27,7 @@ ChartJS.register(
 
 const CategoryBarChart = ({ selectedYear, selectedMonth, loading = false }) => {
   const { getCategoryBreakdown } = useExpenses();
+  const { colorTheme } = useTheme();
   const [drillDown, setDrillDown] = useState({ isOpen: false, category: null, expenses: [] });
 
   const breakdown = useMemo(() => {
@@ -67,7 +69,7 @@ const CategoryBarChart = ({ selectedYear, selectedMonth, loading = false }) => {
         }
       ]
     };
-  }, [breakdown]);
+  }, [breakdown, colorTheme]);
 
   const handleChartClick = useCallback((event, elements) => {
     if (elements.length > 0) {
@@ -191,7 +193,7 @@ const CategoryBarChart = ({ selectedYear, selectedMonth, loading = false }) => {
     hover: {
       animationDuration: 400
     }
-  }), [handleChartClick]);
+  }), [handleChartClick, colorTheme]);
 
   if (loading) {
     return <SkeletonChart height="350px" />;

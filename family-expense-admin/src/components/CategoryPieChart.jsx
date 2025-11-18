@@ -7,6 +7,7 @@ import {
   Legend
 } from 'chart.js';
 import { useExpenses } from '../context/ExpenseContext';
+import { useTheme } from '../contexts/ThemeContext';
 import { SkeletonChart } from './SkeletonLoader';
 import { getThemeColors, hexToRgba, getChartColorPalette } from '../utils/themeColors';
 import './CategoryPieChart.css';
@@ -16,6 +17,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const CategoryPieChart = ({ selectedYear, selectedMonth, loading = false }) => {
   const { getCategoryBreakdown } = useExpenses();
+  const { colorTheme } = useTheme();
 
   const breakdown = getCategoryBreakdown(selectedYear, selectedMonth);
   const categories = Object.keys(breakdown);
