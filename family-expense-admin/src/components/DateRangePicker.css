@@ -69,8 +69,10 @@
 .date-range-close {
   background: rgba(255, 255, 255, 0.2);
   border: none;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: 50%;
   font-size: 24px;
   cursor: pointer;

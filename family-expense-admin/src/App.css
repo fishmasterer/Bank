@@ -210,8 +210,8 @@
 /* Floating Action Button (FAB) */
 .fab {
   position: fixed;
-  bottom: 80px; /* Above bottom nav on mobile */
-  right: 1rem;
+  bottom: calc(80px + env(safe-area-inset-bottom)); /* Above bottom nav + safe area */
+  right: max(1rem, env(safe-area-inset-right));
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -631,8 +631,8 @@
   }
 
   .btn-nav {
-    min-width: 40px;
-    min-height: 40px;
+    min-width: 44px;
+    min-height: 44px;
     padding: 0.5rem;
     font-size: 1rem;
   }
@@ -645,8 +645,42 @@
     width: 52px;
     height: 52px;
     font-size: 1.5rem;
-    bottom: 75px;
-    right: 0.75rem;
+    bottom: calc(75px + env(safe-area-inset-bottom));
+    right: max(0.75rem, env(safe-area-inset-right));
+  }
+}
+
+/* Very small screens (iPhone SE, small Android) */
+@media (max-width: 375px) {
+  .app-header h1 {
+    font-size: 1.125rem;
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
+  }
+
+  .month-selector {
+    gap: 0.5rem;
+  }
+
+  .current-month {
+    font-size: 0.85rem;
+  }
+
+  .btn-nav {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 0.9rem;
+  }
+
+  .bottom-nav-item {
+    font-size: 0.6875rem;
+    min-height: 52px;
+  }
+
+  .bottom-nav-item .icon {
+    font-size: 1.25rem;
   }
 }
 

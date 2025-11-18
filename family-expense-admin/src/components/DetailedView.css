@@ -47,7 +47,7 @@
 
 .clear-search {
   position: absolute;
-  right: 0.5rem;
+  right: 0.25rem;
   top: 50%;
   transform: translateY(-50%);
   background: none;
@@ -55,9 +55,15 @@
   font-size: 1.5rem;
   color: var(--text-tertiary);
   cursor: pointer;
-  padding: 0.25rem;
+  padding: 0.5rem;
+  min-width: 40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
   transition: color 0.15s ease;
+  border-radius: 50%;
 }
 
 .clear-search:hover {
@@ -339,7 +345,7 @@
 }
 
 .expense-type {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   color: var(--text-secondary);
 }
 
@@ -394,7 +400,7 @@
 }
 
 .attachments-label {
-  font-size: 0.813rem;
+  font-size: 0.875rem;
   color: var(--text-secondary);
   font-weight: 500;
 }
@@ -565,7 +571,19 @@
   }
 
   .expense-type {
-    font-size: 0.8rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 375px) {
+  .search-input,
+  .filter-select {
+    font-size: 1rem; /* Prevent iOS zoom */
+  }
+
+  .expense-name {
+    font-size: 0.9375rem;
   }
 }
 
@@ -631,7 +649,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
 }
 
 .budget-label-small {
