@@ -1,0 +1,266 @@
+/* Drawer Overlay */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  animation: fadeIn 0.3s ease-out;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Drawer Content */
+.drawer-content {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: min(300px, 85vw);
+  background-color: var(--bg-primary);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  animation: slideInLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Drawer Header */
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(135deg, var(--color-primary-60) 0%, var(--color-primary-hover) 100%);
+  color: white;
+}
+
+.drawer-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.drawer-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.drawer-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.drawer-close:active {
+  transform: scale(0.95);
+}
+
+/* Drawer Navigation */
+.drawer-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.drawer-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.drawer-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--primary-color);
+  transform: scaleY(0);
+  transition: transform 0.2s ease;
+}
+
+.drawer-item:hover {
+  background-color: var(--bg-hover);
+}
+
+.drawer-item:hover::before {
+  transform: scaleY(1);
+}
+
+.drawer-item:active {
+  background-color: var(--bg-tertiary);
+}
+
+.drawer-item-primary {
+  background: linear-gradient(135deg, var(--color-primary-60) 0%, var(--color-primary-hover) 100%);
+  color: white;
+  margin: 0 0.75rem 0.5rem;
+  border-radius: 8px;
+  width: calc(100% - 1.5rem);
+}
+
+.drawer-item-primary:hover {
+  background: linear-gradient(135deg, var(--color-primary-hover) 0%, var(--primary-color) 100%);
+  transform: translateX(4px);
+}
+
+.drawer-item-primary::before {
+  display: none;
+}
+
+.drawer-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.drawer-item-primary .drawer-item-icon {
+  font-size: 1.5rem;
+  font-weight: 300;
+}
+
+.drawer-item-text {
+  flex: 1;
+}
+
+/* Drawer Divider */
+.drawer-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0.75rem 1rem;
+}
+
+/* Drawer Footer */
+.drawer-footer {
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.drawer-footer p {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* Hamburger Button Styles */
+.hamburger-btn {
+  display: none; /* Hidden on desktop */
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.hamburger-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.hamburger-btn:active {
+  transform: scale(0.95);
+}
+
+.hamburger-icon {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 20px;
+}
+
+.hamburger-icon span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: currentColor;
+  border-radius: 1px;
+  transition: all 0.3s ease;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .hamburger-btn {
+    display: flex;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .drawer-overlay {
+    animation: none;
+  }
+
+  .drawer-content {
+    animation: none;
+  }
+
+  .drawer-item::before {
+    transition: none;
+  }
+
+  .drawer-close:hover,
+  .drawer-item-primary:hover {
+    transform: none;
+  }
+}
+
+/* Dark mode adjustments */
+:root[data-theme="dark"] .drawer-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+:root[data-theme="dark"] .drawer-content {
+  box-shadow: 4px 0 32px rgba(0, 0, 0, 0.5);
+}

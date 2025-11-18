@@ -321,7 +321,7 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
         )
       ) : (
         <div className="categories-list stagger-fast">
-          {categories.map((category, index) => {
+          {categories.map((category) => {
             const data = filteredBreakdown[category];
             const isExpanded = expandedCategory === category;
             const budgetStatus = getCategoryBudgetStatus(category, data.paid);
@@ -401,7 +401,7 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
 
                 {isExpanded && (
                   <div className="expenses-list stagger-fast">
-                    {data.expenses.map((expense, expIndex) => (
+                    {data.expenses.map((expense) => (
                       <div key={expense.id} className={`expense-item stagger-item ${selectedExpenseIds.has(expense.id) ? 'selected' : ''}`}>
                         {!readOnly && (
                           <div className="expense-checkbox-wrapper">
@@ -411,6 +411,7 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
                               onChange={() => toggleExpenseSelection(expense.id)}
                               className="expense-checkbox"
                               onClick={(e) => e.stopPropagation()}
+                              aria-label={`Select ${expense.name}`}
                             />
                           </div>
                         )}
@@ -423,7 +424,7 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
                           </div>
                           <div className="expense-amounts">
                             <span className="planned">
-                              Planned: ${(expense.plannedAmount || 0).toFixed(2)}
+                              Plan: ${(expense.plannedAmount || 0).toFixed(2)}
                             </span>
                             <span className="paid">
                               Paid: ${(expense.paidAmount || 0).toFixed(2)}
@@ -431,9 +432,9 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
                           </div>
                         </div>
                         <div className="expense-meta">
-                          <span className="paid-by">Paid by: {getMemberName(expense.paidBy)}</span>
+                          <span className="paid-by">👤 {getMemberName(expense.paidBy)}</span>
                           {expense.notes && (
-                            <span className="notes">Note: {expense.notes}</span>
+                            <span className="notes">💬 {expense.notes}</span>
                           )}
                           {expense.attachments && expense.attachments.length > 0 && (
                             <div className="expense-attachments">
@@ -472,6 +473,7 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
                             <button
                               onClick={() => onEditExpense(expense)}
                               className="btn-edit btn-press"
+                              aria-label={`Edit ${expense.name}`}
                             >
                               Edit
                             </button>
@@ -484,6 +486,7 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
                                 }
                               }}
                               className="btn-delete btn-press"
+                              aria-label={`Delete ${expense.name}`}
                             >
                               Delete
                             </button>
