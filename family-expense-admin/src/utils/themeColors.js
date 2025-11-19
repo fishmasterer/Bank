@@ -67,8 +67,8 @@ export const getThemeColors = () => {
  */
 export const COLOR_PALETTE = [
   '#667eea', // Purple
-  '#10b981', // Green
-  '#f59e0b', // Amber
+  '#10b981', // Emerald
+  '#14b8a6', // Teal
   '#ef4444', // Red
   '#3b82f6', // Blue
   '#8b5cf6', // Violet
