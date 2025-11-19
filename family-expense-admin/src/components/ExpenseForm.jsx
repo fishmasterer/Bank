@@ -164,7 +164,8 @@ const ExpenseForm = ({
   };
 
   // Handle extracted data from receipt scanner
-  const handleReceiptExtract = (extracted) => {
+  const handleReceiptExtract = async (extracted) => {
+    // Update form with extracted data
     setFormData(prev => ({
       ...prev,
       name: extracted.name || prev.name,
@@ -179,6 +180,30 @@ const ExpenseForm = ({
         month: extracted.date.getMonth() + 1
       })
     }));
+
+    // If receipt image is included (for $1000+ expenses), add as pending attachment
+    if (extracted.receiptImage && extracted.receiptImage.blob) {
+      const receiptFile = new File(
+        [extracted.receiptImage.blob],
+        `receipt-${Date.now()}.jpg`,
+        { type: 'image/jpeg' }
+      );
+
+      // Create a temporary attachment entry
+      // The ImageUpload component will handle the actual upload
+      const tempAttachment = {
+        file: receiptFile,
+        name: receiptFile.name,
+        type: receiptFile.type,
+        url: extracted.receiptImage.preview,
+        pending: true // Mark as pending upload
+      };
+
+      setFormData(prev => ({
+        ...prev,
+        attachments: [...(prev.attachments || []), tempAttachment]
+      }));
+    }
   };
 
   return (

@@ -7,9 +7,9 @@ import './ReceiptScanner.css';
  *
  * Performance considerations:
  * - Tesseract.js (~2MB) is loaded only when scanning starts
+ * - Images are compressed before processing
  * - Uses web worker to avoid blocking UI
- * - Shows progress during processing
- * - Allows cancellation
+ * - Receipt image only saved for expenses >= $1000
  */
 const ReceiptScanner = ({ onExtract, onClose }) => {
   const [image, setImage] = useState(null);
@@ -19,12 +19,46 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
   const [progressStatus, setProgressStatus] = useState('');
   const [error, setError] = useState(null);
   const [extractedData, setExtractedData] = useState(null);
+  const [step, setStep] = useState(1); // 1: Upload, 2: Processing, 3: Review
 
   const fileInputRef = useRef(null);
   const workerRef = useRef(null);
 
+  // Compress image for faster OCR processing
+  const compressImage = (file, maxWidth = 1500) => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+
+      img.onload = () => {
+        let { width, height } = img;
+
+        // Scale down if larger than maxWidth
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            resolve(blob);
+          },
+          'image/jpeg',
+          0.85
+        );
+      };
+
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   // Handle image selection
-  const handleImageSelect = (e) => {
+  const handleImageSelect = async (e) => {
     const file = e.target.files[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
@@ -32,16 +66,24 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
         return;
       }
 
-      // Check file size (max 10MB)
       if (file.size > 10 * 1024 * 1024) {
         setError('Image is too large (max 10MB)');
         return;
       }
 
-      setImage(file);
-      setImagePreview(URL.createObjectURL(file));
       setError(null);
       setExtractedData(null);
+
+      // Compress if large
+      let processedImage = file;
+      if (file.size > 500 * 1024) {
+        setProgressStatus('Optimizing image...');
+        processedImage = await compressImage(file);
+      }
+
+      setImage(processedImage);
+      setImagePreview(URL.createObjectURL(processedImage));
+      setStep(2);
     }
   };
 
@@ -57,8 +99,9 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
     ];
 
     let amount = null;
+    const reversedLines = [...lines].reverse();
     for (const pattern of amountPatterns) {
-      for (const line of lines.reverse()) { // Check from bottom up for total
+      for (const line of reversedLines) {
         const match = line.match(pattern);
         if (match) {
           amount = parseFloat(match[1].replace(',', '.'));
@@ -67,48 +110,43 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
       }
       if (amount) break;
     }
-    lines.reverse(); // Restore order
 
-    // Extract merchant name - usually first non-empty line
+    // Extract merchant name
     let merchantName = '';
     for (const line of lines) {
-      // Skip lines that look like addresses, dates, or amounts
       if (line.length > 3 &&
           !line.match(/^\d{1,2}[\/\-]\d{1,2}/) &&
           !line.match(/^\$/) &&
           !line.match(/^\d+\s*(st|nd|rd|th|ave|street|road|blvd)/i)) {
-        merchantName = line.substring(0, 50); // Limit length
+        merchantName = line.substring(0, 50);
         break;
       }
     }
 
     // Extract date
+    let date = null;
     const datePatterns = [
       /(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/,
       /(\w{3,9})\s+(\d{1,2}),?\s*(\d{4})/i,
     ];
 
-    let date = null;
     for (const line of lines) {
       for (const pattern of datePatterns) {
         const match = line.match(pattern);
         if (match) {
           try {
-            const dateStr = match[0];
-            const parsed = new Date(dateStr);
+            const parsed = new Date(match[0]);
             if (!isNaN(parsed.getTime())) {
               date = parsed;
               break;
             }
-          } catch (e) {
-            // Continue trying other patterns
-          }
+          } catch (e) {}
         }
       }
       if (date) break;
     }
 
-    // Guess category based on keywords
+    // Guess category
     let category = '';
     const textLower = text.toLowerCase();
     const categoryKeywords = {
@@ -128,13 +166,7 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
       }
     }
 
-    return {
-      name: merchantName,
-      amount,
-      date,
-      category,
-      rawText: text
-    };
+    return { name: merchantName, amount, date, category };
   };
 
   // Process image with Tesseract OCR
@@ -147,40 +179,36 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
     setError(null);
 
     try {
-      // Dynamically import Tesseract.js to avoid impacting initial bundle
       const { createWorker } = await import('tesseract.js');
 
       setProgressStatus('Initializing...');
+      setProgress(10);
 
-      // Create worker
       const worker = await createWorker('eng', 1, {
         logger: (m) => {
           if (m.status === 'recognizing text') {
-            setProgress(Math.round(m.progress * 100));
-            setProgressStatus('Scanning receipt...');
+            setProgress(10 + Math.round(m.progress * 85));
+            setProgressStatus('Reading text...');
           }
         }
       });
 
       workerRef.current = worker;
 
-      // Recognize text
       const { data: { text } } = await worker.recognize(image);
-
-      // Parse the extracted text
       const extracted = parseReceiptText(text);
       setExtractedData(extracted);
 
-      // Cleanup
       await worker.terminate();
       workerRef.current = null;
 
-      setProgressStatus('Complete!');
       setProgress(100);
+      setProgressStatus('Done!');
+      setStep(3);
 
     } catch (err) {
       console.error('OCR Error:', err);
-      setError('Failed to scan receipt. Please try again or enter manually.');
+      setError('Scan failed. Try a clearer image or enter manually.');
     } finally {
       setIsProcessing(false);
     }
@@ -194,23 +222,47 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
     }
     setIsProcessing(false);
     setProgress(0);
-    setProgressStatus('');
+    setStep(2);
+  };
+
+  // Update extracted field
+  const updateField = (field, value) => {
+    setExtractedData(prev => ({
+      ...prev,
+      [field]: field === 'amount' ? parseFloat(value) || null : value
+    }));
   };
 
   // Use extracted data
   const handleUseData = () => {
     if (extractedData) {
+      const amount = extractedData.amount || 0;
+
+      // Only include image for expenses >= $1000
+      const includeImage = amount >= 1000;
+
       onExtract({
         name: extractedData.name || '',
-        amount: extractedData.amount || '',
+        amount: amount,
         category: extractedData.category || '',
-        date: extractedData.date || null
+        date: extractedData.date || null,
+        // Pass image data if high-value expense
+        receiptImage: includeImage ? {
+          blob: image,
+          preview: imagePreview
+        } : null
       });
+
+      // Clean up if not saving
+      if (!includeImage && imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+
       onClose();
     }
   };
 
-  // Cleanup preview URL on unmount
+  // Cleanup and close
   const handleClose = useCallback(() => {
     if (imagePreview) {
       URL.revokeObjectURL(imagePreview);
@@ -219,26 +271,45 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
     onClose();
   }, [imagePreview, onClose]);
 
+  // Reset to upload
+  const resetToUpload = () => {
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+    setImage(null);
+    setImagePreview(null);
+    setExtractedData(null);
+    setError(null);
+    setProgress(0);
+    setStep(1);
+  };
+
   return (
     <div className="receipt-scanner-overlay">
       <div className="receipt-scanner-modal">
         <div className="receipt-scanner-header">
           <h3>Scan Receipt</h3>
+          <div className="step-indicator">
+            <span className={`step ${step >= 1 ? 'active' : ''}`}>1. Upload</span>
+            <span className={`step ${step >= 2 ? 'active' : ''}`}>2. Scan</span>
+            <span className={`step ${step >= 3 ? 'active' : ''}`}>3. Review</span>
+          </div>
           <button onClick={handleClose} className="close-btn" aria-label="Close">
             &times;
           </button>
         </div>
 
         <div className="receipt-scanner-content">
-          {!imagePreview ? (
+          {/* Step 1: Upload */}
+          {step === 1 && (
             <div className="upload-section">
               <div
                 className="upload-zone"
                 onClick={() => fileInputRef.current?.click()}
               >
                 <span className="upload-icon">📸</span>
-                <p>Take a photo or upload receipt image</p>
-                <p className="upload-hint">Supports JPG, PNG, HEIC (max 10MB)</p>
+                <p className="upload-title">Upload Receipt</p>
+                <p className="upload-hint">Take photo or choose file</p>
               </div>
               <input
                 ref={fileInputRef}
@@ -249,103 +320,94 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
                 style={{ display: 'none' }}
               />
             </div>
-          ) : (
+          )}
+
+          {/* Step 2: Preview & Scan */}
+          {step === 2 && imagePreview && (
             <div className="preview-section">
               <div className="image-preview">
-                <img src={imagePreview} alt="Receipt preview" />
+                <img src={imagePreview} alt="Receipt" />
+                {isProcessing && (
+                  <div className="processing-overlay">
+                    <div className="progress-container">
+                      <div className="progress-bar">
+                        <div className="progress-fill" style={{ width: `${progress}%` }} />
+                      </div>
+                      <p className="progress-status">{progressStatus}</p>
+                      <button onClick={cancelProcessing} className="cancel-btn">
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-
-              {isProcessing && (
-                <div className="processing-overlay">
-                  <div className="progress-container">
-                    <div className="progress-bar">
-                      <div
-                        className="progress-fill"
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
-                    <p className="progress-status">{progressStatus} {progress}%</p>
-                    <button
-                      onClick={cancelProcessing}
-                      className="cancel-btn"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {extractedData && !isProcessing && (
-                <div className="extracted-data">
-                  <h4>Extracted Data</h4>
-                  <div className="data-field">
-                    <label>Merchant:</label>
-                    <span>{extractedData.name || 'Not detected'}</span>
-                  </div>
-                  <div className="data-field">
-                    <label>Amount:</label>
-                    <span>{extractedData.amount ? `$${extractedData.amount.toFixed(2)}` : 'Not detected'}</span>
-                  </div>
-                  <div className="data-field">
-                    <label>Category:</label>
-                    <span>{extractedData.category || 'Not detected'}</span>
-                  </div>
-                  {extractedData.date && (
-                    <div className="data-field">
-                      <label>Date:</label>
-                      <span>{extractedData.date.toLocaleDateString()}</span>
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           )}
 
-          {error && (
-            <div className="error-message">
-              {error}
+          {/* Step 3: Review & Edit */}
+          {step === 3 && extractedData && (
+            <div className="review-section">
+              <div className="extracted-data">
+                <div className="data-field editable">
+                  <label>Name</label>
+                  <input
+                    type="text"
+                    value={extractedData.name || ''}
+                    onChange={(e) => updateField('name', e.target.value)}
+                    placeholder="Merchant name"
+                  />
+                </div>
+                <div className="data-field editable">
+                  <label>Amount ($)</label>
+                  <input
+                    type="number"
+                    value={extractedData.amount || ''}
+                    onChange={(e) => updateField('amount', e.target.value)}
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                  />
+                </div>
+                <div className="data-field editable">
+                  <label>Category</label>
+                  <input
+                    type="text"
+                    value={extractedData.category || ''}
+                    onChange={(e) => updateField('category', e.target.value)}
+                    placeholder="e.g., Food & Dining"
+                  />
+                </div>
+                {extractedData.amount >= 1000 && (
+                  <div className="receipt-note">
+                    Receipt will be saved (expense is $1,000+)
+                  </div>
+                )}
+              </div>
             </div>
           )}
+
+          {error && <div className="error-message">{error}</div>}
         </div>
 
         <div className="receipt-scanner-actions">
-          {imagePreview && !extractedData && !isProcessing && (
+          {step === 2 && !isProcessing && (
             <>
-              <button
-                onClick={() => {
-                  URL.revokeObjectURL(imagePreview);
-                  setImagePreview(null);
-                  setImage(null);
-                }}
-                className="btn-secondary"
-              >
-                Choose Different
+              <button onClick={resetToUpload} className="btn-secondary">
+                Change Image
               </button>
-              <button
-                onClick={processImage}
-                className="btn-primary"
-              >
-                Scan Receipt
+              <button onClick={processImage} className="btn-primary">
+                Scan Now
               </button>
             </>
           )}
 
-          {extractedData && !isProcessing && (
+          {step === 3 && (
             <>
-              <button
-                onClick={() => {
-                  setExtractedData(null);
-                  setProgress(0);
-                }}
-                className="btn-secondary"
-              >
-                Scan Again
+              <button onClick={resetToUpload} className="btn-secondary">
+                Start Over
               </button>
-              <button
-                onClick={handleUseData}
-                className="btn-primary"
-              >
-                Use This Data
+              <button onClick={handleUseData} className="btn-primary">
+                Use Data
               </button>
             </>
           )}
