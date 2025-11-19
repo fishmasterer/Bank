@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './QuickActionsMenu.css';
 
 const QuickActionsMenu = ({
@@ -12,8 +12,40 @@ const QuickActionsMenu = ({
   readOnly = false
 }) => {
   const menuRef = useRef(null);
+  const [adjustedPosition, setAdjustedPosition] = useState(position);
 
-  // Close on click outside
+  // Adjust position after menu renders to keep it on screen
+  useEffect(() => {
+    if (!isOpen || !menuRef.current) return;
+
+    const menuRect = menuRef.current.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const padding = 16;
+
+    let newX = position.x;
+    let newY = position.y;
+
+    // Adjust horizontal position
+    if (newX + menuRect.width > viewportWidth - padding) {
+      newX = viewportWidth - menuRect.width - padding;
+    }
+    if (newX < padding) {
+      newX = padding;
+    }
+
+    // Adjust vertical position
+    if (newY + menuRect.height > viewportHeight - padding) {
+      newY = viewportHeight - menuRect.height - padding;
+    }
+    if (newY < padding) {
+      newY = padding;
+    }
+
+    setAdjustedPosition({ x: newX, y: newY });
+  }, [isOpen, position]);
+
+  // Close on click outside - use longer delay to prevent closing on touch release
   useEffect(() => {
     if (!isOpen) return;
 
@@ -29,17 +61,17 @@ const QuickActionsMenu = ({
       }
     };
 
-    // Small delay to prevent immediate close
+    // Longer delay to ensure touch events have fully completed
     const timeout = setTimeout(() => {
-      document.addEventListener('click', handleClickOutside);
-      document.addEventListener('touchstart', handleClickOutside);
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchend', handleClickOutside);
       document.addEventListener('keydown', handleEscape);
-    }, 100);
+    }, 300);
 
     return () => {
       clearTimeout(timeout);
-      document.removeEventListener('click', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchend', handleClickOutside);
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, onClose]);
@@ -64,24 +96,16 @@ const QuickActionsMenu = ({
     setTimeout(() => action(expense), 150);
   };
 
-  // Adjust position to stay on screen
-  const adjustedPosition = { ...position };
-  if (menuRef.current) {
-    const menuRect = menuRef.current.getBoundingClientRect();
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
-    if (adjustedPosition.x + menuRect.width > viewportWidth - 16) {
-      adjustedPosition.x = viewportWidth - menuRect.width - 16;
-    }
-    if (adjustedPosition.y + menuRect.height > viewportHeight - 16) {
-      adjustedPosition.y = viewportHeight - menuRect.height - 16;
-    }
-  }
-
   return (
     <>
-      <div className="quick-actions-backdrop" onClick={onClose} />
+      <div
+        className="quick-actions-backdrop"
+        onClick={onClose}
+        onTouchEnd={(e) => {
+          e.preventDefault();
+          onClose();
+        }}
+      />
       <div
         ref={menuRef}
         className="quick-actions-menu"
@@ -92,7 +116,7 @@ const QuickActionsMenu = ({
       >
         <div className="quick-actions-header">
           <span className="quick-actions-amount">
-            ${expense?.amount?.toFixed(2)}
+            ${(expense?.paidAmount || expense?.plannedAmount || 0).toFixed(2)}
           </span>
           <span className="quick-actions-category">
             {expense?.category}
