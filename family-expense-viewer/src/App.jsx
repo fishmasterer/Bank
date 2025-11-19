@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { CurrencyProvider } from './contexts/CurrencyContext';
 import { useAuthorization } from './hooks/useAuthorization';
 import SummaryView from './components/SummaryView';
 import DetailedView from './components/DetailedView';
@@ -255,9 +256,11 @@ function App({ readOnly = false }) {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <ExpenseProvider readOnly={readOnly}>
-          <AppContent />
-        </ExpenseProvider>
+        <CurrencyProvider>
+          <ExpenseProvider readOnly={readOnly}>
+            <AppContent />
+          </ExpenseProvider>
+        </CurrencyProvider>
       </ThemeProvider>
     </AuthProvider>
   );

@@ -149,6 +149,57 @@
   color: white;
 }
 
+/* Selectors Container */
+.quick-add-selectors {
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.quick-add-member-row {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Currency Selector */
+.quick-add-currency-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.currency-chips {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.currency-chip {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  font-size: var(--display-font-xs, var(--font-xs));
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.currency-chip:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.currency-chip.selected {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
 /* Presets Grid */
 .quick-add-presets {
   display: grid;

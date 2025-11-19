@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useExpenses } from '../context/ExpenseContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import './QuickAddWidget.css';
 
 const QUICK_ADD_PRESETS = [
@@ -14,9 +15,11 @@ const QUICK_ADD_PRESETS = [
 
 const QuickAddWidget = ({ selectedYear, selectedMonth, onSuccess, onError }) => {
   const { addExpense, familyMembers, readOnly } = useExpenses();
+  const { currencies } = useCurrency();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState(null);
   const [selectedMember, setSelectedMember] = useState(null);
+  const [selectedCurrency, setSelectedCurrency] = useState('SGD');
   const [customAmount, setCustomAmount] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const menuRef = useRef(null);
@@ -89,12 +92,14 @@ const QuickAddWidget = ({ selectedYear, selectedMonth, onSuccess, onError }) => 
 
     try {
       const amount = parseFloat(customAmount) || selectedPreset.amount;
+      const currencySymbol = currencies[selectedCurrency]?.symbol || '$';
       const expense = {
         name: selectedPreset.name,
         category: selectedPreset.category,
         plannedAmount: amount,
         paidAmount: amount,
         paidBy: selectedMember || familyMembers[0]?.id || 1,
+        currency: selectedCurrency,
         year: selectedYear,
         month: selectedMonth,
         isRecurring: false,
@@ -103,7 +108,7 @@ const QuickAddWidget = ({ selectedYear, selectedMonth, onSuccess, onError }) => 
 
       await addExpense(expense);
       const memberName = familyMembers.find(m => m.id === selectedMember)?.name || 'Unknown';
-      onSuccess?.(`Added ${selectedPreset.name} ($${amount.toFixed(2)}) for ${memberName}`);
+      onSuccess?.(`Added ${selectedPreset.name} (${currencySymbol}${amount.toFixed(2)}) for ${memberName}`);
       handleClose();
     } catch (error) {
       onError?.(`Failed to add ${selectedPreset.name}`);
@@ -146,19 +151,35 @@ const QuickAddWidget = ({ selectedYear, selectedMonth, onSuccess, onError }) => 
               </button>
             </div>
 
-            {/* Member Selector */}
-            <div className="quick-add-member-row">
-              <span className="member-label">For:</span>
-              <div className="member-chips">
-                {familyMembers.map((member) => (
-                  <button
-                    key={member.id}
-                    className={`member-chip ${selectedMember === member.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedMember(member.id)}
-                  >
-                    {member.name}
-                  </button>
-                ))}
+            {/* Member & Currency Selector */}
+            <div className="quick-add-selectors">
+              <div className="quick-add-member-row">
+                <span className="member-label">For:</span>
+                <div className="member-chips">
+                  {familyMembers.map((member) => (
+                    <button
+                      key={member.id}
+                      className={`member-chip ${selectedMember === member.id ? 'selected' : ''}`}
+                      onClick={() => setSelectedMember(member.id)}
+                    >
+                      {member.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="quick-add-currency-row">
+                <span className="member-label">Currency:</span>
+                <div className="currency-chips">
+                  {Object.values(currencies).map((curr) => (
+                    <button
+                      key={curr.code}
+                      className={`currency-chip ${selectedCurrency === curr.code ? 'selected' : ''}`}
+                      onClick={() => setSelectedCurrency(curr.code)}
+                    >
+                      {curr.flag} {curr.code}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -186,7 +207,7 @@ const QuickAddWidget = ({ selectedYear, selectedMonth, onSuccess, onError }) => 
                   <span className="amount-preset-name">{selectedPreset.icon} {selectedPreset.name}</span>
                 </div>
                 <div className="amount-input-wrapper">
-                  <span className="amount-prefix">$</span>
+                  <span className="amount-prefix">{currencies[selectedCurrency]?.symbol || '$'}</span>
                   <input
                     ref={inputRef}
                     type="number"

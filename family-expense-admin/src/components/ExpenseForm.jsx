@@ -1,6 +1,7 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
 import { useNotifications } from '../context/NotificationContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { db, storage } from '../config/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, deleteObject } from 'firebase/storage';
@@ -23,6 +24,7 @@ const ExpenseForm = ({
   const { addExpense, updateExpense, familyMembers } = useExpenses();
   const { addExpenseAction } = useNotifications();
   const { categories, loading: categoriesLoading } = useCategories();
+  const { currencies } = useCurrency();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -34,6 +36,7 @@ const ExpenseForm = ({
     plannedAmount: '',
     paidAmount: '',
     paidBy: familyMembers[0]?.id || 1,
+    currency: 'SGD',
     isRecurring: false,
     year: new Date().getFullYear(),
     month: new Date().getMonth() + 1,
@@ -59,6 +62,7 @@ const ExpenseForm = ({
         plannedAmount: editingExpense.plannedAmount || '',
         paidAmount: editingExpense.paidAmount || '',
         paidBy: editingExpense.paidBy || familyMembers[0]?.id || 1,
+        currency: editingExpense.currency || 'SGD',
         isRecurring: editingExpense.isRecurring || false,
         year: editingExpense.year || new Date().getFullYear(),
         month: editingExpense.month || new Date().getMonth() + 1,
@@ -289,9 +293,28 @@ const ExpenseForm = ({
             </div>
           </div>
 
+          <div className="form-group">
+            <label>Currency</label>
+            <div className="currency-toggle">
+              {Object.values(currencies).map(curr => (
+                <button
+                  key={curr.code}
+                  type="button"
+                  className={`currency-btn ${formData.currency === curr.code ? 'active' : ''}`}
+                  onClick={() => setFormData(prev => ({ ...prev, currency: curr.code }))}
+                >
+                  <span className="currency-flag">{curr.flag}</span>
+                  <span className="currency-code">{curr.code}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="plannedAmount">Planned Amount ($) *</label>
+              <label htmlFor="plannedAmount">
+                Planned Amount ({currencies[formData.currency]?.symbol || '$'}) *
+              </label>
               <input
                 type="number"
                 id="plannedAmount"
@@ -306,7 +329,9 @@ const ExpenseForm = ({
             </div>
 
             <div className="form-group">
-              <label htmlFor="paidAmount">Paid Amount ($)</label>
+              <label htmlFor="paidAmount">
+                Paid Amount ({currencies[formData.currency]?.symbol || '$'})
+              </label>
               <input
                 type="number"
                 id="paidAmount"

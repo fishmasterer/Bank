@@ -350,6 +350,52 @@
   }
 }
 
+/* Currency Toggle */
+.currency-toggle {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.currency-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.currency-btn:hover {
+  border-color: var(--primary-color);
+  background: var(--bg-hover);
+}
+
+.currency-btn.active {
+  border-color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 15%, var(--bg-primary));
+  color: var(--primary-color);
+}
+
+.currency-flag {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.currency-code {
+  color: var(--text-primary);
+}
+
+.currency-btn.active .currency-code {
+  color: var(--primary-color);
+}
+
 /* Bottom sheet slide-up animation */
 @keyframes slideUpSheet {
   from {
