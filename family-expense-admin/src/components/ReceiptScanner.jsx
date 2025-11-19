@@ -1,5 +1,9 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import './ReceiptScanner.css';
+
+// Cache worker instance between scans (saves ~3s per scan)
+let cachedWorker = null;
+let workerInitPromise = null;
 
 /**
  * Receipt Scanner Component
@@ -7,8 +11,8 @@ import './ReceiptScanner.css';
  *
  * Performance considerations:
  * - Tesseract.js (~2MB) is loaded only when scanning starts
- * - Images are compressed before processing
- * - Uses web worker to avoid blocking UI
+ * - Images are compressed and preprocessed (grayscale + contrast)
+ * - Worker is cached between scans for faster subsequent processing
  * - Receipt image only saved for expenses >= $1000
  */
 const ReceiptScanner = ({ onExtract, onClose }) => {
@@ -22,10 +26,18 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
   const [step, setStep] = useState(1); // 1: Upload, 2: Processing, 3: Review
 
   const fileInputRef = useRef(null);
-  const workerRef = useRef(null);
+  const currentWorkerRef = useRef(null);
 
-  // Compress image for faster OCR processing
-  const compressImage = (file, maxWidth = 1500) => {
+  // Cleanup worker on unmount if not caching
+  useEffect(() => {
+    return () => {
+      // Don't terminate cached worker on unmount
+      currentWorkerRef.current = null;
+    };
+  }, []);
+
+  // Preprocess image: resize, grayscale, and enhance contrast for better OCR
+  const preprocessImage = (file, maxWidth = 1500) => {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
@@ -42,14 +54,42 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
 
         canvas.width = width;
         canvas.height = height;
+
+        // Draw original image
         ctx.drawImage(img, 0, 0, width, height);
+
+        // Get image data for processing
+        const imageData = ctx.getImageData(0, 0, width, height);
+        const data = imageData.data;
+
+        // Convert to grayscale and enhance contrast
+        for (let i = 0; i < data.length; i += 4) {
+          // Grayscale using luminosity method
+          const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+
+          // Enhance contrast (increase difference from midpoint)
+          const contrast = 1.3; // 30% more contrast
+          const adjusted = ((gray - 128) * contrast) + 128;
+          const final = Math.max(0, Math.min(255, adjusted));
+
+          data[i] = final;     // R
+          data[i + 1] = final; // G
+          data[i + 2] = final; // B
+          // Alpha stays the same
+        }
+
+        // Put processed image back
+        ctx.putImageData(imageData, 0, 0);
+
+        // Clean up object URL
+        URL.revokeObjectURL(img.src);
 
         canvas.toBlob(
           (blob) => {
             resolve(blob);
           },
           'image/jpeg',
-          0.85
+          0.9 // Higher quality for better OCR
         );
       };
 
@@ -74,16 +114,14 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
       setError(null);
       setExtractedData(null);
 
-      // Compress if large
-      let processedImage = file;
-      if (file.size > 500 * 1024) {
-        setProgressStatus('Optimizing image...');
-        processedImage = await compressImage(file);
-      }
+      // Always preprocess for better OCR (grayscale + contrast)
+      setProgressStatus('Optimizing image...');
+      const processedImage = await preprocessImage(file);
 
       setImage(processedImage);
       setImagePreview(URL.createObjectURL(processedImage));
       setStep(2);
+      setProgressStatus('');
     }
   };
 
@@ -169,6 +207,41 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
     return { name: merchantName, amount, date, category };
   };
 
+  // Get or create cached worker
+  const getWorker = async (setProgressFn) => {
+    // Return cached worker if available
+    if (cachedWorker) {
+      return cachedWorker;
+    }
+
+    // If already initializing, wait for it
+    if (workerInitPromise) {
+      return workerInitPromise;
+    }
+
+    // Create new worker and cache it
+    workerInitPromise = (async () => {
+      const { createWorker } = await import('tesseract.js');
+
+      setProgressFn('Initializing OCR engine...');
+
+      const worker = await createWorker('eng', 1, {
+        logger: (m) => {
+          if (m.status === 'recognizing text') {
+            setProgress(15 + Math.round(m.progress * 80));
+            setProgressStatus('Reading text...');
+          }
+        }
+      });
+
+      cachedWorker = worker;
+      workerInitPromise = null;
+      return worker;
+    })();
+
+    return workerInitPromise;
+  };
+
   // Process image with Tesseract OCR
   const processImage = async () => {
     if (!image) return;
@@ -179,28 +252,19 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
     setError(null);
 
     try {
-      const { createWorker } = await import('tesseract.js');
+      // Use cached worker for faster subsequent scans
+      const worker = await getWorker(setProgressStatus);
+      currentWorkerRef.current = worker;
 
-      setProgressStatus('Initializing...');
-      setProgress(10);
-
-      const worker = await createWorker('eng', 1, {
-        logger: (m) => {
-          if (m.status === 'recognizing text') {
-            setProgress(10 + Math.round(m.progress * 85));
-            setProgressStatus('Reading text...');
-          }
-        }
-      });
-
-      workerRef.current = worker;
+      setProgress(15);
+      setProgressStatus('Scanning receipt...');
 
       const { data: { text } } = await worker.recognize(image);
       const extracted = parseReceiptText(text);
       setExtractedData(extracted);
 
-      await worker.terminate();
-      workerRef.current = null;
+      // Don't terminate - keep worker cached for next scan
+      currentWorkerRef.current = null;
 
       setProgress(100);
       setProgressStatus('Done!');
@@ -209,6 +273,14 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
     } catch (err) {
       console.error('OCR Error:', err);
       setError('Scan failed. Try a clearer image or enter manually.');
+
+      // Clear cached worker on error
+      if (cachedWorker) {
+        try {
+          await cachedWorker.terminate();
+        } catch (e) {}
+        cachedWorker = null;
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -216,10 +288,8 @@ const ReceiptScanner = ({ onExtract, onClose }) => {
 
   // Cancel processing
   const cancelProcessing = async () => {
-    if (workerRef.current) {
-      await workerRef.current.terminate();
-      workerRef.current = null;
-    }
+    // Just mark as not processing - don't terminate cached worker
+    currentWorkerRef.current = null;
     setIsProcessing(false);
     setProgress(0);
     setStep(2);
