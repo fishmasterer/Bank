@@ -27,14 +27,14 @@ const CategoryBudgetSettings = ({ selectedYear, selectedMonth, onClose, onSucces
         }
       } catch (err) {
         console.error('Error loading category budgets:', err);
-        onError?.('Failed to load category budgets');
+        // Don't show error toast for missing documents - only log it
       } finally {
         setIsLoading(false);
       }
     };
 
     loadBudgets();
-  }, [selectedYear, selectedMonth, onError]);
+  }, [selectedYear, selectedMonth]);
 
   const handleLimitChange = (category, value) => {
     setCategoryLimits(prev => ({
