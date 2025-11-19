@@ -14,6 +14,14 @@ const QUICK_ADD_PRESETS = [
 const QuickAddWidget = ({ selectedYear, selectedMonth, onSuccess, onError }) => {
   const { addExpense, familyMembers, readOnly } = useExpenses();
   const [addingPreset, setAddingPreset] = useState(null);
+  const [selectedMember, setSelectedMember] = useState(null);
+
+  // Set default member when familyMembers load
+  React.useEffect(() => {
+    if (familyMembers.length > 0 && selectedMember === null) {
+      setSelectedMember(familyMembers[0].id);
+    }
+  }, [familyMembers, selectedMember]);
 
   if (readOnly) return null;
 
@@ -21,15 +29,12 @@ const QuickAddWidget = ({ selectedYear, selectedMonth, onSuccess, onError }) => 
     setAddingPreset(preset.name);
 
     try {
-      // Use the first family member as default paidBy
-      const defaultMember = familyMembers[0]?.id || 1;
-
       const expense = {
         name: preset.name,
         category: preset.category,
         plannedAmount: preset.amount,
         paidAmount: preset.amount,
-        paidBy: defaultMember,
+        paidBy: selectedMember || familyMembers[0]?.id || 1,
         year: selectedYear,
         month: selectedMonth,
         isRecurring: false,
@@ -37,7 +42,8 @@ const QuickAddWidget = ({ selectedYear, selectedMonth, onSuccess, onError }) => 
       };
 
       await addExpense(expense);
-      onSuccess?.(`Added ${preset.name} ($${preset.amount})`);
+      const memberName = familyMembers.find(m => m.id === selectedMember)?.name || 'Unknown';
+      onSuccess?.(`Added ${preset.name} ($${preset.amount}) for ${memberName}`);
     } catch (error) {
       onError?.(`Failed to add ${preset.name}`);
     } finally {
@@ -47,7 +53,23 @@ const QuickAddWidget = ({ selectedYear, selectedMonth, onSuccess, onError }) => 
 
   return (
     <div className="quick-add-widget">
-      <h3 className="quick-add-title">Quick Add</h3>
+      <div className="quick-add-header">
+        <h3 className="quick-add-title">Quick Add</h3>
+        <div className="quick-add-member-select">
+          <span className="member-label">For:</span>
+          <select
+            value={selectedMember || ''}
+            onChange={(e) => setSelectedMember(Number(e.target.value))}
+            className="member-dropdown"
+          >
+            {familyMembers.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
       <div className="quick-add-presets">
         {QUICK_ADD_PRESETS.map((preset) => (
           <button
