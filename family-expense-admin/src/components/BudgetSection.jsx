@@ -3,10 +3,50 @@ import { useExpenses } from '../context/ExpenseContext';
 import { useBudget } from '../hooks/useBudget';
 import { useCategoryBudget } from '../hooks/useCategoryBudget';
 import { useMemberBudget } from '../hooks/useMemberBudget';
+import useLongPress from '../hooks/useLongPress';
 import { getThemeColors } from '../utils/themeColors';
 import './BudgetSection.css';
 
-const BudgetSection = ({ selectedYear, selectedMonth, onSuccess, onError }) => {
+// Wrapper component for member budget item with long press
+const MemberBudgetItem = ({ member, memberSpent, memberLimit, memberPercent, getStatusColor, onLongPress }) => {
+  const { handlers, isPressed } = useLongPress(
+    onLongPress,
+    null,
+    { delay: 500, movementThreshold: 10 }
+  );
+
+  return (
+    <div
+      className={`member-budget-item ${isPressed ? 'pressed' : ''}`}
+      {...handlers}
+    >
+      <div className="member-budget-header">
+        <span className="member-name">{member.name}</span>
+        <span className="member-amount">
+          ${memberSpent.toLocaleString()}
+          {memberLimit > 0 && (
+            <span className="member-limit"> / ${memberLimit.toLocaleString()}</span>
+          )}
+        </span>
+      </div>
+      {memberLimit > 0 ? (
+        <div className="member-progress-bar">
+          <div
+            className="member-progress-fill"
+            style={{
+              width: `${Math.min(memberPercent, 100)}%`,
+              backgroundColor: getStatusColor(memberPercent)
+            }}
+          />
+        </div>
+      ) : (
+        <span className="no-budget-label">No budget set</span>
+      )}
+    </div>
+  );
+};
+
+const BudgetSection = ({ selectedYear, selectedMonth, onSuccess, onError, onOpenMemberBudgets }) => {
   const { expenses, getExpensesByMonth, familyMembers, getMonthlyTotal } = useExpenses();
   const { budget, loading: budgetLoading, saveBudget } = useBudget(selectedYear, selectedMonth);
   const { categoryBudgets, loading: categoryLoading } = useCategoryBudget(selectedYear, selectedMonth);
@@ -248,30 +288,15 @@ const BudgetSection = ({ selectedYear, selectedMonth, onSuccess, onError }) => {
                 const memberPercent = memberLimit > 0 ? (memberSpent / memberLimit) * 100 : 0;
 
                 return (
-                  <div key={member.id} className="member-budget-item">
-                    <div className="member-budget-header">
-                      <span className="member-name">{member.name}</span>
-                      <span className="member-amount">
-                        ${memberSpent.toLocaleString()}
-                        {memberLimit > 0 && (
-                          <span className="member-limit"> / ${memberLimit.toLocaleString()}</span>
-                        )}
-                      </span>
-                    </div>
-                    {memberLimit > 0 ? (
-                      <div className="member-progress-bar">
-                        <div
-                          className="member-progress-fill"
-                          style={{
-                            width: `${Math.min(memberPercent, 100)}%`,
-                            backgroundColor: getStatusColor(memberPercent)
-                          }}
-                        />
-                      </div>
-                    ) : (
-                      <span className="no-budget-label">No budget set</span>
-                    )}
-                  </div>
+                  <MemberBudgetItem
+                    key={member.id}
+                    member={member}
+                    memberSpent={memberSpent}
+                    memberLimit={memberLimit}
+                    memberPercent={memberPercent}
+                    getStatusColor={getStatusColor}
+                    onLongPress={onOpenMemberBudgets}
+                  />
                 );
               })}
             </div>

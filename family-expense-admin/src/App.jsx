@@ -504,8 +504,9 @@ const AppContent = () => {
             <BudgetSection
               selectedYear={selectedYear}
               selectedMonth={selectedMonth}
-              onSetBudget={() => setShowBudgetSettings(true)}
-              onCategoryBudgets={() => setShowCategoryBudgets(true)}
+              onSuccess={(message) => success(message)}
+              onError={(message) => showError(message)}
+              onOpenMemberBudgets={() => setShowMemberBudgets(true)}
             />
           )}
           {activeTab === 'recurring' && (
@@ -618,6 +619,7 @@ const AppContent = () => {
         onCopyRecurring={handleCopyRecurring}
         onSetBudget={() => setShowBudgetSettings(true)}
         onCategoryBudgets={() => setShowCategoryBudgets(true)}
+        onMemberBudgets={() => setShowMemberBudgets(true)}
         onManageFamily={() => setShowFamilyModal(true)}
         onBudgetReport={() => setShowVarianceReport(true)}
         onExport={handleExport}

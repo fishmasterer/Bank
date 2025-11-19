@@ -942,6 +942,7 @@
 @media (max-width: 768px) {
   .app {
     padding: 0.5rem;
+    padding-top: calc(0.5rem + env(safe-area-inset-top));
   }
 
   .app-header {
@@ -963,8 +964,8 @@
 
   .controls {
     position: sticky;
-    top: 0;
-    padding-top: calc(0.875rem + env(safe-area-inset-top));
+    top: env(safe-area-inset-top);
+    padding-top: 0.875rem;
     z-index: 90;
     flex-direction: column;
     gap: 1rem;

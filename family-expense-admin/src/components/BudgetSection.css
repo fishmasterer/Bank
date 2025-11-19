@@ -251,6 +251,16 @@
   padding: 1rem;
   background: var(--bg-secondary);
   border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.member-budget-item:active,
+.member-budget-item.pressed {
+  transform: scale(0.98);
+  background: var(--bg-hover);
 }
 
 .member-budget-header {
