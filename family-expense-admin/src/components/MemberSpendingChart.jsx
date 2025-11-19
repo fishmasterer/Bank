@@ -5,7 +5,7 @@ import { useExpenses } from '../context/ExpenseContext';
 import { useTheme } from '../contexts/ThemeContext';
 import ChartDrillDown from './ChartDrillDown';
 import { SkeletonChart } from './SkeletonLoader';
-import { getThemeColors, hexToRgba } from '../utils/themeColors';
+import { getThemeColors, hexToRgba, COLOR_PALETTE } from '../utils/themeColors';
 import './MemberSpendingChart.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -15,15 +15,12 @@ const MemberSpendingChart = ({ selectedYear, selectedMonth, loading = false }) =
   const { colorTheme } = useTheme();
   const [drillDown, setDrillDown] = useState({ isOpen: false, member: null, expenses: [] });
 
-  // Default colors for members without assigned color
-  const defaultColors = ['#667eea', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899', '#06b6d4'];
-
   const memberSpendingData = useMemo(() => {
     const memberSpending = familyMembers.map(member => ({
       id: member.id,
       name: member.name,
       amount: getMonthlyTotal(selectedYear, selectedMonth, member.id),
-      color: member.color || defaultColors[(member.id - 1) % defaultColors.length]
+      color: member.color || COLOR_PALETTE[(member.id - 1) % COLOR_PALETTE.length]
     })).filter(m => m.amount > 0);
 
     return memberSpending;

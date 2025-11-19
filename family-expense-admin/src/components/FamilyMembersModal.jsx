@@ -1,18 +1,7 @@
 import React, { useState } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
+import { COLOR_PALETTE } from '../utils/themeColors';
 import './FamilyMembersModal.css';
-
-// Default color palette for members
-const defaultMemberColors = [
-  '#667eea', // Purple
-  '#10b981', // Green
-  '#f59e0b', // Amber
-  '#ef4444', // Red
-  '#3b82f6', // Blue
-  '#8b5cf6', // Violet
-  '#ec4899', // Pink
-  '#06b6d4', // Cyan
-];
 
 const FamilyMembersModal = ({ onClose, onSuccess, onError }) => {
   const { familyMembers, addFamilyMember, updateFamilyMember, expenses } = useExpenses();
@@ -24,7 +13,7 @@ const FamilyMembersModal = ({ onClose, onSuccess, onError }) => {
   const handleEdit = (member) => {
     setEditingId(member.id);
     setEditingName(member.name);
-    setEditingColor(member.color || defaultMemberColors[(member.id - 1) % defaultMemberColors.length]);
+    setEditingColor(member.color || COLOR_PALETTE[(member.id - 1) % COLOR_PALETTE.length]);
   };
 
   const handleSave = async (memberId) => {
@@ -107,7 +96,7 @@ const FamilyMembersModal = ({ onClose, onSuccess, onError }) => {
                     <div className="color-picker-section">
                       <label className="color-label">Member Color</label>
                       <div className="color-options">
-                        {defaultMemberColors.map((color) => (
+                        {COLOR_PALETTE.map((color) => (
                           <button
                             key={color}
                             type="button"
@@ -150,7 +139,7 @@ const FamilyMembersModal = ({ onClose, onSuccess, onError }) => {
                     <div className="member-info">
                       <span
                         className="member-color-indicator"
-                        style={{ backgroundColor: member.color || defaultMemberColors[(member.id - 1) % defaultMemberColors.length] }}
+                        style={{ backgroundColor: member.color || COLOR_PALETTE[(member.id - 1) % COLOR_PALETTE.length] }}
                       />
                       <div className="member-details">
                         <span className="member-name">{member.name}</span>
