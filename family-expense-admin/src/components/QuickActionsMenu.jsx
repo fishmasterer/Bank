@@ -5,8 +5,6 @@ const QuickActionsMenu = ({
   isOpen,
   onClose,
   position,
-  onEdit,
-  onDelete,
   onDuplicate,
   expense,
   readOnly = false
@@ -62,16 +60,17 @@ const QuickActionsMenu = ({
     };
 
     // Longer delay to ensure touch events have fully completed
+    // Use touchstart instead of touchend to avoid closing on the original long-press release
     const timeout = setTimeout(() => {
       document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('touchend', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
       document.addEventListener('keydown', handleEscape);
     }, 300);
 
     return () => {
       clearTimeout(timeout);
       document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchend', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, onClose]);
@@ -126,33 +125,13 @@ const QuickActionsMenu = ({
         <div className="quick-actions-divider" />
 
         {!readOnly && (
-          <>
-            <button
-              className="quick-action-item"
-              onClick={() => handleAction(onEdit)}
-            >
-              <span className="quick-action-icon">✏️</span>
-              <span>Edit</span>
-            </button>
-
-            <button
-              className="quick-action-item"
-              onClick={() => handleAction(onDuplicate)}
-            >
-              <span className="quick-action-icon">📋</span>
-              <span>Duplicate</span>
-            </button>
-
-            <div className="quick-actions-divider" />
-
-            <button
-              className="quick-action-item quick-action-danger"
-              onClick={() => handleAction(onDelete)}
-            >
-              <span className="quick-action-icon">🗑️</span>
-              <span>Delete</span>
-            </button>
-          </>
+          <button
+            className="quick-action-item"
+            onClick={() => handleAction(onDuplicate)}
+          >
+            <span className="quick-action-icon">📋</span>
+            <span>Duplicate</span>
+          </button>
         )}
 
         {readOnly && (
