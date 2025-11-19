@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
 import { useNotifications } from '../context/NotificationContext';
 import { db, storage } from '../config/firebase';
@@ -8,6 +8,9 @@ import ExpenseTemplates from './ExpenseTemplates';
 import ImageUpload from './ImageUpload';
 import { useCategories } from '../hooks/useCategories';
 import './ExpenseForm.css';
+
+// Lazy load ReceiptScanner to avoid loading Tesseract.js (~2MB) until needed
+const ReceiptScanner = lazy(() => import('./ReceiptScanner'));
 
 const ExpenseForm = ({
   editingExpense,
@@ -23,6 +26,7 @@ const ExpenseForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -159,6 +163,49 @@ const ExpenseForm = ({
     }));
   };
 
+  // Handle extracted data from receipt scanner
+  const handleReceiptExtract = async (extracted) => {
+    // Update form with extracted data
+    setFormData(prev => ({
+      ...prev,
+      name: extracted.name || prev.name,
+      plannedAmount: extracted.amount || prev.plannedAmount,
+      paidAmount: extracted.amount || prev.paidAmount,
+      category: (extracted.category && categories.includes(extracted.category))
+        ? extracted.category
+        : prev.category,
+      // If date was extracted, update year/month
+      ...(extracted.date && {
+        year: extracted.date.getFullYear(),
+        month: extracted.date.getMonth() + 1
+      })
+    }));
+
+    // If receipt image is included (for $1000+ expenses), add as pending attachment
+    if (extracted.receiptImage && extracted.receiptImage.blob) {
+      const receiptFile = new File(
+        [extracted.receiptImage.blob],
+        `receipt-${Date.now()}.jpg`,
+        { type: 'image/jpeg' }
+      );
+
+      // Create a temporary attachment entry
+      // The ImageUpload component will handle the actual upload
+      const tempAttachment = {
+        file: receiptFile,
+        name: receiptFile.name,
+        type: receiptFile.type,
+        url: extracted.receiptImage.preview,
+        pending: true // Mark as pending upload
+      };
+
+      setFormData(prev => ({
+        ...prev,
+        attachments: [...(prev.attachments || []), tempAttachment]
+      }));
+    }
+  };
+
   return (
     <div className={`modal-overlay ${transitionClass}`} onClick={onClose}>
       <div
@@ -179,6 +226,13 @@ const ExpenseForm = ({
               className="btn-template"
             >
               📝 Load Template
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowScanner(true)}
+              className="btn-scan"
+            >
+              📸 Scan Receipt
             </button>
           </div>
         )}
@@ -369,6 +423,22 @@ const ExpenseForm = ({
           onSuccess={onSuccess}
           onError={onError}
         />
+      )}
+
+      {showScanner && (
+        <Suspense fallback={
+          <div className="modal-overlay">
+            <div className="scanner-loading">
+              <div className="loading-spinner"></div>
+              <p>Loading scanner...</p>
+            </div>
+          </div>
+        }>
+          <ReceiptScanner
+            onExtract={handleReceiptExtract}
+            onClose={() => setShowScanner(false)}
+          />
+        </Suspense>
       )}
     </div>
   );

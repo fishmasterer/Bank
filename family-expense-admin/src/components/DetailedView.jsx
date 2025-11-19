@@ -141,12 +141,25 @@ const ExpenseItem = ({
             Delete
           </button>
           <button
+            onTouchStart={(e) => {
+              // Prevent parent long press handler from activating
+              e.stopPropagation();
+            }}
+            onTouchEnd={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              const button = e.currentTarget;
+              const rect = button.getBoundingClientRect();
+              onLongPress(expense, rect.left, rect.top + rect.height / 2);
+            }}
             onClick={(e) => {
               e.stopPropagation();
-              const element = document.getElementById(`expense-${expense.id}`);
-              if (element) {
-                const rect = element.getBoundingClientRect();
-                onLongPress(expense, rect.right - 20, rect.top + rect.height / 2);
+              e.preventDefault();
+              // Only handle if not already handled by touch
+              if (e.detail !== 0) {
+                const button = e.currentTarget;
+                const rect = button.getBoundingClientRect();
+                onLongPress(expense, rect.left, rect.top + rect.height / 2);
               }
             }}
             className="btn-more btn-press"

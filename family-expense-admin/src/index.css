@@ -136,10 +136,42 @@
   --color-primary-60: #C2410C;
   --color-primary-hover: #9A3412;
   --color-primary-light: #EA580C;
+
+  /* Light mode backgrounds */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #FAFAF9;
+  --bg-tertiary: #F5F5F4;
+  --bg-hover: #E7E5E4;
+
+  /* Light mode text */
+  --text-primary: #1C1917;
+  --text-secondary: #57534E;
+  --text-tertiary: #78716C;
+  --text-disabled: #A8A29E;
+
+  /* Light mode borders */
+  --border-color: #E7E5E4;
+  --border-light: #F5F5F4;
 }
 
 :root[data-color-theme="orange"][data-theme="dark"] {
   --color-primary-light: #FB923C;
+
+  /* Dark mode backgrounds */
+  --bg-primary: #1C1917;
+  --bg-secondary: #292524;
+  --bg-tertiary: #44403C;
+  --bg-hover: #57534E;
+
+  /* Dark mode text */
+  --text-primary: #FAFAF9;
+  --text-secondary: #D6D3D1;
+  --text-tertiary: #A8A29E;
+  --text-disabled: #78716C;
+
+  /* Dark mode borders */
+  --border-color: #44403C;
+  --border-light: #57534E;
 }
 
 /* THEME 2: Soft Nature (Animal Crossing Inspired) */
@@ -152,6 +184,22 @@
   /* Secondary: Warm earth tones */
   --color-secondary-30: #8B7D6B;
   --color-secondary-light: #A89F91;
+
+  /* Light mode backgrounds */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #FAFAF9;
+  --bg-tertiary: #F5F5F4;
+  --bg-hover: #E7E5E4;
+
+  /* Light mode text */
+  --text-primary: #1C1917;
+  --text-secondary: #57534E;
+  --text-tertiary: #78716C;
+  --text-disabled: #A8A29E;
+
+  /* Light mode borders */
+  --border-color: #E7E5E4;
+  --border-light: #F5F5F4;
 }
 
 :root[data-color-theme="nature"][data-theme="dark"] {
@@ -159,6 +207,22 @@
   --color-primary-60: #7FB093;     /* Brighter sage green */
   --color-primary-hover: #6B9B7B;   /* Medium sage for hover */
   --color-primary-light: #A3C9B1;   /* Light pastel green */
+
+  /* Dark mode backgrounds */
+  --bg-primary: #1C1917;
+  --bg-secondary: #292524;
+  --bg-tertiary: #44403C;
+  --bg-hover: #57534E;
+
+  /* Dark mode text */
+  --text-primary: #FAFAF9;
+  --text-secondary: #D6D3D1;
+  --text-tertiary: #A8A29E;
+  --text-disabled: #78716C;
+
+  /* Dark mode borders */
+  --border-color: #44403C;
+  --border-light: #57534E;
 }
 
 /* THEME 3: Calm Blue */
@@ -171,6 +235,22 @@
   /* Secondary: Cool grays */
   --color-secondary-30: #6B7B8C;
   --color-secondary-light: #8E9AAA;
+
+  /* Light mode backgrounds */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #FAFAF9;
+  --bg-tertiary: #F5F5F4;
+  --bg-hover: #E7E5E4;
+
+  /* Light mode text */
+  --text-primary: #1C1917;
+  --text-secondary: #57534E;
+  --text-tertiary: #78716C;
+  --text-disabled: #A8A29E;
+
+  /* Light mode borders */
+  --border-color: #E7E5E4;
+  --border-light: #F5F5F4;
 }
 
 :root[data-color-theme="blue"][data-theme="dark"] {
@@ -178,6 +258,22 @@
   --color-primary-60: #6B9FD4;     /* Soft sky blue */
   --color-primary-hover: #5A8BC2;   /* Medium blue for hover */
   --color-primary-light: #8AB8E3;   /* Light pastel blue */
+
+  /* Dark mode backgrounds */
+  --bg-primary: #1C1917;
+  --bg-secondary: #292524;
+  --bg-tertiary: #44403C;
+  --bg-hover: #57534E;
+
+  /* Dark mode text */
+  --text-primary: #FAFAF9;
+  --text-secondary: #D6D3D1;
+  --text-tertiary: #A8A29E;
+  --text-disabled: #78716C;
+
+  /* Dark mode borders */
+  --border-color: #44403C;
+  --border-light: #57534E;
 }
 
 /* THEME 4: Obsidian (Always Dark, Sleek & Modern) */
