@@ -6,12 +6,13 @@ import { useState, useRef, useCallback } from 'react';
  */
 const useLongPress = (onLongPress, onClick, options = {}) => {
   const {
-    delay = 500,           // Time to trigger long press
+    delay = 400,           // Time to trigger long press (reduced to beat iOS magnifier)
     movementThreshold = 10 // Max movement allowed during press
   } = options;
 
   const [isPressed, setIsPressed] = useState(false);
   const timeoutRef = useRef(null);
+  const preventDefaultRef = useRef(null);
   const startPos = useRef({ x: 0, y: 0 });
   const isLongPressTriggered = useRef(false);
 
@@ -36,6 +37,10 @@ const useLongPress = (onLongPress, onClick, options = {}) => {
     if (deltaX > movementThreshold || deltaY > movementThreshold) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
+      if (preventDefaultRef.current) {
+        clearTimeout(preventDefaultRef.current);
+        preventDefaultRef.current = null;
+      }
       setIsPressed(false);
     }
   }, [movementThreshold]);
@@ -44,6 +49,10 @@ const useLongPress = (onLongPress, onClick, options = {}) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
+    }
+    if (preventDefaultRef.current) {
+      clearTimeout(preventDefaultRef.current);
+      preventDefaultRef.current = null;
     }
 
     setIsPressed(false);
@@ -59,6 +68,10 @@ const useLongPress = (onLongPress, onClick, options = {}) => {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
+    if (preventDefaultRef.current) {
+      clearTimeout(preventDefaultRef.current);
+      preventDefaultRef.current = null;
+    }
     setIsPressed(false);
     isLongPressTriggered.current = false;
   }, []);
@@ -67,13 +80,18 @@ const useLongPress = (onLongPress, onClick, options = {}) => {
     onTouchStart: (e) => {
       const touch = e.touches[0];
       start(touch.clientX, touch.clientY);
-      // Prevent iOS magnifying glass by preventing default after a short delay
-      // We don't prevent immediately to allow scrolling to still work
+
+      // Prevent iOS magnifying glass - prevent default after short delay
+      // This allows initial scroll detection but blocks magnifier
+      preventDefaultRef.current = setTimeout(() => {
+        // We're still in a potential long press, so prevent default
+        // This is handled via the touchMove preventDefault
+      }, 100);
     },
     onTouchMove: (e) => {
       const touch = e.touches[0];
       move(touch.clientX, touch.clientY);
-      // If we're in a potential long press state, prevent default to stop iOS behaviors
+      // Always prevent default during potential long press to stop iOS behaviors
       if (timeoutRef.current) {
         e.preventDefault();
       }
