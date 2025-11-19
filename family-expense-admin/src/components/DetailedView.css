@@ -552,6 +552,33 @@
   color: white;
 }
 
+.btn-more {
+  padding: 0.5rem;
+  font-size: 1.25rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 700;
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  line-height: 1;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-more:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--primary-color);
+}
+
+.btn-more:active {
+  transform: scale(0.95);
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
   .detailed-view h2 {
@@ -652,12 +679,13 @@
 
   .expense-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr auto;
     gap: 0.5rem;
   }
 
   .btn-edit,
-  .btn-delete {
+  .btn-delete,
+  .btn-more {
     min-height: 44px;
     justify-content: center;
   }

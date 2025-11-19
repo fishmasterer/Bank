@@ -140,6 +140,21 @@ const ExpenseItem = ({
           >
             Delete
           </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const element = document.getElementById(`expense-${expense.id}`);
+              if (element) {
+                const rect = element.getBoundingClientRect();
+                onLongPress(expense, rect.right - 20, rect.top + rect.height / 2);
+              }
+            }}
+            className="btn-more btn-press"
+            aria-label={`More actions for ${expense.name}`}
+            title="More actions (Duplicate, etc.)"
+          >
+            ⋮
+          </button>
         </div>
       )}
     </div>
