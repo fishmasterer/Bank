@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useExpenses } from '../context/ExpenseContext';
 import './QuickAddWidget.css';
 
@@ -126,8 +127,8 @@ const QuickAddWidget = ({ selectedYear, selectedMonth, onSuccess, onError }) => 
         <span className="trigger-text">Quick Add</span>
       </button>
 
-      {/* Modal */}
-      {isOpen && (
+      {/* Modal - rendered via portal to avoid transform issues */}
+      {isOpen && createPortal(
         <>
           <div
             className="quick-add-backdrop"
@@ -215,7 +216,8 @@ const QuickAddWidget = ({ selectedYear, selectedMonth, onSuccess, onError }) => 
               </div>
             )}
           </div>
-        </>
+        </>,
+        document.body
       )}
     </>
   );
