@@ -43,13 +43,20 @@ const BudgetSection = ({ selectedYear, selectedMonth, onSuccess, onError }) => {
       setEditingBudget(false);
       onSuccess('Budget saved successfully');
     } catch (err) {
-      onError('Failed to save budget');
+      // Provide more specific error message
+      if (err.code === 'permission-denied') {
+        onError('Permission denied. Please check Firestore rules for budgets collection.');
+      } else if (err.code === 'unauthenticated') {
+        onError('Please sign in to save budget.');
+      } else {
+        onError(`Failed to save budget: ${err.message || 'Unknown error'}`);
+      }
     }
   };
 
   const getStatusColor = (percent) => {
     if (percent >= 100) return '#ef4444';
-    if (percent >= 80) return '#f59e0b';
+    if (percent >= 80) return '#eab308'; // Yellow for warning
     return '#10b981';
   };
 

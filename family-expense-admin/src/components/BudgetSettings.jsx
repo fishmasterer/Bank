@@ -47,7 +47,14 @@ const BudgetSettings = ({ selectedYear, selectedMonth, onClose, onSuccess, onErr
       onClose();
     } catch (err) {
       console.error('Error saving budget:', err);
-      onError?.('Failed to save budget limit');
+      // Provide more specific error message
+      if (err.code === 'permission-denied') {
+        onError?.('Permission denied. Please check Firestore rules for budgets collection.');
+      } else if (err.code === 'unauthenticated') {
+        onError?.('Please sign in to save budget.');
+      } else {
+        onError?.(`Failed to save budget: ${err.message || 'Unknown error'}`);
+      }
     } finally {
       setIsSubmitting(false);
     }
