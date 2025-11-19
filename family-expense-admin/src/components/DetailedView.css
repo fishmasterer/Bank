@@ -310,8 +310,17 @@
   /* Prevent iOS native long press behaviors */
   -webkit-touch-callout: none;
   -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
   user-select: none;
-  touch-action: manipulation;
+  touch-action: pan-y;
+}
+
+/* Prevent text selection on all children to block iOS magnifier */
+.expense-item,
+.expense-item * {
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
 }
 
 /* Card hover effect */
