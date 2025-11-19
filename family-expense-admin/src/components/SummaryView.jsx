@@ -1,7 +1,8 @@
-import React, { lazy, Suspense, memo } from 'react';
+import React, { lazy, Suspense, memo, useMemo } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
 import { useBudget } from '../hooks/useBudget';
 import { useToast } from '../hooks/useToast';
+import { useCurrency } from '../contexts/CurrencyContext';
 import { SkeletonSummaryView, SkeletonChart } from './SkeletonLoader';
 import { COLOR_PALETTE } from '../utils/themeColors';
 import QuickAddWidget from './QuickAddWidget';
@@ -21,9 +22,42 @@ const ChartSuspense = ({ children, height = '350px' }) => (
 );
 
 const SummaryView = ({ selectedYear, selectedMonth }) => {
-  const { familyMembers, getMonthlyTotal, getMonthlyPlanned, loading } = useExpenses();
+  const { familyMembers, getMonthlyTotal, getMonthlyPlanned, getExpensesByMonth, loading } = useExpenses();
   const { budget, getBudgetStatus } = useBudget(selectedYear, selectedMonth);
   const { success, error: showError } = useToast();
+  const { currencies, convertToSGD, formatAmount } = useCurrency();
+
+  // Calculate currency breakdown
+  const currencyBreakdown = useMemo(() => {
+    const monthExpenses = getExpensesByMonth(selectedYear, selectedMonth);
+
+    const breakdown = {
+      SGD: { paid: 0, planned: 0 },
+      AUD: { paid: 0, planned: 0 }
+    };
+
+    monthExpenses.forEach(exp => {
+      const currency = exp.currency || 'SGD';
+      if (breakdown[currency]) {
+        breakdown[currency].paid += exp.paidAmount || 0;
+        breakdown[currency].planned += exp.plannedAmount || 0;
+      } else {
+        // Default to SGD for unknown currencies
+        breakdown.SGD.paid += exp.paidAmount || 0;
+        breakdown.SGD.planned += exp.plannedAmount || 0;
+      }
+    });
+
+    // Calculate AUD in SGD equivalent
+    const audInSgd = convertToSGD(breakdown.AUD.paid, 'AUD');
+    const totalInSgd = breakdown.SGD.paid + audInSgd;
+
+    return {
+      ...breakdown,
+      audInSgd,
+      totalInSgd
+    };
+  }, [selectedYear, selectedMonth, getExpensesByMonth, convertToSGD]);
 
   // Show skeleton while loading
   if (loading) {
@@ -34,6 +68,9 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
   const totalPaid = getMonthlyTotal(selectedYear, selectedMonth);
 
   const budgetStatus = getBudgetStatus(totalPaid);
+
+  // Check if we have multi-currency expenses
+  const hasMultiCurrency = currencyBreakdown.AUD.paid > 0 || currencyBreakdown.SGD.paid > 0;
 
   return (
     <div className="summary-view">
@@ -109,6 +146,36 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
 
       <div className="summary-card total-card animate-fade-in-up hover-lift">
         <h2>Total for {new Date(selectedYear, selectedMonth - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</h2>
+
+        {/* Currency Breakdown */}
+        {hasMultiCurrency && (currencyBreakdown.SGD.paid > 0 || currencyBreakdown.AUD.paid > 0) && (
+          <div className="currency-breakdown">
+            {currencyBreakdown.SGD.paid > 0 && (
+              <div className="currency-item">
+                <span className="currency-flag">{currencies.SGD?.flag || '🇸🇬'}</span>
+                <span className="currency-label">SGD</span>
+                <span className="currency-amount">S${currencyBreakdown.SGD.paid.toFixed(2)}</span>
+              </div>
+            )}
+            {currencyBreakdown.AUD.paid > 0 && (
+              <div className="currency-item">
+                <span className="currency-flag">{currencies.AUD?.flag || '🇦🇺'}</span>
+                <span className="currency-label">AUD</span>
+                <span className="currency-amount">
+                  A${currencyBreakdown.AUD.paid.toFixed(2)}
+                  <span className="currency-equiv">≈ S${currencyBreakdown.audInSgd.toFixed(2)}</span>
+                </span>
+              </div>
+            )}
+            {currencyBreakdown.AUD.paid > 0 && currencyBreakdown.SGD.paid > 0 && (
+              <div className="currency-total">
+                <span className="currency-total-label">Combined Total</span>
+                <span className="currency-total-amount">S${currencyBreakdown.totalInSgd.toFixed(2)}</span>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="amount-row">
           <div className="amount-item">
             <span className="label">Planned:</span>

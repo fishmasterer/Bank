@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useExpenses } from '../context/ExpenseContext';
+import { useCurrency } from '../contexts/CurrencyContext';
 import './SummaryView.css';
 
 const SummaryView = ({ selectedYear, selectedMonth }) => {
-  const { familyMembers, getMonthlyTotal, getMonthlyPlanned } = useExpenses();
+  const { familyMembers, getMonthlyTotal, getMonthlyPlanned, getExpensesByMonth } = useExpenses();
+  const { currencies, convertToSGD } = useCurrency();
 
   // Initialize selected members from localStorage or default to all selected
   const [selectedMembers, setSelectedMembers] = useState(() => {
@@ -48,6 +50,42 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
     return sum + getMonthlyTotal(selectedYear, selectedMonth, memberId);
   }, 0);
 
+  // Calculate currency breakdown for selected members
+  const currencyBreakdown = useMemo(() => {
+    const monthExpenses = getExpensesByMonth(selectedYear, selectedMonth);
+
+    // Filter to only selected members
+    const filteredExpenses = monthExpenses.filter(exp =>
+      selectedMembers.includes(exp.paidBy)
+    );
+
+    const breakdown = {
+      SGD: { paid: 0 },
+      AUD: { paid: 0 }
+    };
+
+    filteredExpenses.forEach(exp => {
+      const currency = exp.currency || 'SGD';
+      if (breakdown[currency]) {
+        breakdown[currency].paid += exp.paidAmount || 0;
+      } else {
+        breakdown.SGD.paid += exp.paidAmount || 0;
+      }
+    });
+
+    // Calculate AUD in SGD equivalent
+    const audInSgd = convertToSGD ? convertToSGD(breakdown.AUD.paid, 'AUD') : breakdown.AUD.paid * 1.12;
+    const totalInSgd = breakdown.SGD.paid + audInSgd;
+
+    return {
+      ...breakdown,
+      audInSgd,
+      totalInSgd
+    };
+  }, [selectedYear, selectedMonth, selectedMembers, getExpensesByMonth, convertToSGD]);
+
+  const hasMultiCurrency = currencyBreakdown.AUD.paid > 0;
+
   const copyToClipboard = useCallback(() => {
     const amount = netTotal.toFixed(2);
     navigator.clipboard.writeText(amount).then(() => {
@@ -74,6 +112,34 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
             {new Date(selectedYear, selectedMonth - 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
           </span>
         </div>
+
+        {/* Currency Breakdown - only show when there are AUD expenses */}
+        {hasMultiCurrency && (
+          <div className="currency-breakdown">
+            {currencyBreakdown.SGD.paid > 0 && (
+              <div className="currency-item">
+                <span className="currency-flag">{currencies?.SGD?.flag || '🇸🇬'}</span>
+                <span className="currency-label">SGD</span>
+                <span className="currency-amount">S${currencyBreakdown.SGD.paid.toFixed(2)}</span>
+              </div>
+            )}
+            <div className="currency-item highlight">
+              <span className="currency-flag">{currencies?.AUD?.flag || '🇦🇺'}</span>
+              <span className="currency-label">AUD</span>
+              <span className="currency-amount">
+                A${currencyBreakdown.AUD.paid.toFixed(2)}
+                <span className="currency-equiv">≈ S${currencyBreakdown.audInSgd.toFixed(2)}</span>
+              </span>
+            </div>
+            {currencyBreakdown.SGD.paid > 0 && (
+              <div className="currency-total">
+                <span className="currency-total-label">Combined</span>
+                <span className="currency-total-amount">S${currencyBreakdown.totalInSgd.toFixed(2)}</span>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="net-total-amount">
           <span className="amount">${netTotal.toFixed(2)}</span>
           <button onClick={copyToClipboard} className="copy-amount-btn" title="Copy amount to clipboard">

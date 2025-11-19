@@ -3,6 +3,7 @@ import { ExpenseProvider, useExpenses } from './context/ExpenseContext';
 import { NotificationProvider } from './context/NotificationContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { CurrencyProvider } from './contexts/CurrencyContext';
 import { useAuthorization } from './hooks/useAuthorization';
 import { useToast } from './hooks/useToast';
 import useSwipeGesture from './hooks/useSwipeGesture';
@@ -666,11 +667,13 @@ function App({ readOnly = false }) {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <ExpenseProvider readOnly={readOnly}>
-          <NotificationProvider>
-            <AppContent />
-          </NotificationProvider>
-        </ExpenseProvider>
+        <CurrencyProvider>
+          <ExpenseProvider readOnly={readOnly}>
+            <NotificationProvider>
+              <AppContent />
+            </NotificationProvider>
+          </ExpenseProvider>
+        </CurrencyProvider>
       </ThemeProvider>
     </AuthProvider>
   );
