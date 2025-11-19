@@ -62,21 +62,25 @@ export const getThemeColors = () => {
 };
 
 /**
- * Get chart color palette using theme colors
- * @returns {Array} Array of colors for charts
+ * Consistent color palette used throughout the app
+ * Used for charts, member profiles, and other visual elements
+ */
+export const COLOR_PALETTE = [
+  '#667eea', // Purple
+  '#10b981', // Green
+  '#f59e0b', // Amber
+  '#ef4444', // Red
+  '#3b82f6', // Blue
+  '#8b5cf6', // Violet
+  '#ec4899', // Pink
+  '#06b6d4', // Cyan
+];
+
+/**
+ * Get chart color palette - consistent colors for all charts
+ * Uses the same palette as member profile presets for visual consistency
+ * @returns {Array} Array of 8 colors for charts
  */
 export const getChartColorPalette = () => {
-  const colors = getThemeColors();
-  return [
-    colors.primary,
-    colors.success,
-    colors.warning,
-    colors.danger,
-    colors.secondary,
-    hexToRgba(colors.primary, 0.7),
-    hexToRgba(colors.success, 0.7),
-    hexToRgba(colors.warning, 0.7),
-    hexToRgba(colors.danger, 0.7),
-    hexToRgba(colors.secondary, 0.7),
-  ];
+  return COLOR_PALETTE;
 };

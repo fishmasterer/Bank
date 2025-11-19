@@ -3,6 +3,7 @@ import { useExpenses } from '../context/ExpenseContext';
 import { useBudget } from '../hooks/useBudget';
 import { useToast } from '../hooks/useToast';
 import { SkeletonSummaryView, SkeletonChart } from './SkeletonLoader';
+import { COLOR_PALETTE } from '../utils/themeColors';
 import QuickAddWidget from './QuickAddWidget';
 import './SummaryView.css';
 
@@ -131,9 +132,7 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
         {familyMembers.map((member, index) => {
           const planned = getMonthlyPlanned(selectedYear, selectedMonth, member.id);
           const paid = getMonthlyTotal(selectedYear, selectedMonth, member.id);
-          // Default colors for members without assigned color
-          const defaultColors = ['#667eea', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899', '#06b6d4'];
-          const memberColor = member.color || defaultColors[(member.id - 1) % defaultColors.length];
+          const memberColor = member.color || COLOR_PALETTE[(member.id - 1) % COLOR_PALETTE.length];
 
           return (
             <div

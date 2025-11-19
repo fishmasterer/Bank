@@ -20,6 +20,7 @@ import {
   deleteExpenseFromCache,
   isIndexedDBAvailable
 } from '../utils/indexedDBCache';
+import { COLOR_PALETTE } from '../utils/themeColors';
 
 const ExpenseContext = createContext();
 
@@ -360,18 +361,6 @@ export const ExpenseProvider = ({ children, readOnly = false }) => {
     });
   };
 
-  // Default color palette for new members
-  const defaultMemberColors = [
-    '#667eea', // Purple
-    '#10b981', // Green
-    '#f59e0b', // Amber
-    '#ef4444', // Red
-    '#3b82f6', // Blue
-    '#8b5cf6', // Violet
-    '#ec4899', // Pink
-    '#06b6d4', // Cyan
-  ];
-
   const addFamilyMember = async () => {
     if (readOnly) {
       console.warn('Cannot add family member in read-only mode');
@@ -384,11 +373,11 @@ export const ExpenseProvider = ({ children, readOnly = false }) => {
       try {
         const newId = Math.max(...familyMembers.map(m => m.id), 0) + 1;
         // Assign a default color based on member index
-        const colorIndex = (newId - 1) % defaultMemberColors.length;
+        const colorIndex = (newId - 1) % COLOR_PALETTE.length;
         await addDoc(collection(db, 'familyMembers'), {
           id: newId,
           name: `Family Member ${newId}`,
-          color: defaultMemberColors[colorIndex]
+          color: COLOR_PALETTE[colorIndex]
         });
       } catch (err) {
         console.error('Error adding family member:', err);

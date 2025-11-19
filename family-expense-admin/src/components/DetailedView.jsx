@@ -205,14 +205,6 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
     setQuickActionsExpense(null);
   }, []);
 
-  const handleQuickDelete = useCallback((expense) => {
-    if (window.confirm('Delete this expense?')) {
-      trackDelete(expense);
-      deleteExpense(expense.id);
-      addExpenseAction('deleted', expense.name, expense.category);
-    }
-  }, [trackDelete, deleteExpense, addExpenseAction]);
-
   const handleQuickDuplicate = useCallback((expense) => {
     // Create a duplicate expense (without ID, so it gets a new one)
     const duplicateExpense = {
@@ -221,12 +213,6 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
       id: undefined
     };
     onEditExpense(duplicateExpense);
-  }, [onEditExpense]);
-
-  // Wrapper to include source element for shared element transition
-  const handleQuickEdit = useCallback((expense) => {
-    const sourceElement = document.getElementById(`expense-${expense.id}`);
-    onEditExpense(expense, sourceElement);
   }, [onEditExpense]);
 
   // Show/hide undo toast
@@ -672,8 +658,6 @@ const DetailedView = ({ selectedYear, selectedMonth, onEditExpense, onAddExpense
         isOpen={quickActionsOpen}
         onClose={handleQuickActionsClose}
         position={quickActionsPosition}
-        onEdit={handleQuickEdit}
-        onDelete={handleQuickDelete}
         onDuplicate={handleQuickDuplicate}
         expense={quickActionsExpense}
         readOnly={readOnly}
