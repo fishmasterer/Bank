@@ -15,7 +15,7 @@ const QUICK_ADD_PRESETS = [
 
 const QuickAddWidget = ({ selectedYear, selectedMonth, onSuccess, onError }) => {
   const { addExpense, familyMembers, readOnly } = useExpenses();
-  const { currencies } = useCurrency();
+  const { currencies = {} } = useCurrency() || {};
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState(null);
   const [selectedMember, setSelectedMember] = useState(null);
@@ -170,7 +170,7 @@ const QuickAddWidget = ({ selectedYear, selectedMonth, onSuccess, onError }) => 
               <div className="quick-add-currency-row">
                 <span className="member-label">Currency:</span>
                 <div className="currency-chips">
-                  {Object.values(currencies).map((curr) => (
+                  {Object.values(currencies || {}).map((curr) => (
                     <button
                       key={curr.code}
                       className={`currency-chip ${selectedCurrency === curr.code ? 'selected' : ''}`}
