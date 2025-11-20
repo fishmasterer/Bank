@@ -25,11 +25,11 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
   const { familyMembers, getMonthlyTotal, getMonthlyPlanned, getExpensesByMonth, loading } = useExpenses();
   const { budget, getBudgetStatus } = useBudget(selectedYear, selectedMonth);
   const { success, error: showError } = useToast();
-  const { currencies, convertToSGD, formatAmount } = useCurrency();
+  const { currencies = {}, convertToSGD, formatAmount } = useCurrency() || {};
 
   // Calculate currency breakdown
   const currencyBreakdown = useMemo(() => {
-    const monthExpenses = getExpensesByMonth(selectedYear, selectedMonth);
+    const monthExpenses = getExpensesByMonth ? getExpensesByMonth(selectedYear, selectedMonth) : [];
 
     const breakdown = {
       SGD: { paid: 0, planned: 0 },
@@ -48,8 +48,10 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
       }
     });
 
-    // Calculate AUD in SGD equivalent
-    const audInSgd = convertToSGD(breakdown.AUD.paid, 'AUD');
+    // Calculate AUD in SGD equivalent (fallback rate: 1 AUD ≈ 1.12 SGD)
+    const audInSgd = convertToSGD
+      ? convertToSGD(breakdown.AUD.paid, 'AUD')
+      : breakdown.AUD.paid * 1.12;
     const totalInSgd = breakdown.SGD.paid + audInSgd;
 
     return {

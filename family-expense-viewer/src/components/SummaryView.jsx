@@ -4,8 +4,8 @@ import { useCurrency } from '../contexts/CurrencyContext';
 import './SummaryView.css';
 
 const SummaryView = ({ selectedYear, selectedMonth }) => {
-  const { familyMembers, getMonthlyTotal, getMonthlyPlanned, getExpensesByMonth } = useExpenses();
-  const { currencies, convertToSGD } = useCurrency();
+  const { familyMembers = [], getMonthlyTotal, getMonthlyPlanned, getExpensesByMonth } = useExpenses() || {};
+  const { currencies = {}, convertToSGD } = useCurrency() || {};
 
   // Initialize selected members from localStorage or default to all selected
   const [selectedMembers, setSelectedMembers] = useState(() => {
@@ -47,12 +47,12 @@ const SummaryView = ({ selectedYear, selectedMonth }) => {
 
   // Calculate net total for selected members only
   const netTotal = selectedMembers.reduce((sum, memberId) => {
-    return sum + getMonthlyTotal(selectedYear, selectedMonth, memberId);
+    return sum + (getMonthlyTotal ? getMonthlyTotal(selectedYear, selectedMonth, memberId) : 0);
   }, 0);
 
   // Calculate currency breakdown for selected members
   const currencyBreakdown = useMemo(() => {
-    const monthExpenses = getExpensesByMonth(selectedYear, selectedMonth);
+    const monthExpenses = getExpensesByMonth ? getExpensesByMonth(selectedYear, selectedMonth) : [];
 
     // Filter to only selected members
     const filteredExpenses = monthExpenses.filter(exp =>

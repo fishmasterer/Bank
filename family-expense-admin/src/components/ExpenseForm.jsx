@@ -24,7 +24,7 @@ const ExpenseForm = ({
   const { addExpense, updateExpense, familyMembers } = useExpenses();
   const { addExpenseAction } = useNotifications();
   const { categories, loading: categoriesLoading } = useCategories();
-  const { currencies } = useCurrency();
+  const { currencies = {} } = useCurrency() || {};
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -296,7 +296,7 @@ const ExpenseForm = ({
           <div className="form-group">
             <label>Currency</label>
             <div className="currency-toggle">
-              {Object.values(currencies).map(curr => (
+              {Object.values(currencies || {}).map(curr => (
                 <button
                   key={curr.code}
                   type="button"
